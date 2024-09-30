@@ -1,0 +1,25 @@
+# 服务端口
+server:
+  port: 5500
+spring:
+  profiles:
+    active: '@profileActive@'
+  application:
+    name: demo
+  datasource:
+    driver-class-name: 'com.mysql.cj.jdbc.Driver'
+    url: 'jdbc:mysql://localhost:3306/testDb?useUnicode=true&characterEncoding=utf8mb4'
+    username: root
+    password: 123456
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        web: DEBUG
+    com:
+      example:
+        myapp: INFO
+
+# 启用 DEBUG 模式
+debug: false
