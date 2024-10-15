@@ -8,7 +8,7 @@ spring:
     name: demo
   datasource:
     driver-class-name: 'com.mysql.cj.jdbc.Driver'
-    url: 'jdbc:mysql://localhost:3306/testDb?useUnicode=true&characterEncoding=utf8mb4'
+    url: 'jdbc:mysql://localhost:3306/vdb?useUnicode=true&characterEncoding=utf8mb4&useSSL=false&serverTimezone=UTC'
     username: root
     password: 123456
 logging:
@@ -20,6 +20,11 @@ logging:
     com:
       example:
         myapp: INFO
-
+mybatis:
+  configuration:
+#    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+    mapUnderscoreToCamelCase: true
+  mapper-locations: classpath*:mapper/*.xml
 # 启用 DEBUG 模式
 debug: false
+
