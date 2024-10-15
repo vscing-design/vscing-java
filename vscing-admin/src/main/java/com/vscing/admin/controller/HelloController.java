@@ -20,20 +20,20 @@ public class HelloController {
 	@RequestMapping(value = "/queryList", method = RequestMethod.GET)
 	public CommonResult<Object> queryList(Map<String, Object> params) {
 		HelloListDto item = new HelloListDto();
-		item.setId(1);
-		item.setTitle("测试");
-		item.setCreateBy("创建人");
+//		item.setId(1);
+//		item.setTitle("测试");
+//		item.setCreateBy("创建人");
 
-		String dateString = "2024-05-20T12:00:00"; // 假设时间点为12:00:00
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-		LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
+//		String dateString = "2024-05-20T12:00:00"; // 假设时间点为12:00:00
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+//		LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
 //		item.setCreateAt(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
 
-		List<HelloListDto> list = new ArrayList<>();
-		list.add(item);
+//		List<HelloListDto> list = new ArrayList<>();
+//		list.add(item);
 
 		Map<String, Object> result = new HashMap<>();
-		result.put("list", list);
+//		result.put("list", list);
 		result.put("total", 100);
 		return new CommonResult<>(200, "成功", result);
 	}
