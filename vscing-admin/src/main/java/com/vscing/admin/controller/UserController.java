@@ -20,4 +20,18 @@ public class UserController {
         List<UserVo> list = userService.getList();
         return new CommonResult<List<UserVo>>(200, "成功", list);
     }
+
+    @RequestMapping(value = "/addInfo", method = RequestMethod.POST)
+    public CommonResult<Object> addInfo(@RequestBody UserDto userInfo) {
+        return new CommonResult<Object>(200, "成功", userInfo);
+    }
+
+//    @RequestMapping(value = "/list", method = RequestMethod.GET)
+//    @ResponseBody
+//    public CommonResult<CommonPage<UserVo>> list(UserQueryParam queryParam,
+//                                                   @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
+//                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+//        List<UserVo> orderList = userService.list(queryParam, pageSize, pageNum);
+//        return CommonResult.success(CommonPage.restPage(orderList));
+//    }
 }
