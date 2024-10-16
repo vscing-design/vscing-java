@@ -31,4 +31,16 @@ public class BaseEntity implements Serializable {
 
     /** 删除者 */
     private String deletedBy;
+
+    @Override
+    public String toString() {
+        return "BaseEntity{" +
+                "createdAt='" + createdAt + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", deletedAt='" + deletedAt + '\'' +
+                ", deletedBy='" + deletedBy + '\'' +
+                '}';
+    }
 }
