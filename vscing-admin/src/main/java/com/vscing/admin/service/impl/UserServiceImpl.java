@@ -1,5 +1,6 @@
 package com.vscing.admin.service.impl;
 
+import com.vscing.admin.dto.UserDto;
 import com.vscing.admin.mapper.UserMapper;
 import com.vscing.admin.service.UserService;
 import com.vscing.admin.vo.UserVo;
@@ -17,5 +18,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVo> getList() {
         return userMapper.getList();
+    }
+
+    @Override
+    public int addInfo(UserDto userInfo) {
+        return userMapper.addInfo(userInfo);
     }
 }
