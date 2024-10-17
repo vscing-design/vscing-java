@@ -17,6 +17,11 @@
         <result column="deleted_by" property="deletedBy" />
     </resultMap>
 
+    <insert id="addInfo" parameterType="com.vscing.admin.dto.UserDto">
+        INSERT INTO vscing_user(username, password, phone)
+        values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
+    </insert>
+
     <select id="getList" resultType="com.vscing.admin.vo.UserVo">
         SELECT * FROM vscing_user;
     </select>
