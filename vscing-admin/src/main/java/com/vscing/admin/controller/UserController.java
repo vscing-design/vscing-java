@@ -22,8 +22,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/addInfo", method = RequestMethod.POST)
-    public CommonResult<Object> addInfo(@RequestBody UserDto userInfo) {
-        return new CommonResult<Object>(200, "成功", userInfo);
+    public CommonResult<Object> addInfo(@Validated @RequestBody UserDto userInfo) {
+        int result = userService.addInfo(userInfo);
+        boolean isSuccess = result != 0;
+        if (isSuccess) {
+            return new CommonResult<Object>(200, "成功", result);
+        } else {
+            return new CommonResult<Object>(500, "失败", null);
+        }
     }
 
 //    @RequestMapping(value = "/list", method = RequestMethod.GET)
