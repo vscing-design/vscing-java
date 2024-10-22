@@ -22,11 +22,30 @@
         values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
     </insert>
 
-    <select id="getList" resultType="com.vscing.admin.vo.UserVo">
+    <select id="getAllList" resultType="com.vscing.admin.vo.UserVo">
         SELECT * FROM vscing_user;
     </select>
 
-    <select id="getInfo" parameterType="com.vscing.admin.vo.UserVo" resultType="java.util.HashMap">
+    <select id="getList" resultType="com.vscing.admin.vo.UserVo">
+        SELECT * FROM vscing_user
+        <where>
+            <if test="queryParam.username != null and queryParam.username.trim() != ''">
+                AND username LIKE #{queryParam.username}
+            </if>
+            <if test="queryParam.phone != null and queryParam.username.trim() != ''">
+                AND phone = #{queryParam.phone}
+            </if>
+            <if test="queryParam.startDate != null and queryParam.startDate.trim() != ''">
+                AND created_at <![CDATA[ >= ]]> #{query.startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="queryParam.endDate != null and queryParam.endDate.trim() != ''">
+                AND created_at <![CDATA[ <= ]]> #{query.endDate, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getInfo" resultType="java.util.HashMap">
         SELECT * FROM vscing_user where id=#{id};
     </select>
 
