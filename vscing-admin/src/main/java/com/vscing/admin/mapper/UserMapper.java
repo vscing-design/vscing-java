@@ -1,6 +1,11 @@
 package com.vscing.admin.mapper;
 
+import com.vscing.admin.dto.UserDto;
+import com.vscing.admin.dto.UserListDto;
+import com.vscing.admin.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author vscing (vscing@foxmail.com)
@@ -9,5 +14,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper {
 
-  List<UserVo> getList();
+    List<UserVo> getAllList();
+
+    int addInfo(UserDto userInfo);
+
+    List<UserVo> getList(UserListDto queryParam, Integer pageSize, Integer pageNum);
 }
