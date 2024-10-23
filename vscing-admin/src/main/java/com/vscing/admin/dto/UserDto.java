@@ -7,14 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDto {
-    @NotNull(message = "Username cannot be null")
+    @NotNull(message = "用户名不能为空")
     private String username;
 
-    @NotNull(message = "Password cannot be null")
+    @NotNull(message = "手机号不能为空")
+    private String phone;
+
+    @NotNull(message = "密码不能为空")
     private String password;
 
-    @NotNull(message = "Phone cannot be null")
-    private String phone; // 没有提供数据的字段
-
 }
-
