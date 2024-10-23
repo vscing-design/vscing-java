@@ -1,7 +1,9 @@
 package com.vscing.admin.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.vscing.admin.dto.UserDto;
 import com.vscing.admin.dto.UserListDto;
+import com.vscing.admin.dto.UserSaveDto;
 import com.vscing.admin.mapper.UserMapper;
 import com.vscing.admin.service.UserService;
 import com.vscing.admin.vo.UserVo;
@@ -28,7 +30,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserVo> getList(UserListDto queryParam, Integer pageSize, Integer pageNum) {
-        pageNum = (pageNum - 1) * pageSize;
-        return userMapper.getList(queryParam, pageSize, pageNum);
+        PageHelper.startPage(pageNum, pageSize);
+        return userMapper.getList(queryParam);
+    }
+
+    @Override
+    public UserVo getInfo(long id) {
+        return userMapper.getInfo(id);
+    }
+
+    @Override
+    public int updateInfo(UserSaveDto userInfo) {
+        return userMapper.updateInfo(userInfo);
+    }
+
+    @Override
+    public int deleteInfo(long id) {
+        return userMapper.deleteInfo(id);
     }
 }
