@@ -3,6 +3,8 @@ package com.vscing.admin.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * @author vscing (vscing@foxmail.com)
  * @date 2024-10-15 23:52:31

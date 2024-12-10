@@ -2,6 +2,9 @@ package com.vscing.admin.entity;
 
 import com.vscing.common.domain.BaseEntity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author vscing (vscing@foxmail.com)
  * @date 2024-10-15 23:51:25
