@@ -13,16 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import okhttp3.*;
+
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 import java.util.Map;
 import java.time.Instant;
 
@@ -43,6 +40,7 @@ public class TestController {
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<Object> listAll() {
 
+        // 获取当前时间戳
         Instant now = Instant.now();
         long timestamp = now.toEpochMilli();
 
@@ -62,32 +60,45 @@ public class TestController {
         // 日志记录：打印请求参数
         log.info("Request Parameters: {}", params);
 
+        // 创建 OkHttpClient 实例
+        OkHttpClient client = new OkHttpClient();
 
-        try {
-            // 将参数转换为 JSON 字符串
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonBody = objectMapper.writeValueAsString(params);
+        // 构建 multipart/form-data 请求体
+        MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            multipartBuilder.addFormDataPart(entry.getKey(), entry.getValue());
+        }
 
-            // 创建 HttpClient 实例
-            HttpClient client = HttpClient.newHttpClient();
+        MultipartBody requestBody = multipartBuilder.build();
 
-            String query = "?userNo=17856563214&timestamp=" + timestamp + "&sign=" + sign;
+        // 创建 POST 请求
+        Request request = new Request.Builder()
+                .url("https://test.ot.jfshou.cn/ticket/ticket_api/city/query")
+                .post(requestBody)
+                .build();
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("https://test.ot.jfshou.cn/ticket/ticket_api/city/query" + query))
-//                    .uri(new URI("http://127.0.0.1:5500/v1/test/addInfo"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+        // 发送请求并获取响应
+        try (Response response = client.newCall(request).execute()) {
 
-            // 发送请求并获取响应
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
 
             Map<String, Object> result = new HashMap<>(2);
-            result.put("statusCode", response.statusCode());
-            result.put("body", response.body());
+
+            // 将 JSON 字符串解析为 JsonNode 对象
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.body().string());
+
+            result.put("statusCode", response.code());
+            result.put("body", jsonNode);
+
+            // 使用 writerWithDefaultPrettyPrinter() 打印漂亮的 JSON
+//            String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+//            System.out.println("Pretty JSON:\n" + prettyJson);
 
             return CommonResult.success(result);
+
         } catch (Exception e) {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());
