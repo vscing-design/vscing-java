@@ -44,6 +44,9 @@
         <pagehelper.version>2.1.0</pagehelper.version>
         <spring-data-commons.version>3.3.5</spring-data-commons.version>
         <jjwt.version>0.12.5</jjwt.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <jackson-annotations.version>2.15.4</jackson-annotations.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.7.0</springdoc-openapi-starter-webmvc-ui.version>
     </properties>
 
     <!--  模块依赖  -->
@@ -98,6 +101,24 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+            <!-- 发起请求库 -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <!-- json库 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-annotations.version}</version>
+            </dependency>
+            <!-- springdoc-openapi-ui for OpenAPI 3 with Swagger UI -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
             </dependency>
             <!--  数据库版本控制 -->
 <!--            <dependency>-->
