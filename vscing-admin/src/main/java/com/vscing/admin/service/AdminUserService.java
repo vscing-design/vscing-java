@@ -11,4 +11,9 @@ import com.vscing.auth.service.VscingUserDetails;
 public interface AdminUserService {
 
   VscingUserDetails adminUserInfo(long id);
+
+  /**
+   * 登录后获取token
+   */
+  String login(String username, String password);
 }

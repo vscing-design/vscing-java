@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -62,20 +64,22 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
-//        try {
-//            // 尝试认证
-//            Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-//            );
-//
-//            // 创建并返回 JWT
-//            String jwt = tokenProvider.createToken(authentication);
-//
-//            return ResponseEntity.ok(new JwtResponse(jwt));
-//        } catch (AuthenticationException e) {
-//            throw new BadCredentialsException("Invalid username or password");
-//        }
-//    }
+    /**
+     * 强散列哈希加密实现
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // 时间成本，默认是 3
+        int timeCost = 16;
+        // 内存成本，默认是 16384 KB (16 MB)
+        int memoryCost = 65536;
+        // 并行度，默认是 1
+        int parallelism = 2;
+        // 哈希长度，默认是 16 字节
+        int hashLength = 32;
+        // 盐长度，默认是 16 字节
+        int saltLength = 16;
+
+        return new Argon2PasswordEncoder(timeCost, memoryCost, parallelism, hashLength, saltLength);
+    }
 }
