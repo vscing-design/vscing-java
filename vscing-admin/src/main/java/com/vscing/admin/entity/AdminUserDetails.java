@@ -28,7 +28,7 @@ public class AdminUserDetails implements VscingUserDetails {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     //返回当前用户所拥有的资源
-    return (Collection<? extends GrantedAuthority>) relatedData;
+    return null;
   }
 
   @Override
