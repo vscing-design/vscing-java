@@ -39,7 +39,20 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Override
   public VscingUserDetails adminUserInfo(long id) {
-    return null;
+    // 获取用户信息
+    AdminUser adminUser = new AdminUser();
+    adminUser.setId(1L);
+    adminUser.setUsername("vscingAdmin");
+    String encodePassword = passwordEncoder.encode("vscingAdmin@123456");
+    adminUser.setPassword(encodePassword);
+    adminUser.setStatus(1);
+    // 用户关联信息 角色、菜单等
+    Map<String, Object> relatedData = new HashMap<>();
+    relatedData.put("role", new ArrayList<>());
+    relatedData.put("menu", new ArrayList<>());
+
+    VscingUserDetails userDetails = new AdminUserDetails(adminUser, relatedData);
+    return userDetails;
   }
 
   @Override
