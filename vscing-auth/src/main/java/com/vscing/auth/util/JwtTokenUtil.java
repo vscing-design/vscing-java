@@ -1,12 +1,13 @@
-package com.vscing.common.util;
+package com.vscing.auth.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.UUID;
  * @author vscing (vscing@foxmail.com)
  * @date 2024-12-14 18:11:47
 */
+@Component
 public class JwtTokenUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
     private static final SecretKey secretKey = Jwts.SIG.HS256.key().build();

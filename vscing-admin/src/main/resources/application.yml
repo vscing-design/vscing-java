@@ -5,26 +5,44 @@ spring:
   profiles:
     active: '@profileActive@'
   application:
-    name: demo
+    name: vscing
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher # 或者 "path_pattern_parser"
   datasource:
     driver-class-name: 'com.mysql.cj.jdbc.Driver'
-    url: 'jdbc:mysql://localhost:3306/vdb?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8mb4&useSSL=false&serverTimezone=UTC&allowMultiQueries=true'
-    username: root
-    password: 123456
+    url: 'jdbc:mysql://8.152.192.61:5306/hiyafliy?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true'
+    username: hiyafliy
+    password: hiyafliy@888
 logging:
   level:
     root: WARN
-    org:
-      springframework:
-        web: DEBUG
-    com:
-      example:
-        myapp: INFO
+    org.springframework.web: DEBUG
+    com.vscing.admin: INFO
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 mybatis:
   configuration:
 #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
   mapper-locations: classpath*:mapper/*.xml
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  expiration: 604800 #JWT的超期限时间(60*60*24*1)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
+secure:
+  ignored:
+    urls:
+      - /auth/login
+      - /register
+      - /css/**
+      - /js/**
+      - /images/**
+      - /swagger-ui.html
+      - /v3/api-docs/**
 # 启用 DEBUG 模式
 debug: false
 
