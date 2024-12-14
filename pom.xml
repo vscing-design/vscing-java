@@ -22,6 +22,7 @@
         <module>vscing-auth</module>
         <module>vscing-elk</module>
         <module>vscing-mq</module>
+        <module>vscing-netty</module>
     </modules>
 
     <!--  配置管理  -->
@@ -46,7 +47,8 @@
         <jjwt.version>0.12.5</jjwt.version>
         <okhttp.version>4.12.0</okhttp.version>
         <jackson-annotations.version>2.15.4</jackson-annotations.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.7.0</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
+        <hutool.version>5.8.9</hutool.version>
     </properties>
 
     <!--  模块依赖  -->
@@ -119,6 +121,12 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+            </dependency>
+            <!-- Java工具类库 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
             </dependency>
             <!--  数据库版本控制 -->
 <!--            <dependency>-->

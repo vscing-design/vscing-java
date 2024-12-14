@@ -1,4 +1,4 @@
-package com.vscing.admin.config;
+package com.vscing.auth.config;
 
 import lombok.Getter;
 import lombok.Setter;
