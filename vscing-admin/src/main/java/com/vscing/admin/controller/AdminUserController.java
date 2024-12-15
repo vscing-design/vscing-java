@@ -1,10 +1,10 @@
 package com.vscing.admin.controller;
 
 import cn.hutool.core.util.IdUtil;
-import com.vscing.admin.dto.AdminUserLoginDto;
-import com.vscing.admin.entity.AdminUser;
+import com.vscing.admin.po.AdminUserDetails;
+import com.vscing.model.dto.AdminUserLoginDto;
+import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.service.AdminUserService;
-import com.vscing.admin.service.impl.AdminUserServiceImpl;
 import com.vscing.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,19 +69,16 @@ public class AdminUserController {
   }
 
   @PostMapping("/register")
-  public CommonResult<Object> register(@RequestBody AdminUser adminUser, HttpServletRequest request, Principal principal) {
-    logger.info(String.valueOf(principal));
+  public CommonResult<Object> register(@RequestBody AdminUser adminUser, HttpServletRequest request, @AuthenticationPrincipal AdminUserDetails userInfo) {
+
+    logger.info(String.valueOf(userInfo.getUserId()));
+
     // 检查用户名和密码是否为空
     if (adminUser.getUsername() == null || adminUser.getUsername().trim().isEmpty() ||
         adminUser.getPassword() == null || adminUser.getPassword().trim().isEmpty()) {
       return CommonResult.validateFailed("用户名和密码不能为空");
     }
-
-    String encodePassword = passwordEncoder.encode(adminUser.getPassword());
-    adminUser.setPassword(encodePassword);
-    adminUser.setId(IdUtil.getSnowflakeNextId());
     adminUser.setLastIp(RequestUtil.getRequestIp(request));
-
     try {
       long id = adminUserService.createAdminUser(adminUser);
       if (id == 0) {

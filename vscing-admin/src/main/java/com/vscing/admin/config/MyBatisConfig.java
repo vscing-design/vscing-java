@@ -12,6 +12,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan({"com.macro.mall.mapper"})
+@MapperScan({"com.vscing.model.mapper"})
 public class MyBatisConfig {
 }

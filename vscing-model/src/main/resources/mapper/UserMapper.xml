@@ -4,7 +4,7 @@
 <mapper namespace="com.vscing.model.mapper.UserMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.vscing.admin.entity.User">
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.User">
         <id column="id" property="id" />
         <result column="username" property="username" />
         <result column="password" property="password" />
@@ -17,16 +17,16 @@
         <result column="deleted_by" property="deletedBy" />
     </resultMap>
 
-    <insert id="addInfo" parameterType="com.vscing.admin.dto.UserDto">
+    <insert id="addInfo" parameterType="com.vscing.model.dto.UserDto">
         INSERT INTO vscing_user(username, password, phone)
         values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
     </insert>
 
-    <select id="getAllList" resultType="com.vscing.admin.vo.UserVo">
+    <select id="getAllList" resultType="com.vscing.model.vo.UserVo">
         SELECT * FROM vscing_user;
     </select>
 
-    <select id="getList" resultType="com.vscing.admin.vo.UserVo">
+    <select id="getList" resultType="com.vscing.model.vo.UserVo">
         SELECT * FROM vscing_user
         <where>
             <if test="queryParam.username != null and queryParam.username.trim() != ''">
@@ -44,7 +44,7 @@
         </where>
     </select>
 
-    <select id="getInfo" parameterType="long" resultType="com.vscing.admin.vo.UserVo">
+    <select id="getInfo" parameterType="long" resultType="com.vscing.model.vo.UserVo">
         SELECT * FROM vscing_user where id=#{id};
     </select>
 

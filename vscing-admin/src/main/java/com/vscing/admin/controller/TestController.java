@@ -1,7 +1,7 @@
 package com.vscing.admin.controller;
 
-import com.vscing.admin.dto.UserDto;
-import com.vscing.admin.vo.UserVo;
+import com.vscing.model.dto.UserDto;
+import com.vscing.model.vo.UserVo;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.SignatureGenerator;
 import org.slf4j.Logger;

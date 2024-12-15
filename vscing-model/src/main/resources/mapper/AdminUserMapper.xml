@@ -4,7 +4,7 @@
 <mapper namespace="com.vscing.model.mapper.AdminUserMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.vscing.admin.entity.AdminUser">
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.AdminUser">
         <id column="id" property="id" />
         <result column="username" property="username" />
         <result column="nickname" property="nickname" />
@@ -43,7 +43,7 @@
     </select>
 
     <!-- 根据 username 查询用户 -->
-    <select id="selectByUsername" parameterType="String" resultType="com.vscing.admin.entity.AdminUser">
+    <select id="selectByUsername" parameterType="String" resultType="com.vscing.model.entity.AdminUser">
         SELECT * FROM vscing_admin_user WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
     </select>
 
@@ -53,8 +53,8 @@
     </select>
 
     <!-- 插入用户信息 -->
-    <insert id="insert" parameterType="com.vscing.admin.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
-        INSERT INTO vscing_admin_user(id, username, password, lastIp)
+    <insert id="insert" parameterType="com.vscing.model.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
+        INSERT INTO vscing_admin_user(id, username, password, last_ip)
         values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{lastIp,jdbcType=VARCHAR})
     </insert>
 
@@ -69,7 +69,7 @@
     </update>
 
     <!-- 更新用户信息 -->
-    <update id="update" parameterType="com.vscing.admin.entity.AdminUser">
+    <update id="update" parameterType="com.vscing.model.entity.AdminUser">
         UPDATE vscing_admin_user
         <set>
             <if test="record.id != null">
