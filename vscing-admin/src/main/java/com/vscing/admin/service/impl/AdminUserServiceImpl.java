@@ -1,7 +1,10 @@
 package com.vscing.admin.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.vscing.admin.dto.AdminUserListDto;
 import com.vscing.admin.entity.AdminUser;
 import com.vscing.admin.entity.AdminUserDetails;
+import com.vscing.model.mapper.AdminUserMapper;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +41,9 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private AdminUserMapper adminUserMapper;
+
   @Override
   public VscingUserDetails adminUserInfo(long id) {
     // 获取用户信息
@@ -45,7 +52,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     adminUser.setUsername("vscingAdmin");
     String encodePassword = passwordEncoder.encode("vscingAdmin@123456");
     adminUser.setPassword(encodePassword);
-    adminUser.setStatus(1);
+    adminUser.setState(1);
     // 用户关联信息 角色、菜单等
     Map<String, Object> relatedData = new HashMap<>();
     relatedData.put("role", new ArrayList<>());
@@ -66,7 +73,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       adminUser.setUsername("vscingAdmin");
       String encodePassword = passwordEncoder.encode("vscingAdmin@123456");
       adminUser.setPassword(encodePassword);
-      adminUser.setStatus(1);
+      adminUser.setState(1);
       // 用户关联信息 角色、菜单等
       Map<String, Object> relatedData = new HashMap<>();
       relatedData.put("role", new ArrayList<>());
@@ -83,6 +90,17 @@ public class AdminUserServiceImpl implements AdminUserService {
       logger.warn("登录异常:{}", e.getMessage());
     }
     return token;
+  }
+
+  @Override
+  public List<AdminUser> getAdminUserList(AdminUserListDto record, Integer pageSize, Integer pageNum) {
+    PageHelper.startPage(pageNum, pageSize);
+    return adminUserMapper.getList(record);
+  }
+
+  @Override
+  public long createAdminUser(AdminUser adminUser) {
+    return 1L;
   }
 
 }

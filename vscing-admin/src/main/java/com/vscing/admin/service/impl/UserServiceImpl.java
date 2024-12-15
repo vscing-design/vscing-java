@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.vscing.admin.dto.UserDto;
 import com.vscing.admin.dto.UserListDto;
 import com.vscing.admin.dto.UserSaveDto;
-import com.vscing.admin.mapper.UserMapper;
+import com.vscing.model.mapper.UserMapper;
 import com.vscing.admin.service.UserService;
 import com.vscing.admin.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;

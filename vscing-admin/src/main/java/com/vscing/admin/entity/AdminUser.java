@@ -16,12 +16,27 @@ import lombok.Setter;
 public class AdminUser extends BaseEntity {
   private Long id;
 
-  // 用户名称
   private String username;
 
-  // 用户密码
   private String password;
 
-  @Schema(description = "帐号启用状态：0->禁用；1->启用")
-  private Integer status;
+  @Schema(description = "帐号启用状态：1->启用 2->禁用")
+  private Integer state;
+
+  private String phone;
+
+  private String nickname;
+
+  private String email;
+
+  private String avatar;
+
+  private String desc;
+
+  private String lastIp;
+
+  private String loginAt;
+
+  private String token;
+
 }
