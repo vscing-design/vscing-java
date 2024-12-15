@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.admin.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.admin.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="phone" property="phone" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+    </resultMap>
+
+    <insert id="addInfo" parameterType="com.vscing.admin.dto.UserDto">
+        INSERT INTO vscing_user(username, password, phone)
+        values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="getAllList" resultType="com.vscing.admin.vo.UserVo">
+        SELECT * FROM vscing_user;
+    </select>
+
+    <select id="getList" resultType="com.vscing.admin.vo.UserVo">
+        SELECT * FROM vscing_user
+        <where>
+            <if test="queryParam.username != null and queryParam.username.trim() != ''">
+                AND username LIKE #{queryParam.username}
+            </if>
+            <if test="queryParam.phone != null and queryParam.username.trim() != ''">
+                AND phone = #{queryParam.phone}
+            </if>
+            <if test="queryParam.startDate != null and queryParam.startDate.trim() != ''">
+                AND created_at <![CDATA[ >= ]]> #{queryParam.startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="queryParam.endDate != null and queryParam.endDate.trim() != ''">
+                AND created_at <![CDATA[ <= ]]> #{queryParam.endDate, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+
+    <select id="getInfo" parameterType="long" resultType="com.vscing.admin.vo.UserVo">
+        SELECT * FROM vscing_user where id=#{id};
+    </select>
+
+    <update id="updateInfo">
+        UPDATE vscing_user
+        SET username = #{userInfo.username}, phone = #{userInfo.phone}, password = #{userInfo.password}
+        WHERE id = #{userInfo.id}
+    </update>
+
+    <delete id="deleteInfo" parameterType="long">
+        DELETE FROM vscing_user WHERE id = #{id}
+    </delete>
+
+<!--    <insert id="saveInfo" parameterType="com.vscing.admin.entity.User">-->
+<!--        INSERT INTO tb_user_contact(id, provider_user_id, contact_provider_user_id)-->
+<!--        SELECT #{id}, #{providerUserId}, #{contactProviderUserId} FROM DUAL-->
+<!--        WHERE-->
+<!--        NOT EXISTS-->
+<!--        (SELECT * FROM tb_user_contact-->
+<!--        WHERE provider_user_id=#{providerUserId} and contact_provider_user_id=#{contactProviderUserId})-->
+<!--    </insert>-->
+
+
+</mapper>
