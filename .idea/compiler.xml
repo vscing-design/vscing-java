@@ -14,6 +14,7 @@
         <module name="vscing-common" />
         <module name="vscing-api" />
         <module name="vscing-auth" />
+        <module name="vscing-model" />
       </profile>
     </annotationProcessing>
   </component>
@@ -25,6 +26,7 @@
       <module name="vscing-auth" options="-parameters" />
       <module name="vscing-common" options="-parameters" />
       <module name="vscing-elk" options="-parameters" />
+      <module name="vscing-model" options="-parameters" />
       <module name="vscing-mq" options="-parameters" />
       <module name="vscing-netty" options="-parameters" />
     </option>

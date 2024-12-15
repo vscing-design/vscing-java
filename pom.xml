@@ -18,6 +18,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>vscing-admin</module>
+        <module>vscing-api</module>
+        <module>vscing-model</module>
         <module>vscing-common</module>
         <module>vscing-auth</module>
         <module>vscing-elk</module>

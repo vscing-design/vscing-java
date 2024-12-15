@@ -1,4 +1,4 @@
-package com.vscing.admin.mapper;
+package com.vscing.model.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 

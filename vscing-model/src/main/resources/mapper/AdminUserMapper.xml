@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.AdminUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.admin.entity.AdminUser">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="nickname" property="nickname" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="avatar" property="avatar" />
+        <result column="desc" property="desc" />
+        <result column="lastIp" property="lastIp" />
+        <result column="loginAt" property="loginAt" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+    </resultMap>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM vscing_admin_user
+        <where>
+            deleted_at IS NULL
+            <if test="record.username != null and record.username.trim() != ''">
+                AND username LIKE #{record.username}
+            </if>
+            <if test="record.phone != null and record.username.trim() != ''">
+                AND phone = #{record.phone}
+            </if>
+            <if test="record.startDate != null and record.startDate.trim() != ''">
+                AND created_at <![CDATA[ >= ]]> #{record.startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="record.endDate != null and record.endDate.trim() != ''">
+                AND created_at <![CDATA[ <= ]]> #{record.endDate, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 username 查询用户 -->
+    <select id="selectByUsername" parameterType="String" resultType="com.vscing.admin.entity.AdminUser">
+        SELECT * FROM vscing_admin_user WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
+    </select>
+
+    <!-- 根据 ID 查询用户 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM vscing_admin_user WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入用户信息 -->
+    <insert id="insert" parameterType="com.vscing.admin.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
+        INSERT INTO vscing_admin_user(id, username, password, lastIp)
+        values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{lastIp,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 根据 ID 硬删除用户 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM vscing_admin_user WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="long">
+        UPDATE vscing_admin_user SET deleted_at = NOW() WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 更新用户信息 -->
+    <update id="update" parameterType="com.vscing.admin.entity.AdminUser">
+        UPDATE vscing_admin_user
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.username != null">
+                username = #{record.username,jdbcType=VARCHAR},
+            </if>
+            <if test="record.password != null">
+                password = #{record.password,jdbcType=VARCHAR},
+            </if>
+            <if test="record.phone != null">
+                phone = #{record.phone,jdbcType=VARCHAR},
+            </if>
+            <if test="record.avatar != null">
+                avatar = #{record.avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="record.email != null">
+                email = #{record.email,jdbcType=VARCHAR},
+            </if>
+            <if test="record.nickName != null">
+                nickname = #{record.nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.desc != null">
+                desc = #{record.desc,jdbcType=VARCHAR},
+            </if>
+            <if test="record.loginAt != null">
+                login_at = #{record.loginAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.lastIp != null">
+                last_ip = #{record.lastIp,jdbcType=VARCHAR},
+            </if>
+            <if test="record.state != null">
+                state = #{record.state,jdbcType=INTEGER},
+            </if>
+        </set>
+        WHERE id = #{record.id,jdbcType=BIGINT}
+    </update>
+
+</mapper>
