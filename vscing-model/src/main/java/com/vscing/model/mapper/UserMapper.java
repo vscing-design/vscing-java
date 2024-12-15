@@ -1,12 +1,11 @@
 package com.vscing.model.mapper;
 
-import com.vscing.admin.dto.UserDto;
-import com.vscing.admin.dto.UserListDto;
-import com.vscing.admin.dto.UserSaveDto;
-import com.vscing.admin.vo.UserVo;
+import com.vscing.model.dto.UserDto;
+import com.vscing.model.dto.UserListDto;
+import com.vscing.model.dto.UserSaveDto;
+import com.vscing.model.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 

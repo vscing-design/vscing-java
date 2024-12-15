@@ -1,8 +1,7 @@
 package com.vscing.model.mapper;
 
-import com.vscing.admin.dto.AdminUserListDto;
-import com.vscing.admin.dto.UserDto;
-import com.vscing.admin.entity.AdminUser;
+import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.entity.AdminUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

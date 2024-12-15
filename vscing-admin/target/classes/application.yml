@@ -28,7 +28,7 @@ mybatis:
   configuration:
 #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
-  mapper-locations: classpath*:mapper/*.xml
+  mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
 jwt:
   tokenHeader: Authorization #JWT存储的请求头
   expiration: 604800 #JWT的超期限时间(60*60*24*1)

@@ -1,9 +1,9 @@
 package com.vscing.admin.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.vscing.admin.dto.AdminUserListDto;
-import com.vscing.admin.entity.AdminUser;
-import com.vscing.admin.entity.AdminUserDetails;
+import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.entity.AdminUser;
+import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.model.mapper.AdminUserMapper;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.auth.service.VscingUserDetails;

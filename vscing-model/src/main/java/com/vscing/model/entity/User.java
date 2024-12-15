@@ -1,7 +1,6 @@
-package com.vscing.admin.entity;
+package com.vscing.model.entity;
 
 import com.vscing.common.domain.BaseEntity;
-
 import lombok.Getter;
 import lombok.Setter;
 

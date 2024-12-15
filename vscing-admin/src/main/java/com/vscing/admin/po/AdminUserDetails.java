@@ -1,5 +1,6 @@
-package com.vscing.admin.entity;
+package com.vscing.admin.po;
 
+import com.vscing.model.entity.AdminUser;
 import com.vscing.auth.service.VscingUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 
