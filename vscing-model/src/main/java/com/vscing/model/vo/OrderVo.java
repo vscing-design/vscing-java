@@ -1,4 +1,4 @@
-package com.vscing.admin.vo;
+package com.vscing.model.vo;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,9 @@
 package com.vscing.admin.service;
 
-import com.vscing.admin.dto.AdminUserListDto;
-import com.vscing.admin.dto.UserListDto;
-import com.vscing.admin.entity.AdminUser;
-import com.vscing.admin.vo.UserVo;
+import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.dto.UserListDto;
+import com.vscing.model.entity.AdminUser;
+import com.vscing.model.vo.UserVo;
 import com.vscing.auth.service.VscingUserDetails;
 
 import java.util.List;

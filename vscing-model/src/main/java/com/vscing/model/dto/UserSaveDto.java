@@ -1,4 +1,4 @@
-package com.vscing.admin.dto;
+package com.vscing.model.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

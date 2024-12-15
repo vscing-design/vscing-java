@@ -1,7 +1,8 @@
-package com.vscing.admin.entity;
+package com.vscing.model.entity;
+
+import com.vscing.common.domain.BaseEntity;
 
 import java.math.BigDecimal;
-import com.vscing.common.domain.BaseEntity;
 
 /** 
  * @author vscing (vscing@foxmail.com)

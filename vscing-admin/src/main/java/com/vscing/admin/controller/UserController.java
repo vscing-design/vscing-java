@@ -1,10 +1,10 @@
 package com.vscing.admin.controller;
 
-import com.vscing.admin.dto.UserListDto;
-import com.vscing.admin.dto.UserSaveDto;
+import com.vscing.model.dto.UserListDto;
+import com.vscing.model.dto.UserSaveDto;
 import com.vscing.admin.service.UserService;
-import com.vscing.admin.vo.UserVo;
-import com.vscing.admin.dto.UserDto;
+import com.vscing.model.vo.UserVo;
+import com.vscing.model.dto.UserDto;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
