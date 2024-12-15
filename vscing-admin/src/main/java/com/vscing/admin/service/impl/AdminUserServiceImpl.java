@@ -1,6 +1,8 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
+import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.po.AdminUserDetails;
@@ -100,7 +102,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Override
   public long createAdminUser(AdminUser adminUser) {
-    return 1L;
+    String encodePassword = passwordEncoder.encode(adminUser.getPassword());
+    adminUser.setPassword(encodePassword);
+    adminUser.setId(IdUtil.getSnowflakeNextId());
+    return adminUserMapper.insert(adminUser);
   }
 
 }
