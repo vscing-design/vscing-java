@@ -1,0 +1,6 @@
+技术栈全面扩展开花🌼, JDK17+ SpringBoot3.0+Mybatis-Plus+GRPC+Webclient(非阻塞调用第三方接口) Java鸡架（微服务）+ MySQL+Redis+ElasticSearch数据库+ Nacos(2.0版本)+Apollo 服务注册/配置中心+ Mycat(分表) 一致性hash+RocketMQ4.7 + AmazonSQS 消息队列+ Redission分布式锁+日志存储 log4j+slf4j / 分布式日志存储ELK+Flume+Logstash
+
+作者：呆呆蛇
+链接：https://juejin.cn/post/7374683456728760374
+来源：稀土掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
