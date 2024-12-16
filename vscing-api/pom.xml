@@ -72,5 +72,31 @@
         </profile>
     </profiles>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!--                <configuration>-->
+                <!--                    <mainClass>com.vscing.admin.VscingAdminApplication</mainClass> &lt;!&ndash; 替换为你的主类全限定名 &ndash;&gt;-->
+                <!--                </configuration>-->
+                <!--                <executions>-->
+                <!--                    <execution>-->
+                <!--                        <id>repackage</id>-->
+                <!--                        <goals>-->
+                <!--                            <goal>repackage</goal>-->
+                <!--                        </goals>-->
+                <!--                    </execution>-->
+                <!--                </executions>-->
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering> <!-- 启用资源过滤 -->
+            </resource>
+        </resources>
+    </build>
+
 
 </project>

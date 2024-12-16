@@ -29,11 +29,12 @@
 
     <!--  配置管理  -->
     <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <resource.delimiter>@</resource.delimiter>
         <java.version>17</java.version>
-        <spring-boot.version>3.3.4</spring-boot.version>
+        <spring-boot.version>3.3.5</spring-boot.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -226,28 +227,29 @@
                     <version>${maven-resources-plugin.version}</version>
                     <configuration>
                         <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
-                        <delimiters>
-                            <delimiter>${resource.delimiter}</delimiter>
-                        </delimiters>
-                        <useDefaultDelimiters>false</useDefaultDelimiters>
+<!--                        <delimiters>-->
+<!--                            <delimiter>${resource.delimiter}</delimiter>-->
+<!--                        </delimiters>-->
+<!--                        <useDefaultDelimiters>false</useDefaultDelimiters>-->
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
-                    <executions>
-                        <execution>
-                            <id>repackage</id>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>repackage</id>-->
+<!--                            <goals>-->
+<!--                                <goal>repackage</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
                     <configuration>
-<!--                        <arguments>-->
-<!--                            <argument>&#45;&#45;spring.profiles.active=${spring.profiles.active}</argument>-->
-<!--                        </arguments>-->
+                        <arguments>
+                            <argument>--spring.profiles.active=${spring.profiles.active}</argument>
+                        </arguments>
                         <excludes>
                             <exclude>
                                 <groupId>org.projectlombok</groupId>
@@ -258,6 +260,22 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <!-- 实际使用的插件列表 -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <!-- 使用aliyun的镜像源提升依赖下载速度 -->

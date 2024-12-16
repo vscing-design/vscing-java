@@ -1,7 +1,8 @@
-package com.vscing.common.domain;
+package com.vscing.model.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
