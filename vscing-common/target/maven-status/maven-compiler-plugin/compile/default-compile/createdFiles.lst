@@ -1,7 +1,6 @@
 com/vscing/common/api/ResultCode.class
 com/vscing/common/service/payment/PaymentService.class
 com/vscing/common/api/CommonResult.class
-com/vscing/common/domain/BaseEntity.class
 com/vscing/common/util/SignatureGenerator.class
 com/vscing/common/api/IErrorCode.class
 com/vscing/common/api/CommonPage.class

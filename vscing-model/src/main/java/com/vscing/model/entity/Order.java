@@ -1,6 +1,6 @@
 package com.vscing.model.entity;
 
-import com.vscing.common.domain.BaseEntity;
+import com.vscing.model.domain.BaseEntity;
 
 import java.math.BigDecimal;
 

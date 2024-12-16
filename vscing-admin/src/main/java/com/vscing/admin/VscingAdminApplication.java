@@ -1,9 +1,14 @@
 package com.vscing.admin;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+
+/**
+ * VscingAdminApplication
+ *
+ * @author vscing
+ * @date 2024/12/14 23:33
+ */
 
 @SpringBootApplication(scanBasePackages = {"com.vscing"})
 public class VscingAdminApplication {
