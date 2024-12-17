@@ -49,14 +49,9 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Override
   public VscingUserDetails adminUserInfo(long id) {
     // 获取用户信息
-    AdminUser adminUser = new AdminUser();
-    adminUser.setId(1L);
-    adminUser.setUsername("vscingAdmin");
-    String encodePassword = passwordEncoder.encode("vscingAdmin@123456");
-    adminUser.setPassword(encodePassword);
-    adminUser.setState(1);
+    AdminUser adminUser = adminUserMapper.selectById(id);
     // 用户关联信息 角色、菜单等
-    Map<String, Object> relatedData = new HashMap<>();
+    Map<String, Object> relatedData = new HashMap<>(2);
     relatedData.put("role", new ArrayList<>());
     relatedData.put("menu", new ArrayList<>());
 
@@ -70,21 +65,16 @@ public class AdminUserServiceImpl implements AdminUserService {
     //密码需要客户端加密后传递
     try {
       // 获取用户信息
-      AdminUser adminUser = new AdminUser();
-      adminUser.setId(1L);
-      adminUser.setUsername("vscingAdmin");
-      String encodePassword = passwordEncoder.encode("vscingAdmin@123456");
-      adminUser.setPassword(encodePassword);
-      adminUser.setState(1);
-      // 用户关联信息 角色、菜单等
-      Map<String, Object> relatedData = new HashMap<>();
-      relatedData.put("role", new ArrayList<>());
-      relatedData.put("menu", new ArrayList<>());
-
-      VscingUserDetails userDetails = new AdminUserDetails(adminUser, relatedData);
-      if(!passwordEncoder.matches(password, userDetails.getPassword())){
+      AdminUser adminUser = adminUserMapper.selectByUsername(username);
+      if(!passwordEncoder.matches(password, adminUser.getPassword())){
         throw new BadCredentialsException("密码不正确");
       }
+      // 用户关联信息 角色、菜单等
+      Map<String, Object> relatedData = new HashMap<>(2);
+      relatedData.put("role", new ArrayList<>());
+      relatedData.put("menu", new ArrayList<>());
+      //
+      VscingUserDetails userDetails = new AdminUserDetails(adminUser, relatedData);
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
       token = jwtTokenUtil.generateToken(userDetails.getUserId());
