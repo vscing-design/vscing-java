@@ -1,6 +1,8 @@
 package com.vscing.admin.controller;
 
 import com.vscing.admin.po.AdminUserDetails;
+import com.vscing.common.service.RedisService;
+import com.vscing.common.service.impl.RedisServiceImpl;
 import com.vscing.model.dto.AdminUserLoginDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.service.AdminUserService;
@@ -57,6 +59,10 @@ public class AdminUserController {
 
   @GetMapping("/test")
   public CommonResult<String> getActiveProfile() {
+    RedisService redisService = new RedisServiceImpl();
+    redisService.set("a", 123, 60);
+    int num = (Integer) redisService.get("a");
+    System.out.println("启动成功" + num);
     return CommonResult.success("登陆成功", "Active profile: " + activeProfile);
   }
 

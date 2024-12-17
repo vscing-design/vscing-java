@@ -1,11 +1,15 @@
 package com.vscing.admin.controller;
 
+import com.vscing.admin.VscingAdminApplication;
+import com.vscing.common.service.RedisService;
+import com.vscing.common.service.impl.RedisServiceImpl;
 import com.vscing.model.dto.UserDto;
 import com.vscing.model.vo.UserVo;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.SignatureGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
