@@ -3,7 +3,7 @@ server:
   port: 5500
 spring:
   profiles:
-    active: '@profileActive@'
+    active: '@spring.profiles.active@'
   application:
     name: vscing
   mvc:

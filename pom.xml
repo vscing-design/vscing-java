@@ -214,9 +214,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-    </profiles>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -237,24 +234,16 @@
                     <version>${maven-resources-plugin.version}</version>
                     <configuration>
                         <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
-<!--                        <delimiters>-->
-<!--                            <delimiter>${resource.delimiter}</delimiter>-->
-<!--                        </delimiters>-->
-<!--                        <useDefaultDelimiters>false</useDefaultDelimiters>-->
+                        <delimiters>
+                            <delimiter>${resource.delimiter}</delimiter>
+                        </delimiters>
+                        <useDefaultDelimiters>false</useDefaultDelimiters>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>repackage</id>-->
-<!--                            <goals>-->
-<!--                                <goal>repackage</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
                     <configuration>
                         <arguments>
                             <argument>--spring.profiles.active=${spring.profiles.active}</argument>
