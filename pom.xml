@@ -50,6 +50,7 @@
         <jjwt.version>0.12.5</jjwt.version>
         <okhttp.version>4.12.0</okhttp.version>
         <jackson-annotations.version>2.15.4</jackson-annotations.version>
+        <jackson-datatype-jsr310.version>2.18.2</jackson-datatype-jsr310.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <hutool.version>5.8.9</hutool.version>
     </properties>
@@ -118,6 +119,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson-datatype-jsr310.version}</version>
             </dependency>
             <!-- springdoc-openapi-ui for OpenAPI 3 with Swagger UI -->
             <dependency>
@@ -206,6 +212,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

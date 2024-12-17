@@ -2,9 +2,12 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/api/CommonResult.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/api/IErrorCode.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/api/ResultCode.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/config/RedisConfig.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/exception/ApiException.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/exception/Asserts.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/RedisService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/applet/AppletService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/impl/RedisServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/payment/PaymentService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/supplier/SupplierService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/RequestUtil.java
