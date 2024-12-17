@@ -1,6 +1,5 @@
 package com.vscing.admin.controller;
 
-import cn.hutool.core.util.IdUtil;
 import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.model.dto.AdminUserLoginDto;
 import com.vscing.model.entity.AdminUser;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +26,7 @@ import com.vscing.common.util.RequestUtil;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,15 +52,23 @@ public class AdminUserController {
   @Autowired
   private AdminUserService adminUserService;
 
+  @Value("${spring.profiles.active}")
+  private String activeProfile;
+
+  @GetMapping("/test")
+  public CommonResult<String> getActiveProfile() {
+    return CommonResult.success("登陆成功", "Active profile: " + activeProfile);
+  }
+
   @PostMapping("/login")
   @Parameter(name = "username", description = "用户名")
   @Parameter(name = "password", description = "密码")
   public CommonResult<Object> login(@Validated @RequestBody AdminUserLoginDto adminUserLogin) {
     String token = adminUserService.login(adminUserLogin.getUsername(), adminUserLogin.getPassword());
-    if (token.isEmpty()) {
+    if (token == null || token.isBlank()) {
       return CommonResult.failed("登陆失败");
     } else {
-      Map<String, String> tokenMap = new HashMap<>();
+      Map<String, String> tokenMap = new HashMap<>(2);
       tokenMap.put("token", token);
       tokenMap.put("tokenHead", tokenHead);
       return CommonResult.success("登陆成功", tokenMap);

@@ -3,17 +3,12 @@ server:
   port: 5500
 spring:
   profiles:
-    active: '@profileActive@'
+    active: dev
   application:
     name: vscing
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher # 或者 "path_pattern_parser"
-  datasource:
-    driver-class-name: 'com.mysql.cj.jdbc.Driver'
-    url: 'jdbc:mysql://8.152.192.61:5306/hiyafliy?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true'
-    username: hiyafliy
-    password: hiyafliy@888
 logging:
   level:
     root: WARN
@@ -37,10 +32,11 @@ secure:
   ignored:
     urls:
       - /v1/adminUser/login
+      - /v1/adminUser/test
       - /css/**
       - /js/**
       - /images/**
-      - /swagger-ui/index.html
+      - /swagger-ui/**
       - /v3/api-docs/**
 # 启用 DEBUG 模式
 debug: false

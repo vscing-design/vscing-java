@@ -9,11 +9,6 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher # 或者 "path_pattern_parser"
-  datasource:
-    driver-class-name: 'com.mysql.cj.jdbc.Driver'
-    url: 'jdbc:mysql://localhost:3306/vdb?useUnicode=true&characterEncoding=utf8mb4&useSSL=false&serverTimezone=UTC'
-    username: root
-    password: 123456
 logging:
   level:
     root: WARN
@@ -28,7 +23,7 @@ mybatis:
   configuration:
 #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
-  mapper-locations: classpath*:mapper/*.xml
+  mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
 jwt:
   tokenHeader: Authorization #JWT存储的请求头
   expiration: 604800 #JWT的超期限时间(60*60*24*1)
@@ -36,12 +31,12 @@ jwt:
 secure:
   ignored:
     urls:
-      - /auth/login
-      - /register
+      - /v1/adminUser/login
+      - /v1/adminUser/test
       - /css/**
       - /js/**
       - /images/**
-      - /swagger-ui/index.html
+      - /swagger-ui/**
       - /v3/api-docs/**
 # 启用 DEBUG 模式
 debug: false
