@@ -8,10 +8,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
 
 /**
  * SecurityConfig
@@ -32,6 +36,19 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    @Bean
+    public SecurityFilterChain swaggerSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests((authorize) -> authorize
+                // 允许Swagger相关资源需要认证
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").authenticated()
+                // 其他所有请求不需要在此处处理（由另一个安全链负责）
+                .anyRequest().permitAll())
+            // 启用HTTP Basic认证
+            .httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -62,6 +79,21 @@ public class SecurityConfig {
 //        }
 
         return http.build();
+    }
+
+    @Bean(name = "swaggerUserDetailsService")
+    public UserDetailsService swaggerUserDetailsService(PasswordEncoder encoder) {
+        // 内存用户存储，实际项目中应使用数据库或其他持久化方式
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+
+        // 使用 BCrypt 编码器来编码密码
+        manager.createUser(User.withUsername("admin")
+            // 安全地编码密码
+            .password(encoder.encode("admin@123456"))
+            .roles("USER")
+            .build());
+
+        return manager;
     }
 
 }
