@@ -1,24 +1,16 @@
-package com.vscing.admin.controller;
+package com.vscing.admin.controller.v1;
 
-import com.vscing.admin.VscingAdminApplication;
-import com.vscing.common.service.RedisService;
-import com.vscing.common.service.impl.RedisServiceImpl;
-import com.vscing.model.dto.UserDto;
-import com.vscing.model.vo.UserVo;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.SignatureGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.*;
 
@@ -39,6 +31,9 @@ import java.time.Instant;
 public class TestController {
 
     private static final Logger log = LoggerFactory.getLogger(TestController.class);
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     // https://docs.qq.com/doc/DWXVlWmtHbnpLUXdT
     @RequestMapping(value = "/info", method = RequestMethod.GET)

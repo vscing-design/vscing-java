@@ -1,4 +1,4 @@
-package com.vscing.admin.controller;
+package com.vscing.admin.controller.v1;
 
 import org.springframework.web.bind.annotation.*;
 

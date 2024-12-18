@@ -15,7 +15,7 @@ Base logback configuration provided for compatibility with Spring Boot 1.1
     <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
 
     <!--变量-->
-    <property name="LOG_HOME" value="/data/logs"/>
+    <property name="LOG_HOME" value="/www/wwwlogs/java/springboot/logs"/>
     <property name="STANDARD_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|%p|%t|%c|%M|%L|%X{local_ip}|%X{TRACE_ID}|${appName}|%m%n"/>
     <property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>
     <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint}|%clr(${LOG_LEVEL_PATTERN:-%p})|%clr(${PID}){magenta}|${appName}|%clr(%t){faint}|%clr(%logger{39}){cyan}|%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>

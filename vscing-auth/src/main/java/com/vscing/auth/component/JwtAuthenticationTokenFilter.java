@@ -3,6 +3,7 @@ package com.vscing.auth.component;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.service.VscingUserDetailsService;
 import com.vscing.auth.util.JwtTokenUtil;
+import com.vscing.common.util.RedisKeyConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.vscing.common.service.RedisService;
 
 import java.io.IOException;
 
@@ -37,6 +39,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
   @Value("${jwt.tokenHead}")
   private String tokenHead;
 
+  @Autowired
+  private RedisService redisService;
+
   @Override
   protected void doFilterInternal(HttpServletRequest request,
                                   HttpServletResponse response,
@@ -49,10 +54,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
       if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         VscingUserDetails userDetails = this.vscingUserDetailsService.loadUserByUserId(userId);
         if (jwtTokenUtil.validateToken(authToken, userDetails.getUserId())) {
-          UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-          authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          LOGGER.info("authenticated user:{}", userId);
-          SecurityContextHolder.getContext().setAuthentication(authentication);
+          // 检查redis中是否有该token
+          if (redisService.get(RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + userDetails.getUserId() + RedisKeyConstants.KEY_SEPARATOR + authToken) != null) {
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            LOGGER.info("authenticated user:{}", userId);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+          }
         }
       }
     }
