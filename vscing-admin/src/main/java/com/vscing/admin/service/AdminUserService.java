@@ -5,8 +5,10 @@ import com.vscing.model.dto.UserListDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.model.vo.UserVo;
 import com.vscing.auth.service.VscingUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * AdminUserService
@@ -24,16 +26,33 @@ public interface AdminUserService {
   /**
    * 登录后获取token
    */
-  String login(String username, String password);
+  String login(String username, String password, HttpServletRequest request);
 
   /**
-   * 管理员列表
+   * 列表
   */
-  List<AdminUser> getAdminUserList(AdminUserListDto record, Integer pageSize, Integer pageNum);
+  List<AdminUser> getList(AdminUserListDto record, Integer pageSize, Integer pageNum);
 
   /**
-   * 新增管理员
+   * 详情
+   */
+  AdminUser getDetails(long id);
+
+  /**
+   * 新增
   */
-  long createAdminUser(AdminUser adminUser);
+  long created(AdminUser adminUser);
+
+  /**
+   * 编辑
+   */
+  long updated(AdminUser adminUser);
+
+  /**
+   * 删除
+   */
+  long deleted(long id);
+
+
 
 }

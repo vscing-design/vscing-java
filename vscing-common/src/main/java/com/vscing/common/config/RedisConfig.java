@@ -57,8 +57,10 @@ public class RedisConfig {
     public RedisSerializer<Object> redisSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        //必须设置，否则无法将JSON转化为对象，会转化成Map类型
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
+        // 自定义ObjectMapper的时间处理模块
         JavaTimeModule javaTimeModule = new JavaTimeModule();
 
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -71,9 +73,12 @@ public class RedisConfig {
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
 
         objectMapper.registerModule(javaTimeModule);
+
+        // 禁用将日期序列化为时间戳的行为
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new Jackson2JsonRedisSerializer<>(Object.class);
+        //创建JSON序列化器
+        return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
     }
 
     @Bean
@@ -81,14 +86,15 @@ public class RedisConfig {
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
             .disableCachingNullValues()
             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer()))
+            //设置Redis缓存有效期为1天
             .entryTtl(Duration.ofDays(1))
-            .prefixCacheNameWith("FastAlden::");
+            .prefixCacheNameWith("Vscing::");
 
-//        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
 
         return RedisCacheManager.builder(redisConnectionFactory)
             .cacheDefaults(cacheConfiguration)
-//            .cacheWriter(redisCacheWriter)
+            .cacheWriter(redisCacheWriter)
             .build();
     }
 

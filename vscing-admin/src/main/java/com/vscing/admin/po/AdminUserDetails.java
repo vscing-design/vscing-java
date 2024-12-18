@@ -62,6 +62,6 @@ public class AdminUserDetails implements VscingUserDetails {
 
   @Override
   public boolean isEnabled() {
-    return adminUser.getState().equals(1);
+    return adminUser.getStatus().equals(1);
   }
 }

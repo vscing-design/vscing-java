@@ -11,14 +11,15 @@
         <result column="phone" property="phone" />
         <result column="email" property="email" />
         <result column="avatar" property="avatar" />
-        <result column="desc" property="desc" />
-        <result column="lastIp" property="lastIp" />
-        <result column="loginAt" property="loginAt" />
-        <result column="created_at" property="createdAt" />
+        <result column="notes" property="notes" />
+        <result column="status" property="status" />
+        <result column="last_ip" property="lastIp" />
+        <result column="login_at" property="loginAt" jdbcType="TIMESTAMP" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" />
-        <result column="updated_at" property="updatedAt" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
         <result column="updated_by" property="updatedBy" />
-        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
         <result column="deleted_by" property="deletedBy" />
     </resultMap>
 
@@ -43,7 +44,7 @@
     </select>
 
     <!-- 根据 username 查询用户 -->
-    <select id="selectByUsername" parameterType="String" resultType="com.vscing.model.entity.AdminUser">
+    <select id="selectByUsername" parameterType="String" resultMap="BaseResultMap">
         SELECT * FROM vscing_admin_user WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
     </select>
 
@@ -54,8 +55,8 @@
 
     <!-- 插入用户信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
-        INSERT INTO vscing_admin_user(id, username, password, last_ip)
-        values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{lastIp,jdbcType=VARCHAR})
+        INSERT INTO vscing_admin_user(id, username, password, last_ip, created_by)
+        values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{lastIp,jdbcType=VARCHAR}, #{createdBy,jdbcType=BIGINT})
     </insert>
 
     <!-- 根据 ID 硬删除用户 -->
@@ -72,41 +73,38 @@
     <update id="update" parameterType="com.vscing.model.entity.AdminUser">
         UPDATE vscing_admin_user
         <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
             </if>
-            <if test="record.username != null">
-                username = #{record.username,jdbcType=VARCHAR},
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
             </if>
-            <if test="record.password != null">
-                password = #{record.password,jdbcType=VARCHAR},
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="record.phone != null">
-                phone = #{record.phone,jdbcType=VARCHAR},
+            <if test="avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
             </if>
-            <if test="record.avatar != null">
-                avatar = #{record.avatar,jdbcType=VARCHAR},
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
             </if>
-            <if test="record.email != null">
-                email = #{record.email,jdbcType=VARCHAR},
+            <if test="nickname != null">
+                nickname = #{nickname,jdbcType=VARCHAR},
             </if>
-            <if test="record.nickName != null">
-                nickname = #{record.nickName,jdbcType=VARCHAR},
+            <if test="notes != null">
+                notes = #{notes,jdbcType=VARCHAR},
             </if>
-            <if test="record.desc != null">
-                desc = #{record.desc,jdbcType=VARCHAR},
+            <if test="loginAt != null">
+                login_at = #{loginAt,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.loginAt != null">
-                login_at = #{record.loginAt,jdbcType=TIMESTAMP},
+            <if test="lastIp != null">
+                last_ip = #{lastIp,jdbcType=VARCHAR},
             </if>
-            <if test="record.lastIp != null">
-                last_ip = #{record.lastIp,jdbcType=VARCHAR},
-            </if>
-            <if test="record.state != null">
-                state = #{record.state,jdbcType=INTEGER},
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
             </if>
         </set>
-        WHERE id = #{record.id,jdbcType=BIGINT}
+        WHERE id = #{id,jdbcType=BIGINT}
     </update>
 
 </mapper>

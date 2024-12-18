@@ -39,13 +39,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain swaggerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+            // 指定这个安全链只处理这些路径
+            .securityMatcher("/v3/api-docs/**", "/swagger-ui/**")
             .authorizeHttpRequests((authorize) -> authorize
-                // 允许Swagger相关资源需要认证
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").authenticated()
-                // 其他所有请求不需要在此处处理（由另一个安全链负责）
-                .anyRequest().permitAll())
-            // 启用HTTP Basic认证
-            .httpBasic(Customizer.withDefaults());
+                .anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults())
+            // 禁用CSRF保护，因为Swagger UI可能不需要它
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement((session) -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 如果不需要会话管理，可以禁用
 
         return http.build();
     }

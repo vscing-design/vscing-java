@@ -36,8 +36,7 @@ jwt:
 secure:
   ignored:
     urls:
-      - /v1/adminUser/login
-      - /v1/adminUser/test
+      - /v1/admin/login
       - /css/**
       - /js/**
       - /images/**

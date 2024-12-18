@@ -8,7 +8,11 @@ import lombok.Setter;
 public class CommonResult<T> {
     private long code;
     private String message;
-    private T result; // 使用泛型T，可以代表任何类型
+
+    /**
+     * 使用泛型T，可以代表任何类型
+    */
+    private T result;
 
     public CommonResult() {
     }
