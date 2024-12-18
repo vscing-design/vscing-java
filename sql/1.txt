@@ -9,4 +9,5 @@ https://gitee.com/breezefaith/fast-alden
 
 swagger的Config配置
 Redisson、Jedis、Lettuce 是三个不同的操作 Redis 的客户端
+MinIO 文件存储https://juejin.cn/post/7443658338867134518
 
