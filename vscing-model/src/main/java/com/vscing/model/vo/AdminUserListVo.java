@@ -2,6 +2,8 @@ package com.vscing.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +13,8 @@ import java.time.LocalDateTime;
  * @author vscing
  * @date 2024/12/19 22:44
  */
-@Data
+@Getter
+@Setter
 public class AdminUserListVo {
 
   @Schema(description = "用户id")
@@ -48,7 +51,7 @@ public class AdminUserListVo {
   private Long createdBy;
 
   @Schema(description = "更新时间")
-  private String updatedAt;
+  private LocalDateTime updatedAt;
 
   @Schema(description = "更新者ID")
   private Long updatedBy;

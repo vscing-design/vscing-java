@@ -29,15 +29,15 @@
         <where>
             deleted_at IS NULL
             <if test="record.username != null and record.username.trim() != ''">
-                AND username LIKE #{record.username}
+                AND username LIKE CONCAT('%', #{record.username}, '%')
             </if>
-            <if test="record.phone != null and record.username.trim() != ''">
-                AND phone = #{record.phone}
+            <if test="record.phone != null and record.phone.trim() != ''">
+                AND phone LIKE CONCAT('%', #{record.phone}, '%')
             </if>
-            <if test="record.startDate != null and record.startDate.trim() != ''">
+            <if test="record.startDate != null">
                 AND created_at <![CDATA[ >= ]]> #{record.startDate, jdbcType=TIMESTAMP}
             </if>
-            <if test="record.endDate != null and record.endDate.trim() != ''">
+            <if test="record.endDate != null">
                 AND created_at <![CDATA[ <= ]]> #{record.endDate, jdbcType=TIMESTAMP}
             </if>
         </where>

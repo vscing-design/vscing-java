@@ -32,6 +32,9 @@ public class JwtTokenUtil {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
+    @Value("${jwt.superAdminId}")
+    private Long superAdminId;
+
 //    public static void main(String[] args) {
 //        JwtTokenUtil util = new JwtTokenUtil();
 //
@@ -179,5 +182,12 @@ public class JwtTokenUtil {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 判断是否超级管理员
+    */
+    public boolean isSuperAdmin(Long id) {
+        return id != null && id.equals(superAdminId);
     }
 }

@@ -1,14 +1,17 @@
 com/vscing/common/api/ResultCode.class
+com/vscing/common/config/JacksonConfig.class
 com/vscing/common/util/SignatureGenerator.class
 com/vscing/common/api/CommonPage.class
 com/vscing/common/exception/ApiException.class
 com/vscing/common/exception/Asserts.class
 com/vscing/common/service/RedisService.class
 com/vscing/common/service/payment/PaymentService.class
+com/vscing/common/util/RedisKeyConstants.class
 com/vscing/common/api/CommonResult.class
 com/vscing/common/service/impl/RedisServiceImpl.class
 com/vscing/common/api/IErrorCode.class
 com/vscing/common/service/applet/AppletService.class
+com/vscing/common/exception/GlobalExceptionHandler.class
 com/vscing/common/util/RequestUtil.class
 com/vscing/common/service/supplier/SupplierService.class
 com/vscing/common/config/RedisConfig.class

@@ -1,6 +1,7 @@
 package com.vscing.common.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -40,7 +41,8 @@ public class JacksonConfig {
             // long类型转string， 前端处理Long类型，数值过大会丢失精度
 //                        .serializerByType(Long.class, ToStringSerializer.instance)
 //                        .serializerByType(Long.TYPE, ToStringSerializer.instance)
-            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            // 过滤null
+//            .serializationInclusion(JsonInclude.Include.NON_NULL)
             //指定反序列化类型，也可以使用@JsonFormat(pattern = "yyyy-MM-dd")替代。主要是mvc接收日期时使用
             .deserializerByType(LocalTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
             .deserializerByType(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
@@ -52,7 +54,9 @@ public class JacksonConfig {
   }
 
   @Bean
-  public JavaTimeModule javaTimeModule() {
+  public ObjectMapper objectMapper() {
+
+    ObjectMapper mapper = new ObjectMapper();
 
     JavaTimeModule module = new JavaTimeModule();
 
@@ -74,7 +78,9 @@ public class JacksonConfig {
     module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
     module.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
     module.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
-    return module;
+
+    mapper.registerModule(module);
+    return mapper;
   }
 
 }
