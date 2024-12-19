@@ -46,7 +46,7 @@
 
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Supplier">
-        INSERT INTO supplier (
+        INSERT INTO vscing_supplier
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="name != null">name,</if>
@@ -60,8 +60,7 @@
             <if test="prepaidAmount != null">prepaid_amount,</if>
             <if test="coopDesc != null">coop_desc</if>
         </trim>
-        )
-        VALUES (
+        VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
             <if test="name != null">#{name},</if>
@@ -75,7 +74,6 @@
             <if test="prepaidAmount != null">#{prepaidAmount, jdbcType=DECIMAL},</if>
             <if test="coopDesc != null">#{coopDesc}</if>
         </trim>
-        )
     </insert>
 
     <!-- 更新信息 -->
