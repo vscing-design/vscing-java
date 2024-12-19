@@ -3,10 +3,10 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/config/MyBatisConfig.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/config/OpenApiConfig.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/config/VscingSecurityConfig.java
-/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/AdminUserController.java
-/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/IndexController.java
-/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/TestController.java
-/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/UserController.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/AdminUserController.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/IndexController.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/TestController.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/UserController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/po/AdminUserDetails.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/AdminUserService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/UserService.java

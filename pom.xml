@@ -169,7 +169,7 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
-                <scope>provider</scope>
+                <scope>provided</scope>
             </dependency>
             <!-- Hibernate Validator -->
 <!--            <dependency>-->

@@ -1,6 +1,7 @@
 package com.vscing.admin.controller.v1;
 
 import com.vscing.admin.po.AdminUserDetails;
+import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.api.CommonPage;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserLoginDto;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.vscing.common.util.RequestUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,9 @@ public class AdminUserController {
 
   @Value("${jwt.tokenHead}")
   private String tokenHead;
+
+  @Autowired
+  private JwtTokenUtil jwtTokenUtil;
 
   @Autowired
   private AdminUserService adminUserService;
@@ -97,12 +102,19 @@ public class AdminUserController {
 
   @GetMapping("/users/{id}")
   @Operation(summary = "后台用户详情")
-  public CommonResult<AdminUserDetailVo> getUserDetail(@PathVariable("id") Long id) {
+  public CommonResult<AdminUserDetailVo> details(@PathVariable("id") Long id) {
     AdminUser adminUser = adminUserService.getDetails(id);
     if (adminUser == null) {
       return CommonResult.failed("用户不存在");
     }
+    // 关联角色
+    List<Object> relatedRole = new ArrayList<>();
+    // 关联菜单
+    List<Object> relatedMenu = new ArrayList<>();
+
     AdminUserDetailVo detail = AdminUserMapper.INSTANCE.adminUserToAdminUserDetailVo(adminUser);
+    detail.setRelatedRole(relatedRole);
+    detail.setRelatedMenu(relatedMenu);
     return CommonResult.success(detail);
   }
 
@@ -144,8 +156,10 @@ public class AdminUserController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
-    // 操作人ID
-    adminUser.setCreatedBy(userInfo.getUserId());
+    if(userInfo != null) {
+      // 操作人ID
+      adminUser.setUpdatedBy(userInfo.getUserId());
+    }
     try {
       long id = adminUserService.updated(adminUser);
       if (id == 0) {
@@ -160,13 +174,16 @@ public class AdminUserController {
     }
   }
 
-  @DeleteMapping("/users")
+  @DeleteMapping("/users/{id}")
   @Operation(summary = "后台用户删除")
-  public CommonResult<Object> users(@PathVariable("id") String id) {
+  public CommonResult<Object> users(@PathVariable Long id) {
     if(id == null) {
       return CommonResult.validateFailed("参数错误");
     }
-    long result = adminUserService.deleted(Long.parseLong(id));
+    if(jwtTokenUtil.isSuperAdmin(id)) {
+      return CommonResult.failed("超级管理员不可删除！");
+    }
+    long result = adminUserService.deleted(id);
     if (result != 0) {
       return CommonResult.success("删除成功");
     } else {
