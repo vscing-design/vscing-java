@@ -35,6 +35,7 @@ jwt:
 #      roles: USER
 secure:
   ignored:
+    enabled: false  # 安全校验开关，默认开启
     urls:
       - /v1/admin/login
       - /css/**

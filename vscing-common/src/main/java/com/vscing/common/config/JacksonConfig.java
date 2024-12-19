@@ -1,10 +1,11 @@
 package com.vscing.common.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
@@ -12,6 +13,8 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,6 +28,11 @@ import java.time.format.DateTimeFormatter;
  */
 @Configuration
 public class JacksonConfig {
+
+  private static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+  private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+  private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer customizer() {
     return builder ->
@@ -41,6 +49,32 @@ public class JacksonConfig {
             .serializerByType(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
             .serializerByType(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+  }
+
+  @Bean
+  public JavaTimeModule javaTimeModule() {
+
+    JavaTimeModule module = new JavaTimeModule();
+
+    // 配置 Jackson 序列化 BigDecimal 时使用的格式
+    module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
+
+    // 配置 Jackson 序列化 long类型为String，解决后端返回的Long类型在前端精度丢失的问题
+    module.addSerializer(BigInteger.class, ToStringSerializer.instance);
+    module.addSerializer(Long.class, ToStringSerializer.instance);
+    module.addSerializer(Long.TYPE, ToStringSerializer.instance);
+
+    // 配置 Jackson 序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
+    module.addSerializer(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
+    module.addSerializer(new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
+    module.addSerializer(new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
+
+
+    // 配置 Jackson 反序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
+    module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
+    module.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
+    module.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
+    return module;
   }
 
 }

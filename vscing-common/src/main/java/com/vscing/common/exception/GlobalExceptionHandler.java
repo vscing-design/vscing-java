@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.data.redis.RedisConnectionFailureException;
 
+import java.sql.SQLNonTransientConnectionException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,10 +23,38 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(RedisConnectionFailureException.class)
   public ResponseEntity<String> handleRedisConnectionFailure(RedisConnectionFailureException ex) {
+    String errorMessage = "Redis connection error: " + ex.getMessage();
     // 日志记录错误
-    logger.error("Redis connection failed", ex);
+    logger.error("RedisConnectionFailureException caught: {}", ex.getMessage(), ex);
     // 返回自定义的错误消息和状态码
-    return new ResponseEntity<>("Failed to connect to Redis server.", HttpStatus.SERVICE_UNAVAILABLE);
+    return new ResponseEntity<>(errorMessage, HttpStatus.SERVICE_UNAVAILABLE);
+  }
+
+  /**
+   * 处理 SQLNonTransientConnectionException 异常。
+   */
+  @ExceptionHandler(SQLNonTransientConnectionException.class)
+  public ResponseEntity<Object> handleSQLNonTransientConnectionException(SQLNonTransientConnectionException ex) {
+    String errorMessage = "Database connection error: " + ex.getMessage();
+    // 日志记录错误
+    logger.error("SQLNonTransientConnectionException caught: {}", ex.getMessage(), ex);
+    // 返回自定义的错误消息和状态码
+    return new ResponseEntity<>(errorMessage, HttpStatus.SERVICE_UNAVAILABLE);
+  }
+
+  /**
+   * 通用异常处理方法，捕获所有其他未被捕获的异常。
+   */
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleAllExceptions(Exception ex) {
+    // 自定义错误信息
+    String errorMessage = "An unexpected error occurred: " + ex.getMessage();
+
+    // 日志记录（这里假设你有一个日志框架，如 SLF4J）
+    logger.error("Unexpected exception caught: {}", ex.getMessage(), ex);
+
+    // 返回自定义响应
+    return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }

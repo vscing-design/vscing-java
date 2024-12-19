@@ -2,15 +2,14 @@ package com.vscing.admin.controller.v1;
 
 import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.common.api.CommonPage;
-import com.vscing.common.service.RedisService;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserLoginDto;
-import com.vscing.model.dto.UserListDto;
-import com.vscing.model.dto.UserSaveDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.common.api.CommonResult;
-import com.vscing.model.vo.UserVo;
+import com.vscing.model.struct.AdminUserMapper;
+import com.vscing.model.vo.AdminUserDetailVo;
+import com.vscing.model.vo.AdminUserListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,15 +28,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.vscing.common.util.RequestUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * AdminUserController
@@ -85,21 +82,28 @@ public class AdminUserController {
 
   @GetMapping("/users")
   @Operation(summary = "后台用户列表")
-  public CommonResult<CommonPage<AdminUser>> users(AdminUserListDto queryParam,
-                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+  public CommonResult<CommonPage<AdminUserListVo>> users(AdminUserListDto queryParam,
+                                                         @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                         @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<AdminUser> userList = adminUserService.getList(queryParam, pageSize, pageNum);
-    return CommonResult.success(CommonPage.restPage(userList));
+    // 直接调用改进后的 Mapper 方法进行转换
+//    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
+
+    List<AdminUserListVo> list = userList.stream()
+        .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
+        .collect(Collectors.toList());
+    return CommonResult.success(CommonPage.restPage(list));
   }
 
   @GetMapping("/users/{id}")
   @Operation(summary = "后台用户详情")
-  public CommonResult<AdminUser> getUserDetail(@PathVariable("id") Long id) {
+  public CommonResult<AdminUserDetailVo> getUserDetail(@PathVariable("id") Long id) {
     AdminUser adminUser = adminUserService.getDetails(id);
     if (adminUser == null) {
       return CommonResult.failed("用户不存在");
     }
-    return CommonResult.success(adminUser);
+    AdminUserDetailVo detail = AdminUserMapper.INSTANCE.adminUserToAdminUserDetailVo(adminUser);
+    return CommonResult.success(detail);
   }
 
   @PostMapping("/users")

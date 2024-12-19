@@ -54,6 +54,16 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        // TODO：这段可以单独提出来做一个 SecurityFilterChain
+        if (!securityProperties.getEnabled()) {
+            // 如果安全校验开关关闭，则不应用任何安全配置
+            http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable);
+
+            return http.build();
+        }
+
         // 忽略的路径
         http.authorizeHttpRequests(authorize -> authorize
             .requestMatchers(securityProperties.getUrls().toArray(new String[0])).permitAll() // 使用配置文件中的白名单URL
