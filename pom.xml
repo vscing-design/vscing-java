@@ -52,6 +52,7 @@
         <jackson.version>2.18.2</jackson.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <hutool.version>5.8.9</hutool.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
     <!--  模块依赖  -->
@@ -159,17 +160,17 @@
 <!--                <version>https://documentation.red-gate.com/flyway/getting-started-with-flyway/quickstart-guides/quickstart-maven</version>-->
 <!--            </dependency>-->
             <!--  类型转换 -->
-<!--            <dependency>-->
-<!--                <groupId>org.mapstruct</groupId>-->
-<!--                <artifactId>mapstruct</artifactId>-->
-<!--                <version>https://code.exmay.com/detail/21954</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.mapstruct</groupId>-->
-<!--                <artifactId>mapstruct-processor</artifactId>-->
-<!--                <version>${mapstruct.version}</version>-->
-<!--                <scope>provider</scope>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+                <scope>provider</scope>
+            </dependency>
             <!-- Hibernate Validator -->
 <!--            <dependency>-->
 <!--                <groupId>org.hibernate.validator</groupId>-->
@@ -238,6 +239,15 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <scope>provider</scope>
         </dependency>
     </dependencies>
 

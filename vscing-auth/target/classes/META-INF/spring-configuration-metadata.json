@@ -8,6 +8,11 @@
   ],
   "properties": [
     {
+      "name": "secure.ignored.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.vscing.auth.config.SecurityProperties"
+    },
+    {
       "name": "secure.ignored.urls",
       "type": "java.util.List<java.lang.String>",
       "description": "白名单 URL 集合",

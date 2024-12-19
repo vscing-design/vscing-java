@@ -23,4 +23,7 @@ public class SecurityProperties {
      * 白名单 URL 集合
      */
     private List<String> urls;
+
+    private Boolean enabled;
+
 }
