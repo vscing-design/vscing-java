@@ -14,17 +14,33 @@ logging:
     root: WARN
     org.springframework.web: DEBUG
     com.vscing.admin: INFO
+    org.springdoc: DEBUG
+    com.github.xiaoymin: DEBUG
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+#knife4j相关配置 可以不用改
+knife4j:
+  enable: true    #开启knife4j，无需添加@EnableKnife4j注解
+  setting:
+    language: zh_cn   #中文
+    swagger-model-name: 实体类   #重命名SwaggerModel名称,默认
+  #开启Swagger的Basic认证功能,默认是false
+#  basic:
+#    enable: true
+#    # Basic认证用户名
+#    username: hgh
+#    # Basic认证密码
+#    password: a1234567
 mybatis:
   configuration:
 #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
   mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
 jwt:
+  superAdminId: 1868343994693718016
   tokenHeader: Authorization #JWT存储的请求头
   expiration: 604800 #JWT的超期限时间(60*60*24*1)
   tokenHead: 'Bearer '  #JWT负载中拿到开头
