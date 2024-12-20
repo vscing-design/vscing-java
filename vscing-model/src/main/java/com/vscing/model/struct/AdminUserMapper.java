@@ -4,6 +4,7 @@ import com.vscing.model.entity.AdminUser;
 import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public interface AdminUserMapper {
 
   List<AdminUserListVo> adminUserToAdminUserListVos(List<AdminUser> adminUsers);
 
+  @Mapping(target = "relatedRole", ignore = true)
+  @Mapping(target = "relatedMenu", ignore = true)
   AdminUserDetailVo adminUserToAdminUserDetailVo(AdminUser adminUser);
 
 

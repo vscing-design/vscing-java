@@ -19,59 +19,10 @@ MinIO 文件存储https://juejin.cn/post/7443658338867134518
 
 logback-spring 配置路径  https://juejin.cn/post/6844903701870542855
 
-id 转字符串、过滤不要字符（定义视图类）
+https://lanhuapp.com/link/#/invite?sid=qX0OtgDQ
+密码: V8Af
 
-接口入参调整、批量删除和批量修改、批量新增
-
-<plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot.version}</version>
-                    <configuration>
-                        <arguments>
-                            <argument>--spring.profiles.active=${spring.profiles.active}</argument>
-                        </arguments>
-                        <excludes>
-                            <exclude>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                            </exclude>
-                        </excludes>
-                    </configuration>
-                </plugin> 增加mapstruct和mapstruct-processor过滤
+全局错误日志加判断，正式环境不展示出来
 
 
-
-                @Bean
-                    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-                        // 忽略的路径
-                        http.authorizeHttpRequests(authorize -> authorize
-                            .requestMatchers(securityProperties.getUrls().toArray(new String[0])).permitAll() // 使用配置文件中的白名单URL
-                            .anyRequest().authenticated()); // 其他所有请求需要认证
-
-                        http
-                            // 禁用CSRF保护
-                            .csrf(AbstractHttpConfigurer::disable)
-                            // 由于使用的是JWT，CORS保护也可以禁用
-                            .cors(AbstractHttpConfigurer::disable)
-                            // 禁用session
-                            .sessionManagement(session -> session
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-                        // 添加自定义未授权和未登录结果返回
-                        http.exceptionHandling(exceptionHandling -> exceptionHandling
-                            .accessDeniedHandler(restfulAccessDeniedHandler) // 自定义处理未授权
-                            .authenticationEntryPoint(restfulAuthenticationEntryPoint)) // 自定义处理未登录
-                            // 添加JWT过滤器
-                            .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-                        // 动态权限配置时添加动态权限校验过滤器
-                //        if (dynamicSecurityService != null) {
-                //            http.addFilterBefore(dynamicSecurityFilter, FilterSecurityInterceptor.class);
-                //        }
-
-                        return http.build();
-                    }
-增加配置开关，来选择是否拦截请求
 

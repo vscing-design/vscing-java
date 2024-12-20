@@ -40,7 +40,7 @@ public class SecurityConfig {
     public SecurityFilterChain swaggerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
             // 指定这个安全链只处理这些路径
-            .securityMatcher("/v3/api-docs/**", "/swagger-ui/**")
+            .securityMatcher("/v3/api-docs/**", "/swagger-ui/**", "/doc.html", "/webjars/**")
             .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
             .httpBasic(Customizer.withDefaults())
