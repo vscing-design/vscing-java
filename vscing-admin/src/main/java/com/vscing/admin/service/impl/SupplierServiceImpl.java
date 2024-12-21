@@ -55,8 +55,8 @@ public class SupplierServiceImpl implements SupplierService {
   }
 
   @Override
-  public long deleted(long id) {
-    return mapper.softDeleteById(id);
+  public long deleted(long id, long deleterId) {
+    return mapper.softDeleteById(id, deleterId);
   }
 
 }
