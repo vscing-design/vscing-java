@@ -38,6 +38,6 @@ public interface SupplierService {
   /**
    * 删除
    */
-  long deleted(long id);
+  long deleted(long id, long deleterId);
 
 }

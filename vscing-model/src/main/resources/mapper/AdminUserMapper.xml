@@ -88,7 +88,7 @@
     </delete>
 
     <!-- 根据 ID 软删除用户 -->
-    <update id="softDeleteById" parameterType="long">
+    <update id="softDeleteById" parameterType="map">
         UPDATE <include refid="tableName" />
         SET deleted_at = NOW(),
             deleted_by = #{deleterId, jdbcType=BIGINT}
