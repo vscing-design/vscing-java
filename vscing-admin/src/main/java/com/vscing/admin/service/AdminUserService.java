@@ -1,14 +1,11 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.AdminUserListDto;
-import com.vscing.model.dto.UserListDto;
 import com.vscing.model.entity.AdminUser;
-import com.vscing.model.vo.UserVo;
 import com.vscing.auth.service.VscingUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * AdminUserService
@@ -51,7 +48,7 @@ public interface AdminUserService {
   /**
    * 删除
    */
-  long deleted(long id);
+  long deleted(long id, long deleterId);
 
 
 

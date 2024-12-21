@@ -26,7 +26,7 @@ public interface AdminUserMapper {
 
   int deleteById(long id);
 
-  int softDeleteById(long id);
+  int softDeleteById(long id, long deleterId);
 
   int update(AdminUser record);
 

@@ -176,14 +176,14 @@ public class AdminUserController {
 
   @DeleteMapping("/users/{id}")
   @Operation(summary = "后台用户删除")
-  public CommonResult<Object> users(@PathVariable Long id) {
+  public CommonResult<Object> users(@PathVariable Long id, @AuthenticationPrincipal AdminUserDetails userInfo) {
     if(id == null) {
       return CommonResult.validateFailed("参数错误");
     }
     if(jwtTokenUtil.isSuperAdmin(id)) {
       return CommonResult.failed("超级管理员不可删除！");
     }
-    long result = adminUserService.deleted(id);
+    long result = adminUserService.deleted(id, userInfo.getUserId());
     if (result != 0) {
       return CommonResult.success("删除成功");
     } else {
