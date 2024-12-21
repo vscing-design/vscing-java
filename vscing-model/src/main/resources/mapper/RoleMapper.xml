@@ -55,7 +55,7 @@
             <if test="name != null">#{name, jdbcType=VARCHAR},</if>
             <if test="sortOrder != null">#{sortOrder, jdbcType=TINYINT},</if>
             <if test="notes != null">#{notes, jdbcType=VARCHAR},</if>
-            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
 
@@ -66,7 +66,7 @@
             <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
             <if test="sortOrder != null">sort_order = #{sortOrder, jdbcType=TINYINT},</if>
             <if test="notes != null">notes = #{notes, jdbcType=VARCHAR},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
