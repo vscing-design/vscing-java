@@ -30,3 +30,16 @@ CREATE TABLE vscing_order (
     REFERENCES vscing_user(id)
     ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci comment = '订单信息表';
+
+CREATE TABLE vscing_roles (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) DEFAULT '' NOT NULL,
+    sort_order INT DEFAULT 0,
+    notes VARCHAR(255) DEFAULT '' NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at TIMESTAMP NULL,
+    deleted_by BIGINT
+);ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci comment = '角色表';
