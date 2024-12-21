@@ -24,6 +24,6 @@ public interface SupplierMapper {
 
   int update(Supplier record);
 
-  int softDeleteById(long id);
+  int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
 }

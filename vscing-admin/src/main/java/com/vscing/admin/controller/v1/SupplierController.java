@@ -130,11 +130,11 @@ public class SupplierController {
 
   @DeleteMapping("/{id}")
   @Operation(summary = "删除")
-  public CommonResult<Object> delete(@PathVariable Long id) {
+  public CommonResult<Object> delete(@PathVariable Long id, @AuthenticationPrincipal AdminUserDetails userInfo) {
     if(id == null) {
       return CommonResult.validateFailed("参数错误");
     }
-    long result = supplierService.deleted(id);
+    long result = supplierService.deleted(id, userInfo.getUserId());
     if (result != 0) {
       return CommonResult.success("删除成功");
     } else {
