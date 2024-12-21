@@ -23,9 +23,14 @@
         <result column="deleted_by" property="deletedBy" />
     </resultMap>
 
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_admin_user
+    </sql>
+
     <!-- 查询用户列表 -->
     <select id="getList" resultMap="BaseResultMap">
-        SELECT * FROM vscing_admin_user
+        SELECT * FROM <include refid="tableName" />
         <where>
             deleted_at IS NULL
             <if test="record.username != null and record.username.trim() != ''">
@@ -45,33 +50,54 @@
 
     <!-- 根据 username 查询用户 -->
     <select id="selectByUsername" parameterType="String" resultMap="BaseResultMap">
-        SELECT * FROM vscing_admin_user WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
+        SELECT * FROM <include refid="tableName" /> WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
     </select>
 
     <!-- 根据 ID 查询用户 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
-        SELECT * FROM vscing_admin_user WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
     <!-- 插入用户信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
-        INSERT INTO vscing_admin_user(id, username, password, last_ip, created_by)
-        values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{lastIp,jdbcType=VARCHAR}, #{createdBy,jdbcType=BIGINT})
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="nickname != null">nickname,</if>
+            <if test="phone != null">phone,</if>
+            <if test="status != null">status,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="username != null">#{username, jdbcType=VARCHAR},</if>
+            <if test="password != null">#{password, jdbcType=VARCHAR},</if>
+            <if test="nickname != null">#{nickname, jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
     </insert>
 
     <!-- 根据 ID 硬删除用户 -->
     <delete id="deleteById" parameterType="long">
-        DELETE FROM vscing_admin_user WHERE id = #{id,jdbcType=BIGINT}
+        DELETE FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT}
     </delete>
 
     <!-- 根据 ID 软删除用户 -->
     <update id="softDeleteById" parameterType="long">
-        UPDATE vscing_admin_user SET deleted_at = NOW() WHERE id = #{id,jdbcType=BIGINT}
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+            deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
     <!-- 更新用户信息 -->
     <update id="update" parameterType="com.vscing.model.entity.AdminUser">
-        UPDATE vscing_admin_user
+        UPDATE <include refid="tableName" />
         <set>
             <if test="username != null">
                 username = #{username,jdbcType=VARCHAR},
@@ -102,6 +128,9 @@
             </if>
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="updatedBy != null">
+                updated_by = #{updatedBy, jdbcType=BIGINT}
             </if>
         </set>
         WHERE id = #{id,jdbcType=BIGINT}

@@ -136,8 +136,8 @@ public class AdminUserServiceImpl implements AdminUserService {
   }
 
   @Override
-  public long deleted(long id) {
-    return adminUserMapper.softDeleteById(id);
+  public long deleted(long id, long deleterId) {
+    return adminUserMapper.softDeleteById(id, deleterId);
   }
 
 }
