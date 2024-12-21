@@ -77,7 +77,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     try {
       // 获取用户信息
       AdminUser adminUser = adminUserMapper.selectByUsername(username);
-      if(!passwordEncoder.matches(password, adminUser.getPassword())){
+      if(adminUser != null && !passwordEncoder.matches(password, adminUser.getPassword())){
         throw new BadCredentialsException("密码不正确");
       }
       // 用户关联信息 角色、菜单等
