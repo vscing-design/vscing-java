@@ -8,4 +8,7 @@ package com.vscing.model.dto;
  */
 public class RoleListDto {
 
+    @Schema(description = "角色名称")
+    private String name;
+  
 }
