@@ -3,6 +3,7 @@ package com.vscing.common.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import io.github.linpeilie.Converter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MapstructUtils {
 
-    private final static Converter CONVERTER = SpringUtils.getBean(Converter.class);
+    private final static Converter CONVERTER = SpringUtil.getBean(Converter.class);
 
     /**
      * 将 T 类型对象，转换为 desc 类型的对象并返回
