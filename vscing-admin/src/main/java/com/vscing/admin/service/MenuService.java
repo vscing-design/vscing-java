@@ -10,6 +10,11 @@ public interface MenuService {
     /**
      * 列表
      */
+    List<Menu> getAllList(MenuListDto record);
+
+    /**
+     * 列表
+     */
     List<Menu> getList(MenuListDto record, Integer pageSize, Integer pageNum);
 
     /**
