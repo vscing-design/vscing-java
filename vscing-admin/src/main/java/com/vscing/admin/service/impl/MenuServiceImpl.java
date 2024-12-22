@@ -18,8 +18,29 @@ public class MenuServiceImpl implements MenuService {
     private MenuMapper menuMapper;
 
     @Override
-    public List<Menu> getAllList(MenuListDto record) {
-        return menuMapper.getList(record);
+    public List<MenuTreeVo> getAllList(MenuListDto record) {
+        List<Menu> menuList = menuMapper.getList(record);
+        Map<Long, MenuTreeVo> menuMap = new HashMap<>();
+        List<MenuTreeVo> tree = new ArrayList<>();
+
+        // 将Menu实体转换为MenuTreeVo对象，并建立映射关系
+        for (Menu menu : menuList) {
+            MenuTreeVo menuVo = MenuMapper.INSTANCE.menuToMenuTreeVo(menu);
+            menuMap.put(menu.getId(), menuVo);
+        }
+
+        // 构建树形结构
+        for (Menu menu : menuList) {
+            if (menu.getParentId() == null || menu.getParentId() == 0) {
+                tree.add(menuMap.get(menu.getId())); // 根菜单
+            } else {
+                MenuTreeVo parent = menuMap.get(menu.getParentId());
+                if (parent != null) {
+                    parent.getChildren().add(menuMap.get(menu.getId())); // 将当前菜单添加到父菜单的children中
+                }
+            }
+        }
+        return tree;
     }
 
     @Override
