@@ -9,6 +9,7 @@ package com.vscing.common.exception;
 import com.vscing.common.api.CommonResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,13 +23,16 @@ public class GlobalExceptionHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+  @Value("${app.debug}")
+  private Boolean appDebug;
+
   @ExceptionHandler(RedisConnectionFailureException.class)
   public ResponseEntity<Object> handleRedisConnectionFailure(RedisConnectionFailureException ex) {
     String errorMessage = "Redis connection error: " + ex.getMessage();
     // 日志记录错误
     logger.error("RedisConnectionFailureException caught: {}", ex.getMessage(), ex);
     // 返回自定义的错误消息和状态码
-    return new ResponseEntity<>(CommonResult.failed(errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "服务器异常"), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   /**
@@ -40,7 +44,7 @@ public class GlobalExceptionHandler {
     // 日志记录错误
     logger.error("SQLNonTransientConnectionException caught: {}", ex.getMessage(), ex);
     // 返回自定义的错误消息和状态码
-    return new ResponseEntity<>(CommonResult.failed(errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "服务器异常"), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   /**
@@ -55,7 +59,7 @@ public class GlobalExceptionHandler {
     logger.error("Unexpected exception caught: {}", ex.getMessage(), ex);
 
     // 返回自定义响应
-    return new ResponseEntity<>(CommonResult.failed(errorMessage), HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "服务器异常"), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }

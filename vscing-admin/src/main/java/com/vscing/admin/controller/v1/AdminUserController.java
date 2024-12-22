@@ -3,12 +3,12 @@ package com.vscing.admin.controller.v1;
 import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.api.CommonPage;
+import com.vscing.common.util.MapstructUtils;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserLoginDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.common.api.CommonResult;
-import com.vscing.model.struct.AdminUserMapper;
 import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,11 +92,8 @@ public class AdminUserController {
                                                          @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<AdminUser> userList = adminUserService.getList(queryParam, pageSize, pageNum);
     // 直接调用改进后的 Mapper 方法进行转换
-//    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
-    // .map(is -> MapstructUtils.convert(is, AdminUserListVo.class))
-
     List<AdminUserListVo> list = userList.stream()
-        .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
+        .map(adminUser -> MapstructUtils.convert(adminUser, AdminUserListVo.class))
         .collect(Collectors.toList());
     return CommonResult.success(CommonPage.restPage(list));
   }
@@ -112,8 +109,8 @@ public class AdminUserController {
     List<Object> relatedRole = new ArrayList<>();
     // 关联菜单
     List<Object> relatedMenu = new ArrayList<>();
-
-    AdminUserDetailVo detail = AdminUserMapper.INSTANCE.adminUserToAdminUserDetailVo(adminUser);
+    // 直接调用改进后的 Mapper 方法进行转换
+    AdminUserDetailVo detail = MapstructUtils.convert(adminUser, AdminUserDetailVo.class);
     detail.setRelatedRole(relatedRole);
     detail.setRelatedMenu(relatedMenu);
     return CommonResult.success(detail);
@@ -152,6 +149,9 @@ public class AdminUserController {
   public CommonResult<Object> users(@Validated @RequestBody AdminUser adminUser,
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (adminUser.getId() == null) {
+      return CommonResult.validateFailed("ID不能为空");
+    }
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();

@@ -6,6 +6,7 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MenuListDto;
 import com.vscing.model.entity.Menu;
+import com.vscing.model.vo.MenuTreeVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -40,13 +41,14 @@ public class MenuController {
                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Menu> list = menuService.getList(queryParam, pageSize, pageNum);
-    // 直接调用改进后的 Mapper 方法进行转换
-//    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
-
-//    List<AdminUserListVo> list = userList.stream()
-//        .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
-//        .collect(Collectors.toList());
     return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @GetMapping("/tree")
+  @Operation(summary = "树形列表")
+  public CommonResult<List<MenuTreeVo>> lists(MenuListDto queryParam) {
+    List<MenuTreeVo> list = menuService.getAllList(queryParam);
+    return CommonResult.success(list);
   }
 
   @GetMapping("/{id}")
@@ -93,6 +95,9 @@ public class MenuController {
   public CommonResult<Object> save(@Validated @RequestBody Menu menu,
                                    BindingResult bindingResult,
                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (menu.getId() == null) {
+      return CommonResult.validateFailed("ID不能为空");
+    }
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();

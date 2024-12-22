@@ -21,6 +21,9 @@
     <sql id="tableName">
         vscing_role
     </sql>
+    <sql id="adminUserRoleTableName">
+        vscing_admin_user_role
+    </sql>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultMap="BaseResultMap">

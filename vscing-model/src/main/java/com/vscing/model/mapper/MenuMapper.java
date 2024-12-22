@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MenuListDto;
 import com.vscing.model.entity.Menu;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/22 00:44
  */
+@Mapper
 public interface MenuMapper {
 
   List<Menu> getList(@Param("record") MenuListDto record);

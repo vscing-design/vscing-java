@@ -2,6 +2,7 @@ package com.vscing.admin.service;
 
 import com.vscing.model.dto.MenuListDto;
 import com.vscing.model.entity.Menu;
+import com.vscing.model.vo.MenuTreeVo;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface MenuService {
     /**
      * 列表
      */
-    List<Menu> getAllList(MenuListDto record);
+    List<MenuTreeVo> getAllList(MenuListDto record);
 
     /**
      * 列表
