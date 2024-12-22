@@ -39,4 +39,129 @@ TODO：https://gitee.com/dromara/RuoYi-Vue-Plus
 - sql注入https://juejin.cn/search?query=%E5%B8%B8%E8%A7%81%E7%9A%84web%E6%94%BB%E5%87%BB%E6%9C%89%E5%93%AA%E4%BA%9B&utm_source=gold_browser_extension&utm_medium=search
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+
+public class Body {
+    private int code;
+    private String message;
+    private List<City> data;
+
+    // getters and setters
+}
+
+public class City {
+    private String cityName;
+    private int cityId;
+    private String firstLetter;
+    private int isHot;
+    private String provinceName;
+    private List<Region> regions;
+    private String cityCode;
+
+    // getters and setters
+}
+
+public class Region {
+    private String regionName;
+    private int regionId;
+
+    // getters and setters
+}
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// ...
+
+ObjectMapper mapper = new ObjectMapper();
+Body body = mapper.readValue(jsonResponse, Body.class);
+
+for (City city : body.getData()) {
+    // 执行数据库操作
+}
+
+import java.sql.*;
+
+// ...
+
+Connection conn = null;
+try {
+    conn = DriverManager.getConnection(url, username, password);
+    conn.setAutoCommit(false); // 开始事务
+
+    for (City city : body.getData()) {
+        String cityCode = city.getCityCode();
+        // 检查cityCode是否存在于city表中
+        String cityQuery = "SELECT * FROM city WHERE city_code = ?";
+        try (PreparedStatement cityStmt = conn.prepareStatement(cityQuery)) {
+            cityStmt.setString(1, cityCode);
+            ResultSet rs = cityStmt.executeQuery();
+            if (rs.next()) {
+                // 更新city表
+                String cityUpdate = "UPDATE city SET city_id = ? WHERE city_code = ?";
+                try (PreparedStatement cityUpdateStmt = conn.prepareStatement(cityUpdate)) {
+                    cityUpdateStmt.setInt(1, city.getCityId());
+                    cityUpdateStmt.setString(2, cityCode);
+                    cityUpdateStmt.executeUpdate();
+                }
+            }
+        }
+
+        // 检查cityCode是否存在于area表中
+        String areaQuery = "SELECT * FROM area WHERE city_code = ?";
+        try (PreparedStatement areaStmt = conn.prepareStatement(areaQuery)) {
+            areaStmt.setString(1, cityCode);
+            ResultSet rs = areaStmt.executeQuery();
+            if (rs.next()) {
+                // 更新area表
+                String areaUpdate = "UPDATE area SET city_id = ? WHERE city_code = ?";
+                try (PreparedStatement areaUpdateStmt = conn.prepareStatement(areaUpdate)) {
+                    areaUpdateStmt.setInt(1, city.getCityId());
+                    areaUpdateStmt.setString(2, cityCode);
+                    areaUpdateStmt.executeUpdate();
+                }
+            }
+        }
+
+        // 遍历regions
+        for (Region region : city.getRegions()) {
+            // 检查regionName是否存在于area表中
+            String regionQuery = "SELECT * FROM area WHERE name = ?";
+            try (PreparedStatement regionStmt = conn.prepareStatement(regionQuery)) {
+                regionStmt.setString(1, region.getRegionName());
+                ResultSet rs = regionStmt.executeQuery();
+                if (rs.next()) {
+                    // 更新area表
+                    String regionUpdate = "UPDATE area SET region_id = ? WHERE name = ?";
+                    try (PreparedStatement regionUpdateStmt = conn.prepareStatement(regionUpdate)) {
+                        regionUpdateStmt.setInt(1, region.getRegionId());
+                        regionUpdateStmt.setString(2, region.getRegionName());
+                        regionUpdateStmt.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    conn.commit(); // 提交事务
+} catch (SQLException e) {
+    if (conn != null) {
+        try {
+            conn.rollback(); // 回滚事务
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+    e.printStackTrace();
+} finally {
+    if (conn != null) {
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
 
