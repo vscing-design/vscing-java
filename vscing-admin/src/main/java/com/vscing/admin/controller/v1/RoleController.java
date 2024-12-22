@@ -39,12 +39,6 @@ public class RoleController {
                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Role> list = roleService.getList(queryParam, pageSize, pageNum);
-    // 直接调用改进后的 Mapper 方法进行转换
-//    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
-
-//    List<AdminUserListVo> list = userList.stream()
-//        .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
-//        .collect(Collectors.toList());
     return CommonResult.success(CommonPage.restPage(list));
   }
 
@@ -92,6 +86,9 @@ public class RoleController {
   public CommonResult<Object> save(@Validated @RequestBody Role role,
                                    BindingResult bindingResult,
                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (role.getId() == null) {
+      return CommonResult.validateFailed("ID不能为空");
+    }
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();

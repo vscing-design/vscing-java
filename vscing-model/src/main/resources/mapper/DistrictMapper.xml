@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.DistrictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.District">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="city_id" property="cityId" jdbcType="BIGINT" />
+        <result column="s1_city_id" property="s1CityId" jdbcType="BIGINT" />
+        <result column="s1_region_id" property="s1RegionId" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="short_name" property="shortName" jdbcType="VARCHAR" />
+        <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+        <result column="first_letter" property="firstLetter" jdbcType="VARCHAR" />
+        <result column="full_letter" property="fullLetter" jdbcType="VARCHAR" />
+        <result column="lng" property="lng" jdbcType="VARCHAR" />
+        <result column="lat" property="lng" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_district
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="record.name != null">
+                AND name LIKE CONCAT('%', #{record.name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.District">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cityId != null">city_id,</if>
+            <if test="s1CityId != null">s1_city_id,</if>
+            <if test="s1RegionId != null">s1_region_id,</if>
+            <if test="name != null">name,</if>
+            <if test="shortName != null">short_name,</if>
+            <if test="pinyin != null">pinyin,</if>
+            <if test="firstLetter != null">first_letter,</if>
+            <if test="fullLetter != null">full_letter,</if>
+            <if test="lng != null">lng,</if>
+            <if test="lat != null">lat,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="cityId != null">#{cityId, jdbcType=BIGINT},</if>
+            <if test="s1CityId != null">#{s1CityId, jdbcType=BIGINT},</if>
+            <if test="s1RegionId != null">#{s1RegionId, jdbcType=BIGINT},</if>
+            <if test="name != null">#{name,jdbcType=VARCHAR},</if>
+            <if test="shortName != null">#{shortName,jdbcType=VARCHAR},</if>
+            <if test="pinyin != null">#{pinyin,jdbcType=VARCHAR},</if>
+            <if test="firstLetter != null">#{firstLetter,jdbcType=VARCHAR},</if>
+            <if test="fullLetter != null">#{fullLetter,jdbcType=VARCHAR},</if>
+            <if test="lng != null">#{lng,jdbcType=VARCHAR},</if>
+            <if test="lat != null">#{lat,jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.District">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="cityId != null">city_id = #{cityId,jdbcType=BIGINT},</if>
+            <if test="s1CityId != null">s1_city_id = #{s1CityId,jdbcType=BIGINT},</if>
+            <if test="s1RegionId != null">s1_region_id = #{s1RegionId, jdbcType=BIGINT},</if>
+            <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>
+            <if test="shortName != null">short_name = #{shortName,jdbcType=VARCHAR},</if>
+            <if test="pinyin != null">pinyin = #{pinyin,jdbcType=VARCHAR},</if>
+            <if test="firstLetter != null">first_letter = #{firstLetter,jdbcType=VARCHAR},</if>
+            <if test="fullLetter != null">full_letter = #{fullLetter,jdbcType=VARCHAR},</if>
+            <if test="lng != null">lng = #{lng,jdbcType=VARCHAR},</if>
+            <if test="lat != null">lat = #{lat,jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

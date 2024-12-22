@@ -1,26 +1,21 @@
-package com.vscing.model.entity;
+package com.vscing.model.vo;
 
-import com.vscing.model.domain.BaseEntity;
-import com.vscing.model.vo.MenuTreeVo;
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
- * Menu
+ * MenuTreeVo
  *
  * @author vscing
- * @date 2024/12/22 00:41
+ * @date 2024/12/22 21:08
  */
 @Getter
 @Setter
-@AutoMappers({
-    @AutoMapper(target = MenuTreeVo.class)
-})
-public class Menu extends BaseEntity {
+public class MenuTreeVo {
 
   @Schema(description = "菜单id")
   private Long id;
@@ -28,7 +23,6 @@ public class Menu extends BaseEntity {
   @Schema(description = "菜单父id")
   private Long parentId;
 
-  @NotNull(message = "菜单名称不能为空")
   @Schema(description = "菜单名称")
   private String name;
 
@@ -38,12 +32,25 @@ public class Menu extends BaseEntity {
   @Schema(description = "icon")
   private String icon;
 
-  @Schema(description = "路由地址")
-  private String path;
-
   @Schema(description = "前端组件")
   private String component;
 
   @Schema(description = "启用状态：1->启用 2->禁用")
   private Integer status;
+
+  @Schema(description = "创建时间")
+  private LocalDateTime createdAt;
+
+  @Schema(description = "创建者ID")
+  private Long createdBy;
+
+  @Schema(description = "更新时间")
+  private LocalDateTime updatedAt;
+
+  @Schema(description = "更新者ID")
+  private Long updatedBy;
+
+  @Schema(description = "子数据列表")
+  private List<MenuTreeVo> children;
+
 }

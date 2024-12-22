@@ -1,10 +1,12 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import com.vscing.model.vo.AdminUserDetailVo;
+import com.vscing.model.vo.AdminUserListVo;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AutoMappers({
-        @AutoMapper(target = AdminUserListVo.class)
+    @AutoMapper(target = AdminUserListVo.class),
+    @AutoMapper(target = AdminUserDetailVo.class)
 })
 public class AdminUser extends BaseEntity {
 

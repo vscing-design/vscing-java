@@ -1,5 +1,7 @@
 package com.vscing.model.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * MenuListDto
  *

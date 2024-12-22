@@ -4,16 +4,10 @@ import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.admin.service.SupplierService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
-import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.SupplierListDto;
-import com.vscing.model.entity.AdminUser;
 import com.vscing.model.entity.Supplier;
-import com.vscing.model.struct.AdminUserMapper;
-import com.vscing.model.vo.AdminUserDetailVo;
-import com.vscing.model.vo.AdminUserListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -28,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * SupplierController
@@ -52,12 +44,6 @@ public class SupplierController {
                                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                          @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Supplier> list = supplierService.getList(queryParam, pageSize, pageNum);
-    // 直接调用改进后的 Mapper 方法进行转换
-//    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
-
-//    List<AdminUserListVo> list = userList.stream()
-//        .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
-//        .collect(Collectors.toList());
     return CommonResult.success(CommonPage.restPage(list));
   }
 
@@ -105,6 +91,9 @@ public class SupplierController {
   public CommonResult<Object> save(@Validated @RequestBody Supplier supplier,
                                     BindingResult bindingResult,
                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (supplier.getId() == null) {
+      return CommonResult.validateFailed("ID不能为空");
+    }
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();

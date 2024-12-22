@@ -1,8 +1,6 @@
 package com.vscing.model.domain;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,6 +11,11 @@ import java.time.LocalDateTime;
 */
 @Data
 public class BaseEntity implements Serializable {
+
+    /**
+     * 序列化版本 UID
+    */
+    private static final long serialVersionUID = 1L;
 
     /** 创建时间 */
     private LocalDateTime createdAt;

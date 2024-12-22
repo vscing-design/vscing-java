@@ -1,15 +1,16 @@
 package com.vscing.common.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.vscing.common.handler.BigNumberSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 /**
  * JacksonConfig
@@ -27,6 +29,7 @@ import java.time.format.DateTimeFormatter;
  * @author vscing
  * @date 2024/12/18 23:27
  */
+@Slf4j
 @Configuration
 public class JacksonConfig {
 
@@ -36,51 +39,32 @@ public class JacksonConfig {
 
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer customizer() {
-    return builder ->
-        builder.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            // long类型转string， 前端处理Long类型，数值过大会丢失精度
-//                        .serializerByType(Long.class, ToStringSerializer.instance)
-//                        .serializerByType(Long.TYPE, ToStringSerializer.instance)
-            // 过滤null
-//            .serializationInclusion(JsonInclude.Include.NON_NULL)
-            //指定反序列化类型，也可以使用@JsonFormat(pattern = "yyyy-MM-dd")替代。主要是mvc接收日期时使用
-            .deserializerByType(LocalTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
-            .deserializerByType(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-            // 日期序列化，主要返回数据时使用
-            .serializerByType(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
-            .serializerByType(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-  }
+    return builder -> {
+      // 关闭未知属性报错
+      builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      // 过滤null
+//      builder.serializationInclusion(JsonInclude.Include.NON_NULL);
 
-  @Bean
-  public ObjectMapper objectMapper() {
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    JavaTimeModule module = new JavaTimeModule();
-
-    // 配置 Jackson 序列化 BigDecimal 时使用的格式
-    module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
-
-    // 配置 Jackson 序列化 long类型为String，解决后端返回的Long类型在前端精度丢失的问题
-    module.addSerializer(BigInteger.class, ToStringSerializer.instance);
-    module.addSerializer(Long.class, ToStringSerializer.instance);
-    module.addSerializer(Long.TYPE, ToStringSerializer.instance);
-
-    // 配置 Jackson 序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
-    module.addSerializer(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
-    module.addSerializer(new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
-    module.addSerializer(new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
-
-
-    // 配置 Jackson 反序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
-    module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
-    module.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
-    module.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
-
-    mapper.registerModule(module);
-    return mapper;
+      // 全局配置序列化返回 JSON 处理
+      JavaTimeModule javaTimeModule = new JavaTimeModule();
+      // long类型转string， 前端处理Long类型，数值过大会丢失精度
+      javaTimeModule.addSerializer(Long.class, BigNumberSerializer.INSTANCE);
+      javaTimeModule.addSerializer(Long.TYPE, BigNumberSerializer.INSTANCE);
+      javaTimeModule.addSerializer(BigInteger.class, BigNumberSerializer.INSTANCE);
+      // BigDecimal类型转string
+      javaTimeModule.addSerializer(BigDecimal.class, ToStringSerializer.instance);
+      // 配置 Jackson 序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
+      javaTimeModule.addSerializer(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
+      javaTimeModule.addSerializer(new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
+      javaTimeModule.addSerializer(new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
+      // 配置 Jackson 反序列化 LocalDateTime、LocalDate、LocalTime 时使用的格式
+      javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN)));
+      javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
+      javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
+      builder.modules(javaTimeModule);
+      builder.timeZone(TimeZone.getDefault());
+      log.info("初始化 jackson 配置");
+    };
   }
 
 }

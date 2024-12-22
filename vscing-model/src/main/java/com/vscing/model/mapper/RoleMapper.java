@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.RoleListDto;
 import com.vscing.model.entity.Role;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/22 00:48
  */
+@Mapper
 public interface RoleMapper {
 
   List<Role> getList(@Param("record") RoleListDto record);
