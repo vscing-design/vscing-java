@@ -35,8 +35,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public long updated(Menu adminUser) {
-        return menuMapper.update(adminUser);
+    public long updated(Menu menu) {
+        return menuMapper.update(menu);
     }
 
     @Override
