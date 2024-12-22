@@ -34,11 +34,11 @@
         SELECT * FROM <include refid="tableName" />
         <where>
             deleted_at IS NULL
-            <if test="name != null">
-                AND name LIKE CONCAT('%', #{name}, '%')
+            <if test="record.name != null">
+                AND name LIKE CONCAT('%', #{record.name}, '%')
             </if>
-            <if test="status != null">
-                AND status = #{status}
+            <if test="record.status != null">
+                AND status = #{record.status}
             </if>
         </where>
     </select>
