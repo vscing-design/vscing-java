@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@AutoMappers({
+        @AutoMapper(target = AdminUserListVo.class)
+})
 public class AdminUser extends BaseEntity {
 
   @Schema(description = "用户id")
