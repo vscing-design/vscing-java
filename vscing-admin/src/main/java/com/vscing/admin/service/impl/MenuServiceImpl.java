@@ -18,6 +18,11 @@ public class MenuServiceImpl implements MenuService {
     private MenuMapper menuMapper;
 
     @Override
+    public List<Menu> getAllList(MenuListDto record) {
+        return menuMapper.getList(record);
+    }
+
+    @Override
     public List<Menu> getList(MenuListDto record, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
         return menuMapper.getList(record);
