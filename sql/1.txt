@@ -27,6 +27,9 @@ https://lanhuapp.com/link/#/invite?sid=qX0OtgDQ
 TODO：
 - 测试分页列表
 - 测试关联列表
+- XSS
+- sql注入
+- https://juejin.cn/search?query=%E5%B8%B8%E8%A7%81%E7%9A%84web%E6%94%BB%E5%87%BB%E6%9C%89%E5%93%AA%E4%BA%9B&utm_source=gold_browser_extension&utm_medium=search
 
 
 
