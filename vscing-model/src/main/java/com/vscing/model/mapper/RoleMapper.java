@@ -24,4 +24,6 @@ public interface RoleMapper {
 
   int update(Role record);
 
+  List<Role> getRolesByUserId(long id);
+
 }
