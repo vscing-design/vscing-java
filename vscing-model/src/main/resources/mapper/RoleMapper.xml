@@ -78,4 +78,12 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 根据 用户ID 查询关联角色信息 -->
+    <select id="getRolesByUserId" parameterType="long" resultMap="BaseResultMap">
+        SELECT role.*
+        FROM <include refid="tableName" /> role
+        INNER JOIN <include refid="adminUserRoleTableName" /> ur ON role.id = ur.role_id
+        WHERE ur.admin_user_id = #{id, jdbcType=BIGINT}
+    </select>
+
 </mapper>
