@@ -24,9 +24,17 @@ https://lanhuapp.com/link/#/invite?sid=qX0OtgDQ
 
 全局错误日志加判断，正式环境不展示出来
 
-TODO：
+TODO：https://gitee.com/dromara/RuoYi-Vue-Plus
 - 测试分页列表
 - 测试关联列表
+- MD5加密工具类
+- AES加密
+- 获取IP的工具类
+- Url构建工具类
+- Http接口请求工具
+- 正则表达式工具类
+- AOP相关的工具
+- Session工具类
 - XSS https://juejin.cn/post/6996598745454346247?searchId=20241221091351D34CED46B811E476BC1F
 - sql注入https://juejin.cn/search?query=%E5%B8%B8%E8%A7%81%E7%9A%84web%E6%94%BB%E5%87%BB%E6%9C%89%E5%93%AA%E4%BA%9B&utm_source=gold_browser_extension&utm_medium=search
 
