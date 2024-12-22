@@ -93,6 +93,7 @@ public class AdminUserController {
     List<AdminUser> userList = adminUserService.getList(queryParam, pageSize, pageNum);
     // 直接调用改进后的 Mapper 方法进行转换
 //    List<AdminUserListVo> list = AdminUserMapper.INSTANCE.adminUserToAdminUserListVos(userList);
+    // .map(is -> MapstructUtils.convert(is, AdminUserListVo.class))
 
     List<AdminUserListVo> list = userList.stream()
         .map(AdminUserMapper.INSTANCE::adminUserToAdminUserListVo)
