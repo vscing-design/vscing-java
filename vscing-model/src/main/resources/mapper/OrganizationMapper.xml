@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.OrganizationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Organization">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="TINYINT" />
+        <result column="sort_order" property="sortOrder" jdbcType="TINYINT" />
+        <result column="notes" property="notes" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_organization
+    </sql>
+    <sql id="adminUserOrganizationTableName">
+        vscing_admin_user_organization
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="name != null">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="type != null">
+                AND type = #{record.type}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Organization">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="name != null">name,</if>
+            <if test="type != null">type,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="notes != null">notes,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="parentId != null">#{parentId, jdbcType=BIGINT},</if>
+            <if test="name != null">#{name, jdbcType=VARCHAR},</if>
+            <if test="type != null">#{type, jdbcType=TINYINT},</if>
+            <if test="sortOrder != null">#{sortOrder, jdbcType=TINYINT},</if>
+            <if test="notes != null">#{notes, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Organization">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="parentId != null">parent_id = #{parentId, jdbcType=BIGINT},</if>
+            <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
+            <if test="type != null">type = #{type, jdbcType=TINYINT},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder, jdbcType=TINYINT},</if>
+            <if test="notes != null">notes = #{notes, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 用户ID 查询关联信息 -->
+    <select id="getOrganizationsByUserId" parameterType="long" resultMap="BaseResultMap">
+        SELECT o.*
+        FROM <include refid="tableName" /> o
+        INNER JOIN <include refid="adminUserOrganizationTableName" /> uo ON o.id = uo.organization_id
+        WHERE ur.admin_user_id = #{id, jdbcType=BIGINT}
+    </select>
+
+    <!-- 根据 用户ID 删除关联信息 -->
+    <delete id="deleteOrganizationsByUserId" parameterType="long">
+        DELETE FROM <include refid="adminUserOrganizationTableName" /> WHERE admin_user_id=#{id}
+    </delete>
+
+    <!-- 根据 用户ID 增加关联信息 -->
+    <insert id="insertOrganizationsBatch" parameterType="map">
+        INSERT INTO user_organizations (admin_user_id, organization_id)
+        <foreach collection="organizationIds" item="organizationId" separator=",">
+            VALUES (#{id}, #{organizationId})
+        </foreach>
+    </insert>
+
+</mapper>
