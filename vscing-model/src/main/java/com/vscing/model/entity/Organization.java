@@ -1,6 +1,9 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import com.vscing.model.vo.OrganizationTreeVo;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +16,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@AutoMappers({
+    @AutoMapper(target = OrganizationTreeVo.class)
+})
 public class Organization extends BaseEntity {
 
     @Schema(description = "主键Id")
