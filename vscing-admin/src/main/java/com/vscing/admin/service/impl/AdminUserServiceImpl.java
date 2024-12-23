@@ -14,8 +14,11 @@ import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
+import com.vscing.model.entity.Role;
 import com.vscing.model.mapper.AdminUserMapper;
 import com.vscing.model.mapper.OrganizationMapper;
+import com.vscing.model.mapper.RoleMapper;
+import com.vscing.model.request.AdminUserRolesRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Autowired
   private AdminUserMapper adminUserMapper;
+
+  @Autowired
+  private RoleMapper roleMapper;
 
   @Autowired
   private OrganizationMapper organizationMapper;
@@ -192,6 +198,27 @@ public class AdminUserServiceImpl implements AdminUserService {
     if (rowsAffected <= 0) {
       throw new ServiceException("删除关联用户失败");
     }
+    return true;
+  }
+
+  @Override
+  public List<Role> getRoleList(long id) {
+    return roleMapper.getRolesByAdminUserId(id);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public boolean createdRoleList(AdminUserRolesRequest adminUserRoles) {
+    // 删除关联
+    roleMapper.deleteRolesByAdminUserId(adminUserRoles.getAdminUserId());
+    // 增加关联
+    if(adminUserRoles.getRoleIds().size() > 0) {
+      int rowsAffected = roleMapper.insertRolesBatch(adminUserRoles.getAdminUserId(), adminUserRoles.getRoleIds());
+      if (rowsAffected != adminUserRoles.getRoleIds().size()) {
+        throw new ServiceException("新增关联失败");
+      }
+    }
+
     return true;
   }
 

@@ -26,6 +26,10 @@ public interface RoleMapper {
 
   int update(Role record);
 
-  List<Role> getRolesByUserId(long id);
+  List<Role> getRolesByAdminUserId(long id);
+
+  int deleteRolesByAdminUserId(long id);
+
+  int insertRolesBatch(@Param("id") long id, @Param("roleIds") List<Long> roleIds);
 
 }

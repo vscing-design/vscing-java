@@ -82,11 +82,25 @@
     </update>
 
     <!-- 根据 用户ID 查询关联角色信息 -->
-    <select id="getRolesByUserId" parameterType="long" resultMap="BaseResultMap">
+    <select id="getRolesByAdminUserId" parameterType="long" resultMap="BaseResultMap">
         SELECT role.*
         FROM <include refid="tableName" /> role
         INNER JOIN <include refid="adminUserRoleTableName" /> ur ON role.id = ur.role_id
         WHERE ur.admin_user_id = #{id, jdbcType=BIGINT}
     </select>
+
+    <!-- 根据 用户ID 删除关联信息 -->
+    <delete id="deleteRolesByAdminUserId" parameterType="long">
+        DELETE FROM <include refid="adminUserRoleTableName" /> WHERE admin_user_id=#{id}
+    </delete>
+
+    <!-- 根据 用户ID 增加关联信息 -->
+    <insert id="insertRolesBatch" parameterType="map">
+        INSERT INTO <include refid="adminUserRoleTableName" /> (admin_user_id, role_id)
+        VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (#{id}, #{roleId})
+        </foreach>
+    </insert>
 
 </mapper>
