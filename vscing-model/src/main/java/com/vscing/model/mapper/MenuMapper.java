@@ -26,4 +26,10 @@ public interface MenuMapper {
 
   int update(Menu record);
 
+  List<Menu> getMenusByRoleId(long id);
+
+  int deleteMenusByRoleId(long id);
+
+  int insertMenusBatch(@Param("id") long id, @Param("menuIds") List<Long> menuIds);
+
 }

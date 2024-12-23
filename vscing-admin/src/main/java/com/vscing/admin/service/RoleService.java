@@ -1,7 +1,9 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.RoleListDto;
+import com.vscing.model.entity.Menu;
 import com.vscing.model.entity.Role;
+import com.vscing.model.request.RoleMenusRequest;
 
 import java.util.List;
 
@@ -31,5 +33,15 @@ public interface RoleService {
      * 删除
      */
     long deleted(long id, long deleterId);
+
+    /**
+     * 角色关联菜单列表
+     */
+    List<Menu> getMenuList(long id);
+
+    /**
+     * 角色关联菜单
+     */
+    boolean createdMenuList(RoleMenusRequest roleMenus);
     
 }

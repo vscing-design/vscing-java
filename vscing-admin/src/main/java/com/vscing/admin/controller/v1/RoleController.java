@@ -5,16 +5,25 @@ import com.vscing.admin.service.RoleService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.RoleListDto;
+import com.vscing.model.entity.Menu;
 import com.vscing.model.entity.Role;
+import com.vscing.model.request.RoleMenusRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,14 +33,42 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/22 01:26
  */
+@Slf4j
 @RestController
 @RequestMapping("/v1/role")
 @Tag(name = "系统角色接口", description = "系统角色接口")
 public class RoleController {
-  private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
 
   @Autowired
   private RoleService roleService;
+
+  @GetMapping("/menus/{id}")
+  @Operation(summary = "关联菜单列表")
+  public CommonResult<CommonPage<Menu>> lists(@PathVariable("id") Long id) {
+    List<Menu> list = roleService.getMenuList(id);
+    return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @PostMapping("/menus")
+  @Operation(summary = "新增关联菜单")
+  public CommonResult<Object> add(@Validated @RequestBody RoleMenusRequest roleMenus,
+                                  BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    try {
+      boolean res = roleService.createdMenuList(roleMenus);
+      if (res) {
+        return CommonResult.success("新增成功");
+      }
+      return CommonResult.failed("新增失败");
+    } catch (Exception e) {
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
+    }
+  }
 
   @GetMapping
   @Operation(summary = "列表")
@@ -75,9 +112,8 @@ public class RoleController {
         return CommonResult.success("新增成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -106,9 +142,8 @@ public class RoleController {
         return CommonResult.success("编辑成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
