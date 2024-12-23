@@ -1,6 +1,7 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -22,7 +23,8 @@ import java.time.LocalDateTime;
 @Setter
 @AutoMappers({
     @AutoMapper(target = AdminUserListVo.class),
-    @AutoMapper(target = AdminUserDetailVo.class)
+    @AutoMapper(target = AdminUserDetailVo.class),
+    @AutoMapper(target = AdminUserSaveDto.class),
 })
 public class AdminUser extends BaseEntity {
 
