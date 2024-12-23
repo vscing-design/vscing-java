@@ -25,6 +25,9 @@
     <sql id="tableName">
         vscing_menu
     </sql>
+    <sql id="roleMenuTableName">
+        vscing_role_menu
+    </sql>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultMap="BaseResultMap">
@@ -93,5 +96,27 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 根据 角色ID 查询关联菜单信息 -->
+    <select id="getMenusByRoleId" parameterType="long" resultMap="BaseResultMap">
+        SELECT menu.*
+        FROM <include refid="tableName" /> menu
+        INNER JOIN <include refid="roleMenuTableName" /> rm ON menu.id = rm.menu_id
+        WHERE rm.role_id = #{id, jdbcType=BIGINT}
+    </select>
+
+    <!-- 根据 角色ID 删除关联信息 -->
+    <delete id="deleteMenusByRoleId" parameterType="long">
+        DELETE FROM <include refid="roleMenuTableName" /> WHERE role_id=#{id}
+    </delete>
+
+    <!-- 根据 角色ID 增加关联信息 -->
+    <insert id="insertMenusBatch" parameterType="map">
+        INSERT INTO <include refid="roleMenuTableName" /> (role_id, menu_id)
+        VALUES
+        <foreach collection="menuIds" item="menuId" separator=",">
+            (#{id}, #{menuId})
+        </foreach>
+    </insert>
 
 </mapper>
