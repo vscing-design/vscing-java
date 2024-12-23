@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author vscing
  * @date 2024/12/14 23:33
  */
-
+@EnableScheduling
 @SpringBootApplication(scanBasePackages = {"com.vscing"})
 public class VscingAdminApplication {
 
