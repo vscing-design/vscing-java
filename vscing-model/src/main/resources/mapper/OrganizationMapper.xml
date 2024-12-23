@@ -107,9 +107,10 @@
 
     <!-- 根据 用户ID 增加关联信息 -->
     <insert id="insertOrganizationsBatch" parameterType="map">
-        INSERT INTO user_organizations (admin_user_id, organization_id)
+        INSERT INTO <include refid="adminUserOrganizationTableName" /> (admin_user_id, organization_id)
+        VALUES
         <foreach collection="organizationIds" item="organizationId" separator=",">
-            VALUES (#{id}, #{organizationId})
+            (#{id}, #{organizationId})
         </foreach>
     </insert>
 

@@ -1,6 +1,7 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.auth.service.VscingUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,17 +39,22 @@ public interface AdminUserService {
   /**
    * 新增
   */
-  long created(AdminUser adminUser);
+  boolean created(AdminUserSaveDto adminUser);
 
   /**
    * 编辑
    */
-  long updated(AdminUser adminUser);
+  boolean updated(AdminUserSaveDto adminUser);
+
+  /**
+   * 更新机构信息
+   */
+  void updateOrganizations(Long id, List<Long> organizationIds);
 
   /**
    * 删除
    */
-  long deleted(long id, long deleterId);
+  boolean deleted(long id, long deleterId);
 
 
 

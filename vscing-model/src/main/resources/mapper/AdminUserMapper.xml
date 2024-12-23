@@ -60,25 +60,23 @@
     </select>
 
     <!-- 插入用户信息 -->
-    <insert id="insert" parameterType="com.vscing.model.entity.AdminUser" useGeneratedKeys="false" keyProperty="id">
+    <insert id="insert" parameterType="com.vscing.model.dto.AdminUserSaveDto" useGeneratedKeys="false" keyProperty="id">
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="username != null">username,</if>
-            <if test="password != null">password,</if>
-            <if test="nickname != null">nickname,</if>
             <if test="phone != null">phone,</if>
-            <if test="status != null">status,</if>
+            <if test="password != null">password,</if>
+            <if test="lastIp != null">last_ip,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="username != null">#{username, jdbcType=VARCHAR},</if>
-            <if test="password != null">#{password, jdbcType=VARCHAR},</if>
-            <if test="nickname != null">#{nickname, jdbcType=VARCHAR},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
-            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="password != null">#{password, jdbcType=VARCHAR},</if>
+            <if test="lastIp != null">#{lastIp, jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
@@ -97,38 +95,14 @@
     </update>
 
     <!-- 更新用户信息 -->
-    <update id="update" parameterType="com.vscing.model.entity.AdminUser">
+    <update id="update" parameterType="com.vscing.model.dto.AdminUserSaveDto">
         UPDATE <include refid="tableName" />
         <set>
             <if test="username != null">
                 username = #{username,jdbcType=VARCHAR},
             </if>
-            <if test="password != null">
-                password = #{password,jdbcType=VARCHAR},
-            </if>
             <if test="phone != null">
                 phone = #{phone,jdbcType=VARCHAR},
-            </if>
-            <if test="avatar != null">
-                avatar = #{avatar,jdbcType=VARCHAR},
-            </if>
-            <if test="email != null">
-                email = #{email,jdbcType=VARCHAR},
-            </if>
-            <if test="nickname != null">
-                nickname = #{nickname,jdbcType=VARCHAR},
-            </if>
-            <if test="notes != null">
-                notes = #{notes,jdbcType=VARCHAR},
-            </if>
-            <if test="loginAt != null">
-                login_at = #{loginAt,jdbcType=TIMESTAMP},
-            </if>
-            <if test="lastIp != null">
-                last_ip = #{lastIp,jdbcType=VARCHAR},
-            </if>
-            <if test="status != null">
-                status = #{status,jdbcType=INTEGER},
             </if>
             <if test="updatedBy != null">
                 updated_by = #{updatedBy, jdbcType=BIGINT}

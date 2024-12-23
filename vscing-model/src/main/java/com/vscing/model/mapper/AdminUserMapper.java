@@ -1,6 +1,7 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,12 +23,12 @@ public interface AdminUserMapper {
 
   AdminUser selectByUsername(String username);
 
-  int insert(AdminUser record);
+  int insert(AdminUserSaveDto record);
 
   int deleteById(long id);
 
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
-  int update(AdminUser record);
+  int update(AdminUserSaveDto record);
 
 }

@@ -2,16 +2,20 @@ package com.vscing.admin.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
-import com.vscing.common.service.RedisService;
-import com.vscing.common.util.RedisKeyConstants;
-import com.vscing.common.util.RequestUtil;
-import com.vscing.model.dto.AdminUserListDto;
-import com.vscing.model.entity.AdminUser;
 import com.vscing.admin.po.AdminUserDetails;
-import com.vscing.model.mapper.AdminUserMapper;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
+import com.vscing.common.exception.ServiceException;
+import com.vscing.common.service.RedisService;
+import com.vscing.common.util.MapstructUtils;
+import com.vscing.common.util.RedisKeyConstants;
+import com.vscing.common.util.RequestUtil;
+import com.vscing.model.dto.AdminUserListDto;
+import com.vscing.model.dto.AdminUserSaveDto;
+import com.vscing.model.entity.AdminUser;
+import com.vscing.model.mapper.AdminUserMapper;
+import com.vscing.model.mapper.OrganizationMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +27,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
 
 /**
  * AdminUserService
@@ -53,6 +58,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Autowired
   private AdminUserMapper adminUserMapper;
+
+  @Autowired
+  private OrganizationMapper organizationMapper;
 
   @Autowired
   private RedisService redisService;
@@ -97,8 +105,9 @@ public class AdminUserServiceImpl implements AdminUserService {
       // 记录到redis
       redisService.set(RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + adminUser.getId() + RedisKeyConstants.KEY_SEPARATOR + token, adminUser, expiration);
 
+      AdminUserSaveDto adminUserDto = MapstructUtils.convert(adminUser, AdminUserSaveDto.class);
       // 更新表数据
-      adminUserMapper.update(adminUser);
+      adminUserMapper.update(adminUserDto);
     } catch (AuthenticationException e) {
       logger.warn("登录异常:{}", e.getMessage());
     }
@@ -123,21 +132,67 @@ public class AdminUserServiceImpl implements AdminUserService {
   }
 
   @Override
-  public long created(AdminUser adminUser) {
-    String encodePassword = passwordEncoder.encode(adminUser.getPassword());
-    adminUser.setPassword(encodePassword);
-    adminUser.setId(IdUtil.getSnowflakeNextId());
-    return adminUserMapper.insert(adminUser);
+  @Transactional(rollbackFor = Exception.class)
+  public boolean created(AdminUserSaveDto adminUser) {
+    try {
+      String encodePassword = passwordEncoder.encode(adminUser.getPassword());
+      Long id = IdUtil.getSnowflakeNextId();
+      adminUser.setPassword(encodePassword);
+      adminUser.setId(id);
+      // 创建用户
+      int rowsAffected = adminUserMapper.insert(adminUser);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("新增用户失败");
+      }
+      // 增加关联机构
+      rowsAffected = organizationMapper.insertOrganizationsBatch(id, adminUser.getOrganizationIds());
+      if (rowsAffected != adminUser.getOrganizationIds().size()) {
+        throw new ServiceException("新增关联机构失败");
+      }
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
+    return true;
   }
 
   @Override
-  public long updated(AdminUser adminUser) {
-    return adminUserMapper.update(adminUser);
+  public boolean updated(AdminUserSaveDto adminUser) {
+    // 编辑用户
+    adminUserMapper.update(adminUser);
+    // 关联机构
+    updateOrganizations(adminUser.getId(), adminUser.getOrganizationIds());
+    return true;
   }
 
   @Override
-  public long deleted(long id, long deleterId) {
-    return adminUserMapper.softDeleteById(id, deleterId);
+  @Transactional(rollbackFor = Exception.class)
+  public void updateOrganizations(Long id, List<Long> organizationIds) {
+    // 删除关联机构
+    int rowsAffected = organizationMapper.deleteOrganizationsByUserId(id);
+    if (rowsAffected <= 0) {
+      throw new ServiceException("删除关联用户失败");
+    }
+    // 增加关联机构
+    rowsAffected = organizationMapper.insertOrganizationsBatch(id, organizationIds);
+    if (rowsAffected != organizationIds.size()) {
+      throw new ServiceException("新增关联机构失败");
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public boolean deleted(long id, long deleterId) {
+    // 创建用户
+    int rowsAffected = adminUserMapper.softDeleteById(id, deleterId);
+    if (rowsAffected <= 0) {
+      throw new ServiceException("删除用户失败");
+    }
+    // 删除关联机构
+    rowsAffected = organizationMapper.deleteOrganizationsByUserId(id);
+    if (rowsAffected <= 0) {
+      throw new ServiceException("删除关联用户失败");
+    }
+    return true;
   }
 
 }

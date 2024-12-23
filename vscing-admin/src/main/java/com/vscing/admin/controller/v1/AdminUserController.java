@@ -1,42 +1,45 @@
 package com.vscing.admin.controller.v1;
 
 import com.vscing.admin.po.AdminUserDetails;
+import com.vscing.admin.service.AdminUserService;
 import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.api.CommonPage;
+import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.MapstructUtils;
+import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserLoginDto;
+import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
-import com.vscing.admin.service.AdminUserService;
-import com.vscing.common.api.CommonResult;
+import com.vscing.model.request.AdminUserEditRequest;
+import com.vscing.model.request.AdminUserSaveRequest;
 import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.vscing.common.util.RequestUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -46,12 +49,11 @@ import java.util.stream.Collectors;
  * @date 2024/12/14 23:15
  */
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/admin")
 @Tag(name = "系统管理员登陆接口", description = "系统管理员登陆接口")
 public class AdminUserController {
-
-  private static final Logger logger = LoggerFactory.getLogger(AdminUserController.class);
 
   @Value("${jwt.tokenHead}")
   private String tokenHead;
@@ -118,7 +120,7 @@ public class AdminUserController {
 
   @PostMapping("/users")
   @Operation(summary = "后台用户新增")
-  public CommonResult<Object> users(@Validated @RequestBody AdminUser adminUser,
+  public CommonResult<Object> users(@Validated @RequestBody AdminUserSaveRequest adminUserSave,
                                         BindingResult bindingResult,
                                         HttpServletRequest request,
                                         @AuthenticationPrincipal AdminUserDetails userInfo) {
@@ -127,51 +129,55 @@ public class AdminUserController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 验证密码和确认密码是否匹配
+    if (!Objects.equals(adminUserSave.getPassword(), adminUserSave.getConfirmPassword())) {
+      return CommonResult.validateFailed("两次密码不一致");
+    }
+    // 直接调用改进后的 Mapper 方法进行转换
+    AdminUserSaveDto adminUser = MapstructUtils.convert(adminUserSave, AdminUserSaveDto.class);
     // 增加ip地址、操作人ID
     adminUser.setLastIp(RequestUtil.getRequestIp(request));
-    adminUser.setCreatedBy(userInfo.getUserId());
+    // 操作人ID
+    if(userInfo != null && userInfo.getUserId() != null) {
+      adminUser.setCreatedBy(userInfo.getUserId());
+    }
     try {
-      long id = adminUserService.created(adminUser);
-      if (id == 0) {
-        return CommonResult.failed("新增失败");
-      } else {
+      boolean res = adminUserService.created(adminUser);
+      if (res) {
         return CommonResult.success("新增成功");
       }
+      return CommonResult.failed("新增失败");
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
   @PutMapping("/users")
   @Operation(summary = "后台用户编辑")
-  public CommonResult<Object> users(@Validated @RequestBody AdminUser adminUser,
+  public CommonResult<Object> users(@Validated @RequestBody AdminUserEditRequest adminUserEdit,
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal AdminUserDetails userInfo) {
-    if (adminUser.getId() == null) {
-      return CommonResult.validateFailed("ID不能为空");
-    }
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
-    if(userInfo != null) {
-      // 操作人ID
+    // 直接调用改进后的 Mapper 方法进行转换
+    AdminUserSaveDto adminUser = MapstructUtils.convert(adminUserEdit, AdminUserSaveDto.class);
+    // 操作人ID
+    if(userInfo != null && userInfo.getUserId() != null) {
       adminUser.setUpdatedBy(userInfo.getUserId());
     }
+    boolean res = adminUserService.updated(adminUser);
     try {
-      long id = adminUserService.updated(adminUser);
-      if (id == 0) {
-        return CommonResult.failed("编辑失败");
-      } else {
+      if (res) {
         return CommonResult.success("编辑成功");
       }
+      return CommonResult.failed("编辑失败");
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -184,11 +190,20 @@ public class AdminUserController {
     if(jwtTokenUtil.isSuperAdmin(id)) {
       return CommonResult.failed("超级管理员不可删除！");
     }
-    long result = adminUserService.deleted(id, userInfo.getUserId());
-    if (result != 0) {
-      return CommonResult.success("删除成功");
-    } else {
+    // 操作人ID
+    Long byId = 0L;
+    if(userInfo != null && userInfo.getUserId() != null) {
+      byId = userInfo.getUserId();
+    }
+    try {
+      boolean res = adminUserService.deleted(id, byId);
+      if (res) {
+        return CommonResult.success("删除成功");
+      }
       return CommonResult.failed("删除失败");
+    } catch (Exception e) {
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
