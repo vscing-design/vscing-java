@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +87,19 @@ public class AdminUserController {
     }
   }
 
+  @GetMapping("/self")
+  @Operation(summary = "登陆用户信息")
+  public CommonResult<AdminUserDetailVo> self(@AuthenticationPrincipal AdminUserDetails userInfo) {
+    if(userInfo == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    AdminUserDetailVo adminUser = userInfo.getAdminUser();
+    if (adminUser == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    return CommonResult.success(adminUser);
+  }
+
   @GetMapping("/users")
   @Operation(summary = "后台用户列表")
   public CommonResult<CommonPage<AdminUserListVo>> users(AdminUserListDto queryParam,
@@ -103,20 +115,12 @@ public class AdminUserController {
 
   @GetMapping("/users/{id}")
   @Operation(summary = "后台用户详情")
-  public CommonResult<AdminUserDetailVo> details(@PathVariable("id") Long id) {
+  public CommonResult<AdminUser> details(@PathVariable("id") Long id) {
     AdminUser adminUser = adminUserService.getDetails(id);
     if (adminUser == null) {
       return CommonResult.failed("用户不存在");
     }
-    // 关联角色
-    List<Object> relatedRole = new ArrayList<>();
-    // 关联菜单
-    List<Object> relatedMenu = new ArrayList<>();
-    // 直接调用改进后的 Mapper 方法进行转换
-    AdminUserDetailVo detail = MapstructUtils.convert(adminUser, AdminUserDetailVo.class);
-    detail.setRelatedRole(relatedRole);
-    detail.setRelatedMenu(relatedMenu);
-    return CommonResult.success(detail);
+    return CommonResult.success(adminUser);
   }
 
   @PostMapping("/users")

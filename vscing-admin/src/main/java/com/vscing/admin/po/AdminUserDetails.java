@@ -1,11 +1,10 @@
 package com.vscing.admin.po;
 
-import com.vscing.model.entity.AdminUser;
 import com.vscing.auth.service.VscingUserDetails;
+import com.vscing.model.vo.AdminUserDetailVo;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * AdminUserDetails
@@ -16,14 +15,10 @@ import java.util.Map;
 public class AdminUserDetails implements VscingUserDetails {
 
   // 后台用户
-  private final AdminUser adminUser;
+  private final AdminUserDetailVo adminUser;
 
-  // 关联信息
-  private final Map<String, Object> relatedData;
-
-  public AdminUserDetails(AdminUser adminUser, Map<String, Object> relatedData) {
+  public AdminUserDetails(AdminUserDetailVo adminUser) {
     this.adminUser = adminUser;
-    this.relatedData = relatedData;
   }
 
   @Override
@@ -39,6 +34,9 @@ public class AdminUserDetails implements VscingUserDetails {
 
   @Override
   public Long getUserId() { return adminUser.getId(); }
+
+  @Override
+  public AdminUserDetailVo getAdminUser() { return adminUser; }
 
   @Override
   public String getPassword() {
