@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/v1/address")
-@Tag(name = "系统管理员登陆接口", description = "系统管理员登陆接口")
+@Tag(name = "地址库接口", description = "地址库接口")
 public class AddressController {
 
   @Autowired

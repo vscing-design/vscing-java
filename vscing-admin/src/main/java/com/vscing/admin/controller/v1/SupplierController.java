@@ -8,6 +8,7 @@ import com.vscing.model.dto.SupplierListDto;
 import com.vscing.model.entity.Supplier;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/20 00:40
  */
+@Slf4j
 @RestController
 @RequestMapping("/v1/supplier")
 @Tag(name = "供应商接口", description = "供应商接口")
@@ -80,9 +82,8 @@ public class SupplierController {
         return CommonResult.success("新增成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -111,9 +112,8 @@ public class SupplierController {
         return CommonResult.success("编辑成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 

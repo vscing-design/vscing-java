@@ -1,23 +1,23 @@
 package com.vscing.admin.controller.v1;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.SignatureGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestBody;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Value;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import okhttp3.*;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.time.Instant;
 
 /**
  * TestController
@@ -25,12 +25,10 @@ import java.time.Instant;
  * @date 2024/12/11 00:51
  * @auth vscing(vscing @ foxmail.com)
  */
-
+@Slf4j
 @RestController
 @RequestMapping("/v1/test")
 public class TestController {
-
-    private static final Logger log = LoggerFactory.getLogger(TestController.class);
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
@@ -102,10 +100,5 @@ public class TestController {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
-    }
-
-    @RequestMapping(value = "/addInfo", method = RequestMethod.POST)
-    public CommonResult<Object> addInfo(@RequestBody Map<String, Object> info) {
-        return CommonResult.success(info);
     }
 }
