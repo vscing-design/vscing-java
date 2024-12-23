@@ -11,7 +11,9 @@ import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserLoginDto;
 import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
+import com.vscing.model.entity.Role;
 import com.vscing.model.request.AdminUserEditRequest;
+import com.vscing.model.request.AdminUserRolesRequest;
 import com.vscing.model.request.AdminUserSaveRequest;
 import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
@@ -200,6 +202,34 @@ public class AdminUserController {
         return CommonResult.success("删除成功");
       }
       return CommonResult.failed("删除失败");
+    } catch (Exception e) {
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @GetMapping("/roles/{id}")
+  @Operation(summary = "关联角色列表")
+  public CommonResult<CommonPage<Role>> lists(@PathVariable("id") Long id) {
+    List<Role> list = adminUserService.getRoleList(id);
+    return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @PostMapping("/roles")
+  @Operation(summary = "新增关联角色")
+  public CommonResult<Object> add(@Validated @RequestBody AdminUserRolesRequest adminUserRoles,
+                                  BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    try {
+      boolean res = adminUserService.createdRoleList(adminUserRoles);
+      if (res) {
+        return CommonResult.success("新增成功");
+      }
+      return CommonResult.failed("新增失败");
     } catch (Exception e) {
       log.error("请求错误: " + e.getMessage());
       return CommonResult.failed("请求错误");
