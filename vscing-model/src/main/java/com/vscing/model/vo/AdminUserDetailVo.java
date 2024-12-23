@@ -1,5 +1,10 @@
 package com.vscing.model.vo;
 
+import com.vscing.model.dto.AdminUserSaveDto;
+import com.vscing.model.entity.Menu;
+import com.vscing.model.entity.Organization;
+import com.vscing.model.entity.Role;
+import io.github.linpeilie.annotations.AutoMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +20,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@AutoMapper(target = AdminUserSaveDto.class)
 public class AdminUserDetailVo {
 
   @Schema(description = "用户id")
@@ -22,6 +28,9 @@ public class AdminUserDetailVo {
 
   @Schema(description = "账户")
   private String username;
+
+  @Schema(description = "密码")
+  private String password;
 
   @Schema(description = "手机号")
   private String phone;
@@ -56,10 +65,13 @@ public class AdminUserDetailVo {
   @Schema(description = "更新者ID")
   private Long updatedBy;
 
+  @Schema(description = "关联机构")
+  private List<Organization> relatedOrgList;
+
   @Schema(description = "关联角色")
-  private List<Object> relatedRole;
+  private List<Role> relatedRoleList;
 
   @Schema(description = "关联菜单")
-  private List<Object> relatedMenu;
+  private List<Menu> relatedMenuList;
 
 }

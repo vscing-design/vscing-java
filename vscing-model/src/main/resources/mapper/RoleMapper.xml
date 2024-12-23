@@ -26,12 +26,12 @@
     </sql>
 
     <!-- 查询用户列表 -->
-    <select id="getList" resultMap="BaseResultMap">
+    <select id="getList" parameterType="com.vscing.model.dto.RoleListDto" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
         <where>
             deleted_at IS NULL
-            <if test="record.name != null">
-                AND name LIKE CONCAT('%', #{record.name}, '%')
+            <if test="name != null">
+                AND name LIKE CONCAT('%', #{name}, '%')
             </if>
         </where>
     </select>

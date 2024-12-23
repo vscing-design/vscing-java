@@ -6,6 +6,7 @@ import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.model.entity.Role;
 import com.vscing.model.request.AdminUserRolesRequest;
+import com.vscing.model.vo.AdminUserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -27,6 +28,11 @@ public interface AdminUserService {
    * 登录后获取token
    */
   String login(String username, String password, HttpServletRequest request);
+
+  /**
+   * 用户信息
+  */
+  AdminUserDetailVo self(long id);
 
   /**
    * 列表

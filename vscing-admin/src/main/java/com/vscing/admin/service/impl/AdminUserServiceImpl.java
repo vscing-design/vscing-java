@@ -13,12 +13,17 @@ import com.vscing.common.util.RedisKeyConstants;
 import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserSaveDto;
+import com.vscing.model.dto.MenuListDto;
 import com.vscing.model.entity.AdminUser;
+import com.vscing.model.entity.Menu;
+import com.vscing.model.entity.Organization;
 import com.vscing.model.entity.Role;
 import com.vscing.model.mapper.AdminUserMapper;
+import com.vscing.model.mapper.MenuMapper;
 import com.vscing.model.mapper.OrganizationMapper;
 import com.vscing.model.mapper.RoleMapper;
 import com.vscing.model.request.AdminUserRolesRequest;
+import com.vscing.model.vo.AdminUserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * AdminUserService
@@ -53,6 +59,9 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Value("${jwt.expiration}")
   private Long expiration;
 
+  @Value("${jwt.superAdminId}")
+  private Long superAdminId;
+
   @Autowired
   private JwtTokenUtil jwtTokenUtil;
 
@@ -63,10 +72,13 @@ public class AdminUserServiceImpl implements AdminUserService {
   private AdminUserMapper adminUserMapper;
 
   @Autowired
+  private OrganizationMapper organizationMapper;
+
+  @Autowired
   private RoleMapper roleMapper;
 
   @Autowired
-  private OrganizationMapper organizationMapper;
+  private MenuMapper menuMapper;
 
   @Autowired
   private RedisService redisService;
@@ -74,14 +86,42 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Override
   public VscingUserDetails adminUserInfo(long id) {
     // 获取用户信息
-    AdminUser adminUser = adminUserMapper.selectById(id);
-    // 用户关联信息 角色、菜单等
-    Map<String, Object> relatedData = new HashMap<>(2);
-    relatedData.put("role", new ArrayList<>());
-    relatedData.put("menu", new ArrayList<>());
+    AdminUserDetailVo adminUser = this.self(id);
+    return new AdminUserDetails(adminUser);
+  }
 
-    VscingUserDetails userDetails = new AdminUserDetails(adminUser, relatedData);
-    return userDetails;
+  @Override
+  public AdminUserDetailVo self(long id) {
+    // 获取用户信息
+    AdminUser entity = adminUserMapper.selectById(id);
+    // 直接调用改进后的 Mapper 方法进行转换
+    AdminUserDetailVo adminUser = MapstructUtils.convert(entity, AdminUserDetailVo.class);
+    if (adminUser.getId().equals(superAdminId)) {
+      // 用户关联机构
+      List<Organization> orgList = organizationMapper.getList(null);
+      adminUser.setRelatedOrgList(orgList);
+      // 用户关联角色
+      List<Role> roleList = roleMapper.getList(null);
+      adminUser.setRelatedRoleList(roleList);
+      // 用户关联菜单（基于角色ID）
+      List<Menu> menuList = menuMapper.getList(new MenuListDto());
+      adminUser.setRelatedMenuList(menuList);
+    } else {
+      // 用户关联机构
+      List<Organization> orgList = organizationMapper.getOrganizationsByUserId(adminUser.getId());
+      adminUser.setRelatedOrgList(orgList);
+      // 用户关联角色
+      List<Role> roleList = roleMapper.getRolesByAdminUserId(adminUser.getId());
+      adminUser.setRelatedRoleList(roleList);
+      // 用户关联菜单（基于角色ID）
+      if (!roleList.isEmpty()) {
+        List<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toList());
+        List<Menu> menuList = menuMapper.getMenusByRoleIds(roleIds);
+        adminUser.setRelatedMenuList(menuList);
+      }
+    }
+
+    return adminUser;
   }
 
   @Override
@@ -90,16 +130,13 @@ public class AdminUserServiceImpl implements AdminUserService {
     //密码需要客户端加密后传递
     try {
       // 获取用户信息
-      AdminUser adminUser = adminUserMapper.selectByUsername(username);
-      if(adminUser != null && !passwordEncoder.matches(password, adminUser.getPassword())){
+      AdminUser entity = adminUserMapper.selectByUsername(username);
+      if(entity != null && !passwordEncoder.matches(password, entity.getPassword())){
         throw new BadCredentialsException("密码不正确");
       }
-      // 用户关联信息 角色、菜单等
-      Map<String, Object> relatedData = new HashMap<>(2);
-      relatedData.put("role", new ArrayList<>());
-      relatedData.put("menu", new ArrayList<>());
-      // 用户信息上下文
-      VscingUserDetails userDetails = new AdminUserDetails(adminUser, relatedData);
+      // 获取用户信息
+      AdminUserDetailVo adminUser = this.self(entity.getId());
+      VscingUserDetails userDetails = new AdminUserDetails(adminUser);
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
       token = jwtTokenUtil.generateToken(userDetails.getUserId());

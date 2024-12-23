@@ -105,6 +105,17 @@
         WHERE rm.role_id = #{id, jdbcType=BIGINT}
     </select>
 
+    <!-- 根据 角色ID 查询关联菜单信息 -->
+    <select id="getMenusByRoleIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT menu.*
+        FROM <include refid="tableName" /> menu
+        INNER JOIN <include refid="roleMenuTableName" /> rm ON menu.id = rm.menu_id
+        WHERE rm.role_id IN
+        <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+
     <!-- 根据 角色ID 删除关联信息 -->
     <delete id="deleteMenusByRoleId" parameterType="long">
         DELETE FROM <include refid="roleMenuTableName" /> WHERE role_id=#{id}

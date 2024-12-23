@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface RoleMapper {
 
-  List<Role> getList(@Param("record") RoleListDto record);
+  List<Role> getList(RoleListDto record);
 
   Role selectById(long id);
 
