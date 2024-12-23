@@ -9,13 +9,20 @@ import com.vscing.model.entity.Menu;
 import com.vscing.model.vo.MenuTreeVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -25,12 +32,11 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/22 01:24
  */
+@Slf4j
 @RestController
 @RequestMapping("/v1/menu")
 @Tag(name = "系统菜单接口", description = "系统菜单接口")
 public class MenuController {
-
-  private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
 
   @Autowired
   private MenuService menuService;
@@ -84,9 +90,8 @@ public class MenuController {
         return CommonResult.success("新增成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -115,9 +120,8 @@ public class MenuController {
         return CommonResult.success("编辑成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 

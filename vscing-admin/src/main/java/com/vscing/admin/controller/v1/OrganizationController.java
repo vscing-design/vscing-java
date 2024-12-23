@@ -90,9 +90,8 @@ public class OrganizationController {
         return CommonResult.success("新增成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -121,9 +120,8 @@ public class OrganizationController {
         return CommonResult.success("编辑成功");
       }
     } catch (Exception e) {
-      // 记录异常日志
-      e.printStackTrace();
-      return CommonResult.failed("系统错误: " + e.getMessage());
+      log.error("请求错误: " + e.getMessage());
+      return CommonResult.failed("请求错误");
     }
   }
 
