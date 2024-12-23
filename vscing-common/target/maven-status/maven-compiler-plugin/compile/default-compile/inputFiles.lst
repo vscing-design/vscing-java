@@ -7,11 +7,13 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/exception/ApiException.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/exception/Asserts.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/exception/GlobalExceptionHandler.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/handler/BigNumberSerializer.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/RedisService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/applet/AppletService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/impl/RedisServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/payment/PaymentService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/supplier/SupplierService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/MapstructUtils.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/RedisKeyConstants.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/RequestUtil.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/SignatureGenerator.java
