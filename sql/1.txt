@@ -1,9 +1,9 @@
-技术栈全面扩展开花🌼, JDK17+ SpringBoot3.0+Mybatis-Plus+GRPC+Webclient(非阻塞调用第三方接口) Java鸡架（微服务）+ MySQL+Redis+ElasticSearch数据库+ Nacos(2.0版本)+Apollo 服务注册/配置中心+ Mycat(分表) 一致性hash+RocketMQ4.7 + AmazonSQS 消息队列+ Redission分布式锁+日志存储 log4j+slf4j / 分布式日志存储ELK+Flume+Logstash
+TODO：用户增加校验是否名称唯一
+TODO: 增加修改密码接口
+TODO：增加用户信息接口
 
-作者：呆呆蛇
+技术栈全面扩展开花🌼, JDK17+ SpringBoot3.0+Mybatis-Plus+GRPC+Webclient(非阻塞调用第三方接口) Java鸡架（微服务）+ MySQL+Redis+ElasticSearch数据库+ Nacos(2.0版本)+Apollo 服务注册/配置中心+ Mycat(分表) 一致性hash+RocketMQ4.7 + AmazonSQS 消息队列+ Redission分布式锁+日志存储 log4j+slf4j / 分布式日志存储ELK+Flume+Logstash
 链接：https://juejin.cn/post/7374683456728760374
-来源：稀土掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 二哥的Java进阶之路
 https://javabetter.cn/springboot/Filter-Interceptor-Listener.html#%E5%89%8D%E8%A8%80
@@ -26,7 +26,8 @@ https://lanhuapp.com/link/#/invite?sid=qX0OtgDQ
 
 mqtt 测试地址 https://juejin.cn/post/7410017851626913833
 
-TODO：https://gitee.com/dromara/RuoYi-Vue-Plus
+- https://gitee.com/dromara/RuoYi-Vue-Plus
+- 错误提示
 - 测试分页列表
 - 测试关联列表
 - MD5加密工具类
