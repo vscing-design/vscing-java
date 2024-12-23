@@ -12,6 +12,7 @@ import com.vscing.model.mapper.RoleMapper;
 import com.vscing.model.request.RoleMenusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-//    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public boolean createdMenuList(RoleMenusRequest roleMenus) {
         // 删除关联机构
         menuMapper.deleteMenusByRoleId(roleMenus.getRoleId());
