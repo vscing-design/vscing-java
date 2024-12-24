@@ -61,10 +61,11 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public boolean createdMenuList(RoleMenusRequest roleMenus) {
         // 删除关联机构
-        menuMapper.deleteMenusByRoleId(roleMenus.getRoleId());
+        Long roleId = Long.valueOf(roleMenus.getRoleId());
+        menuMapper.deleteMenusByRoleId(roleId);
         // 增加关联机构
         if(roleMenus.getMenuIds().size() > 0) {
-            int rowsAffected = menuMapper.insertMenusBatch(roleMenus.getRoleId(), roleMenus.getMenuIds());
+            int rowsAffected = menuMapper.insertMenusBatch(roleId, roleMenus.getMenuIds());
             if (rowsAffected != roleMenus.getMenuIds().size()) {
                 throw new ServiceException("新增关联失败");
             }
