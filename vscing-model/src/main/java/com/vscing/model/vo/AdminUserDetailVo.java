@@ -3,6 +3,7 @@ package com.vscing.model.vo;
 import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.Menu;
 import com.vscing.model.entity.Organization;
+import com.vscing.model.entity.Permission;
 import com.vscing.model.entity.Role;
 import io.github.linpeilie.annotations.AutoMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,5 +74,8 @@ public class AdminUserDetailVo {
 
   @Schema(description = "关联菜单")
   private List<Menu> relatedMenuList;
+
+  @Schema(description = "按钮权限")
+  private List<Permission> relatedPermissionList;
 
 }

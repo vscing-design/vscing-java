@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.vscing.model.mapper.MenuMapper">
+<mapper namespace="com.vscing.model.mapper.PermissionMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Menu">
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Permission">
         <id column="id" property="id" jdbcType="BIGINT" />
-        <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+        <result column="menu_id" property="menuId" jdbcType="BIGINT" />
         <result column="name" property="name" jdbcType="VARCHAR" />
-        <result column="system" property="system" jdbcType="VARCHAR" />
-        <result column="icon" property="icon" jdbcType="VARCHAR" />
-        <result column="path" property="path" jdbcType="VARCHAR" />
-        <result column="component" property="component" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
@@ -23,10 +20,10 @@
 
     <!-- 定义一个SQL片段，用于指定表名 -->
     <sql id="tableName">
-        vscing_menu
+        vscing_permission
     </sql>
-    <sql id="roleMenuTableName">
-        vscing_role_menu
+    <sql id="rolePermissionTableName">
+        vscing_role_permission
     </sql>
 
     <!-- 查询用户列表 -->
@@ -37,6 +34,12 @@
             <if test="name != null">
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
+            <if test="name != null">
+                AND code LIKE CONCAT('%', #{code}, '%')
+            </if>
+            <if test="status != null">
+                AND status LIKE CONCAT('%', #{status}, '%')
+            </if>
         </where>
     </select>
 
@@ -46,43 +49,34 @@
     </select>
 
     <!-- 插入信息 -->
-    <insert id="insert" parameterType="com.vscing.model.entity.Menu">
+    <insert id="insert" parameterType="com.vscing.model.entity.Permission">
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="parentId != null">parent_id,</if>
+            <if test="menuId != null">menu_id,</if>
             <if test="name != null">name,</if>
-            <if test="system != null">system,</if>
-            <if test="icon != null">icon,</if>
-            <if test="path != null">path,</if>
-            <if test="component != null">component,</if>
+            <if test="code != null">code,</if>
             <if test="status != null">status,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
-            <if test="parentId != null">#{parentId, jdbcType=BIGINT},</if>
+            <if test="menuId != null">#{menuId, jdbcType=BIGINT},</if>
             <if test="name != null">#{name, jdbcType=VARCHAR},</if>
-            <if test="system != null">#{system, jdbcType=VARCHAR},</if>
-            <if test="icon != null">#{icon, jdbcType=VARCHAR},</if>
-            <if test="path != null">#{path, jdbcType=VARCHAR},</if>
-            <if test="component != null">#{component, jdbcType=VARCHAR},</if>
+            <if test="code != null">#{code, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
 
     <!-- 更新信息 -->
-    <update id="update" parameterType="com.vscing.model.entity.Menu">
+    <update id="update" parameterType="com.vscing.model.entity.Permission">
         UPDATE <include refid="tableName" />
         <set>
-            <if test="parentId != null">parent_id = #{parentId, jdbcType=BIGINT},</if>
+            <if test="menuId != null">menu_id = #{menuId, jdbcType=BIGINT},</if>
             <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
-            <if test="system != null">system = #{system, jdbcType=VARCHAR},</if>
-            <if test="icon != null">icon = #{icon, jdbcType=VARCHAR},</if>
-            <if test="component != null">component = #{component, jdbcType=VARCHAR},</if>
-            <if test="path != null">path = #{path, jdbcType=VARCHAR},</if>
+            <if test="code != null">code = #{code, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
@@ -98,35 +92,35 @@
     </update>
 
     <!-- 根据 角色ID 查询关联菜单信息 -->
-    <select id="getMenusByRoleId" parameterType="long" resultMap="BaseResultMap">
-        SELECT menu.*
-        FROM <include refid="tableName" /> menu
-        INNER JOIN <include refid="roleMenuTableName" /> rm ON menu.id = rm.menu_id
-        WHERE rm.role_id = #{id, jdbcType=BIGINT}
+    <select id="getPermissionsByRoleId" parameterType="long" resultMap="BaseResultMap">
+        SELECT p.*
+        FROM <include refid="tableName" /> p
+        INNER JOIN <include refid="rolePermissionTableName" /> rp ON p.id = rp.permission_id
+        WHERE rp.role_id = #{id, jdbcType=BIGINT}
     </select>
 
     <!-- 根据 角色ID 查询关联菜单信息 -->
-    <select id="getMenusByRoleIds" parameterType="java.util.List" resultMap="BaseResultMap">
-        SELECT menu.*
-        FROM <include refid="tableName" /> menu
-        INNER JOIN <include refid="roleMenuTableName" /> rm ON menu.id = rm.menu_id
-        WHERE rm.role_id IN
+    <select id="getPermissionsByRoleIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT p.*
+        FROM <include refid="tableName" /> p
+        INNER JOIN <include refid="rolePermissionTableName" /> rp ON p.id = rp.permission_id
+        WHERE rp.role_id IN
         <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
             #{roleId, jdbcType=BIGINT}
         </foreach>
     </select>
 
     <!-- 根据 角色ID 删除关联信息 -->
-    <delete id="deleteMenusByRoleId" parameterType="long">
-        DELETE FROM <include refid="roleMenuTableName" /> WHERE role_id=#{id}
+    <delete id="deletePermissionsByRoleId" parameterType="long">
+        DELETE FROM <include refid="rolePermissionTableName" /> WHERE role_id=#{id}
     </delete>
 
     <!-- 根据 角色ID 增加关联信息 -->
-    <insert id="insertMenusBatch" parameterType="map">
-        INSERT INTO <include refid="roleMenuTableName" /> (role_id, menu_id)
+    <insert id="insertPermissionsBatch" parameterType="map">
+        INSERT INTO <include refid="rolePermissionTableName" /> (role_id, permission_id)
         VALUES
-        <foreach collection="menuIds" item="menuId" separator=",">
-            (#{id}, #{menuId})
+        <foreach collection="permissionIds" item="permissionId" separator=",">
+            (#{id}, #{permissionId})
         </foreach>
     </insert>
 
