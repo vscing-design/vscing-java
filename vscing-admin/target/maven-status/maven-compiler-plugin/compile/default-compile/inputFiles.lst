@@ -7,6 +7,7 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/AddressController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/AdminUserController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/MenuController.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/OrganizationController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/RoleController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/SupplierController.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/controller/v1/TestController.java
@@ -15,12 +16,14 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/AddressService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/AdminUserService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/MenuService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/OrganizationService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/RoleService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/SupplierService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/UserService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/AddressServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/AdminUserServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/MenuServiceImpl.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/OrganizationServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/RoleServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/SupplierServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/UserServiceImpl.java

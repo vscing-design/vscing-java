@@ -13,14 +13,15 @@ import com.vscing.common.util.RedisKeyConstants;
 import com.vscing.common.util.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserSaveDto;
-import com.vscing.model.dto.MenuListDto;
 import com.vscing.model.entity.AdminUser;
 import com.vscing.model.entity.Menu;
 import com.vscing.model.entity.Organization;
+import com.vscing.model.entity.Permission;
 import com.vscing.model.entity.Role;
 import com.vscing.model.mapper.AdminUserMapper;
 import com.vscing.model.mapper.MenuMapper;
 import com.vscing.model.mapper.OrganizationMapper;
+import com.vscing.model.mapper.PermissionMapper;
 import com.vscing.model.mapper.RoleMapper;
 import com.vscing.model.request.AdminUserRolesRequest;
 import com.vscing.model.vo.AdminUserDetailVo;
@@ -81,6 +82,9 @@ public class AdminUserServiceImpl implements AdminUserService {
   private MenuMapper menuMapper;
 
   @Autowired
+  private PermissionMapper permissionMapper;
+
+  @Autowired
   private RedisService redisService;
 
   @Override
@@ -104,8 +108,11 @@ public class AdminUserServiceImpl implements AdminUserService {
       List<Role> roleList = roleMapper.getList(null);
       adminUser.setRelatedRoleList(roleList);
       // 用户关联菜单（基于角色ID）
-      List<Menu> menuList = menuMapper.getList(new MenuListDto());
+      List<Menu> menuList = menuMapper.getList(null);
       adminUser.setRelatedMenuList(menuList);
+      // 用户关联按钮权限（基于角色ID）
+      List<Permission> permissionList = permissionMapper.getList(null);
+      adminUser.setRelatedPermissionList(permissionList);
     } else {
       // 用户关联机构
       List<Organization> orgList = organizationMapper.getOrganizationsByUserId(adminUser.getId());
@@ -118,6 +125,12 @@ public class AdminUserServiceImpl implements AdminUserService {
         List<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toList());
         List<Menu> menuList = menuMapper.getMenusByRoleIds(roleIds);
         adminUser.setRelatedMenuList(menuList);
+      }
+      // 用户关联菜单（基于角色ID）
+      if (!roleList.isEmpty()) {
+        List<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toList());
+        List<Permission> permissionList = permissionMapper.getPermissionsByRoleIds(roleIds);
+        adminUser.setRelatedPermissionList(permissionList);
       }
     }
 

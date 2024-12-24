@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface MenuMapper {
 
-  List<Menu> getList(@Param("record") MenuListDto record);
+  List<Menu> getList(MenuListDto record);
 
   Menu selectById(long id);
 

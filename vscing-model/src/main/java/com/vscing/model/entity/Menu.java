@@ -44,6 +44,6 @@ public class Menu extends BaseEntity {
   @Schema(description = "前端组件")
   private String component;
 
-  @Schema(description = "启用状态：1->启用 2->禁用")
+  @Schema(description = "状态：1->显示 2->隐藏")
   private Integer status;
 }
