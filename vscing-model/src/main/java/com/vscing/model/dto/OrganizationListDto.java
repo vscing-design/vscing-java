@@ -16,4 +16,7 @@ public class OrganizationListDto {
     @Schema(description = "机构类型：1->企业")
     private Integer type;
 
+    @Schema(description = "机构ID/机构父ID")
+    private Integer organizationId;
+
 }

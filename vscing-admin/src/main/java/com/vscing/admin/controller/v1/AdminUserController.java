@@ -153,7 +153,7 @@ public class AdminUserController {
       }
       return CommonResult.failed("新增失败");
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }
@@ -181,7 +181,7 @@ public class AdminUserController {
       }
       return CommonResult.failed("编辑失败");
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }
@@ -207,7 +207,7 @@ public class AdminUserController {
       }
       return CommonResult.failed("删除失败");
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }
@@ -235,7 +235,7 @@ public class AdminUserController {
       }
       return CommonResult.failed("新增失败");
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }

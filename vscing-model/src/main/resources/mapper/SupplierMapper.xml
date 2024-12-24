@@ -68,16 +68,16 @@
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
-            <if test="name != null">#{name, jdbcType="VARCHAR"},</if>
-            <if test="status != null">#{status, jdbcType="TINYINT"},</if>
+            <if test="name != null">#{name, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="accessDate != null">#{accessDate, jdbcType=TIMESTAMP},</if>
-            <if test="configAccont != null">#{configAccont, jdbcType="VARCHAR"},</if>
-            <if test="configKey != null">#{configKey, jdbcType="VARCHAR"},</if>
-            <if test="configId != null">#{configId, jdbcType="VARCHAR"},</if>
-            <if test="contacts != null">#{contacts, jdbcType="VARCHAR"},</if>
-            <if test="phone != null">#{phone, jdbcType="VARCHAR"},</if>
+            <if test="configAccont != null">#{configAccont, jdbcType=VARCHAR},</if>
+            <if test="configKey != null">#{configKey, jdbcType=VARCHAR},</if>
+            <if test="configId != null">#{configId, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">#{contacts, jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="prepaidAmount != null">#{prepaidAmount, jdbcType=DECIMAL},</if>
-            <if test="coopDesc != null">#{coopDesc, jdbcType="VARCHAR"},</if>
+            <if test="coopDesc != null">#{coopDesc, jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
@@ -86,16 +86,16 @@
     <update id="update" parameterType="com.vscing.model.entity.Supplier">
         UPDATE <include refid="tableName" />
         <set>
-            <if test="name != null">name = #{name, jdbcType="VARCHAR"},</if>
+            <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType="TINYINT"},</if>
             <if test="accessDate != null">access_date = #{accessDate, jdbcType=TIMESTAMP},</if>
-            <if test="configAccont != null">config_accont = #{configAccont, jdbcType="VARCHAR"},</if>
-            <if test="configKey != null">config_key = #{configKey, jdbcType="VARCHAR"},</if>
-            <if test="configId != null">config_id = #{configId, jdbcType="VARCHAR"},</if>
-            <if test="contacts != null">contacts = #{contacts, jdbcType="VARCHAR"},</if>
-            <if test="phone != null">phone = #{phone, jdbcType="VARCHAR"},</if>
+            <if test="configAccont != null">config_accont = #{configAccont, jdbcType=VARCHAR},</if>
+            <if test="configKey != null">config_key = #{configKey, jdbcType=VARCHAR},</if>
+            <if test="configId != null">config_id = #{configId, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">contacts = #{contacts, jdbcType=VARCHAR},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="prepaidAmount != null">prepaid_amount = #{prepaidAmount, jdbcType=DECIMAL},</if>
-            <if test="coopDesc != null">coop_desc = #{coopDesc, jdbcType="VARCHAR"},</if>
+            <if test="coopDesc != null">coop_desc = #{coopDesc, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}

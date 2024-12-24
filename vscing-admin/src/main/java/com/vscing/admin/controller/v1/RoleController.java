@@ -65,7 +65,7 @@ public class RoleController {
       }
       return CommonResult.failed("新增失败");
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }
@@ -112,7 +112,7 @@ public class RoleController {
         return CommonResult.success("新增成功");
       }
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }
@@ -142,7 +142,7 @@ public class RoleController {
         return CommonResult.success("编辑成功");
       }
     } catch (Exception e) {
-      log.error("请求错误: " + e.getMessage());
+      log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
     }
   }

@@ -32,6 +32,9 @@
         SELECT * FROM <include refid="tableName" />
         <where>
             deleted_at IS NULL
+            <if test="organizationId != null">
+                AND (id = #{organizationId} OR parent_id = #{organizationId})
+            </if>
             <if test="name != null">
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
