@@ -90,7 +90,7 @@ public class AdminUserController {
   @Operation(summary = "登陆用户信息")
   public CommonResult<AdminUserDetailVo> self(@AuthenticationPrincipal AdminUserDetails userInfo) {
     if(userInfo == null) {
-      return CommonResult.failed("用户不存在");
+      return CommonResult.failed("上下文异常");
     }
     AdminUserDetailVo adminUser = userInfo.getAdminUser();
     if (adminUser == null) {

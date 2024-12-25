@@ -1,5 +1,6 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.po.AdminUserDetails;
@@ -102,7 +103,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     AdminUser entity = adminUserMapper.selectById(id);
     // 直接调用改进后的 Mapper 方法进行转换
     AdminUserDetailVo adminUser = MapstructUtils.convert(entity, AdminUserDetailVo.class);
-    if (adminUser.getId().equals(superAdminId)) {
+    if (adminUser != null && adminUser.getId().equals(superAdminId)) {
       // 用户关联机构
       List<Organization> orgList = organizationMapper.getList(null);
       adminUser.setRelatedOrgList(orgList);
@@ -115,7 +116,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       // 用户关联按钮权限（基于角色ID）
       List<Permission> permissionList = permissionMapper.getList(null);
       adminUser.setRelatedPermissionList(permissionList);
-    } else {
+    } else if (adminUser != null) {
       // 用户关联机构
       List<Organization> orgList = organizationMapper.getOrganizationsByUserId(adminUser.getId());
       adminUser.setRelatedOrgList(orgList);
@@ -181,6 +182,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     // 提取用户 ID 列表
     List<Long> adminUserIds = adminUserList.stream().map(AdminUserListVo::getId).collect(Collectors.toList());
+
+    // 空数据处理
+    if (CollUtil.isEmpty((adminUserIds))) {
+      return adminUserList;
+    }
 
     // 根据用户 ID 列表查询机构信息
     List<AdminUserOrganizationVo> organizationList = organizationMapper.getOrganizationsByUserIds(adminUserIds);
