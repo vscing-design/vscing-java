@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.OrganizationListDto;
 import com.vscing.model.entity.Organization;
+import com.vscing.model.vo.AdminUserOrganizationVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +22,8 @@ public interface OrganizationMapper {
     int update(Organization record);
 
     List<Organization> getOrganizationsByUserId(long id);
+
+    List<AdminUserOrganizationVo> getOrganizationsByUserIds(List<Long> adminUserIds);
 
     int deleteOrganizationsByUserId(long id);
 

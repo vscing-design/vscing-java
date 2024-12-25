@@ -1,11 +1,11 @@
 package com.vscing.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * AdminUserListVo
@@ -55,4 +55,8 @@ public class AdminUserListVo {
 
   @Schema(description = "更新者ID")
   private Long updatedBy;
+
+  @Schema(description = "所属机构")
+  private List<AdminUserOrganizationVo> organizationList;
+
 }

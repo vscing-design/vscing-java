@@ -28,23 +28,32 @@
     <sql id="tableName">
         vscing_admin_user
     </sql>
+    <sql id="adminUserOrganizationTableName">
+        vscing_admin_user_organization
+    </sql>
 
     <!-- 查询用户列表 -->
-    <select id="getList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" />
+    <select id="getList" resultType="com.vscing.model.vo.AdminUserListVo">
+        SELECT
+        u.*
+        FROM <include refid="tableName" /> u
+        LEFT JOIN <include refid="adminUserOrganizationTableName" /> uo ON u.id = uo.admin_user_id
         <where>
-            deleted_at IS NULL
+            u.deleted_at IS NULL
             <if test="record.username != null and record.username.trim() != ''">
-                AND username LIKE CONCAT('%', #{record.username}, '%')
+                AND u.username LIKE CONCAT('%', #{record.username}, '%')
             </if>
             <if test="record.phone != null and record.phone.trim() != ''">
-                AND phone LIKE CONCAT('%', #{record.phone}, '%')
+                AND u.phone LIKE CONCAT('%', #{record.phone}, '%')
             </if>
             <if test="record.startDate != null">
-                AND created_at <![CDATA[ >= ]]> #{record.startDate, jdbcType=TIMESTAMP}
+                AND u.created_at <![CDATA[ >= ]]> #{record.startDate, jdbcType=TIMESTAMP}
             </if>
             <if test="record.endDate != null">
-                AND created_at <![CDATA[ <= ]]> #{record.endDate, jdbcType=TIMESTAMP}
+                AND u.created_at <![CDATA[ <= ]]> #{record.endDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="record.organizationId != null">
+                AND uo.organization_id = #{record.organizationId, jdbcType=BIGINT}
             </if>
         </where>
     </select>

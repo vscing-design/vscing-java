@@ -7,6 +7,7 @@ import com.vscing.model.entity.AdminUser;
 import com.vscing.model.entity.Role;
 import com.vscing.model.request.AdminUserRolesRequest;
 import com.vscing.model.vo.AdminUserDetailVo;
+import com.vscing.model.vo.AdminUserListVo;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public interface AdminUserService {
   /**
    * 列表
   */
-  List<AdminUser> getList(AdminUserListDto record, Integer pageSize, Integer pageNum);
+  List<AdminUserListVo> getList(AdminUserListDto record, Integer pageSize, Integer pageNum);
 
   /**
    * 详情

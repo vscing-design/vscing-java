@@ -25,6 +25,8 @@ import com.vscing.model.mapper.PermissionMapper;
 import com.vscing.model.mapper.RoleMapper;
 import com.vscing.model.request.AdminUserRolesRequest;
 import com.vscing.model.vo.AdminUserDetailVo;
+import com.vscing.model.vo.AdminUserListVo;
+import com.vscing.model.vo.AdminUserOrganizationVo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,9 +173,28 @@ public class AdminUserServiceImpl implements AdminUserService {
   }
 
   @Override
-  public List<AdminUser> getList(AdminUserListDto record, Integer pageSize, Integer pageNum) {
+  public List<AdminUserListVo> getList(AdminUserListDto record, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
-    return adminUserMapper.getList(record);
+
+    // 查询用户列表
+    List<AdminUserListVo> adminUserList = adminUserMapper.getList(record);
+
+    // 提取用户 ID 列表
+    List<Long> adminUserIds = adminUserList.stream().map(AdminUserListVo::getId).collect(Collectors.toList());
+
+    // 根据用户 ID 列表查询机构信息
+    List<AdminUserOrganizationVo> organizationList = organizationMapper.getOrganizationsByUserIds(adminUserIds);
+
+    // 将机构信息按用户 ID 分组
+    Map<Long, List<AdminUserOrganizationVo>> organizationMap = organizationList.stream()
+        .collect(Collectors.groupingBy(AdminUserOrganizationVo::getAdminUserId));
+
+    // 给每个用户增加机构列表数据
+    for (AdminUserListVo adminUser : adminUserList) {
+      adminUser.setOrganizationList(organizationMap.getOrDefault(adminUser.getId(), List.of()));
+    }
+
+    return adminUserList;
   }
 
   @Override

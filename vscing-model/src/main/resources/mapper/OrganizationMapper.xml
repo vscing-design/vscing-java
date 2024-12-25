@@ -103,6 +103,17 @@
         WHERE ur.admin_user_id = #{id, jdbcType=BIGINT}
     </select>
 
+    <!-- 根据 用户ID列表 查询关联信息 -->
+    <select id="getOrganizationsByUserIds" parameterType="java.util.List" resultType="com.vscing.model.vo.AdminUserOrganizationVo">
+        SELECT o.*, uo.admin_user_id
+        FROM <include refid="tableName" /> o
+        INNER JOIN <include refid="adminUserOrganizationTableName" /> uo ON o.id = uo.organization_id
+        WHERE uo.admin_user_id IN
+        <foreach collection="adminUserIds" item="adminUserId" open="(" separator="," close=")">
+            #{adminUserId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+
     <!-- 根据 用户ID 删除关联信息 -->
     <delete id="deleteOrganizationsByUserId" parameterType="long">
         DELETE FROM <include refid="adminUserOrganizationTableName" /> WHERE admin_user_id=#{id}

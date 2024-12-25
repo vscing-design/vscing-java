@@ -3,6 +3,7 @@ package com.vscing.model.mapper;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserSaveDto;
 import com.vscing.model.entity.AdminUser;
+import com.vscing.model.vo.AdminUserListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @Mapper
 public interface AdminUserMapper {
 
-  List<AdminUser> getList(@Param("record") AdminUserListDto record);
+  List<AdminUserListVo> getList(@Param("record") AdminUserListDto record);
 
   AdminUser selectById(long id);
 

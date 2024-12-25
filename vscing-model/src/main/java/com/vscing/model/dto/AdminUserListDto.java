@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class AdminUserListDto {
 
+  @Schema(description = "机构ID")
+  private Long organizationId;
+
   @Schema(description = "账户")
   private String username;
 

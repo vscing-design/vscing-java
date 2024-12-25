@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * AdminUserController
@@ -105,12 +104,8 @@ public class AdminUserController {
   public CommonResult<CommonPage<AdminUserListVo>> users(AdminUserListDto queryParam,
                                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                          @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
-    List<AdminUser> userList = adminUserService.getList(queryParam, pageSize, pageNum);
-    // 直接调用改进后的 Mapper 方法进行转换
-    List<AdminUserListVo> list = userList.stream()
-        .map(adminUser -> MapstructUtils.convert(adminUser, AdminUserListVo.class))
-        .collect(Collectors.toList());
-    return CommonResult.success(CommonPage.restPage(list));
+    List<AdminUserListVo> userList = adminUserService.getList(queryParam, pageSize, pageNum);
+    return CommonResult.success(CommonPage.restPage(userList));
   }
 
   @GetMapping("/users/{id}")
