@@ -87,7 +87,7 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
-            <if test="status != null">status = #{status, jdbcType="TINYINT"},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="accessDate != null">access_date = #{accessDate, jdbcType=TIMESTAMP},</if>
             <if test="configAccont != null">config_accont = #{configAccont, jdbcType=VARCHAR},</if>
             <if test="configKey != null">config_key = #{configKey, jdbcType=VARCHAR},</if>
