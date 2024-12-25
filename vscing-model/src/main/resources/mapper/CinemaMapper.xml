@@ -7,12 +7,6 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Cinema">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="province_id" property="provinceId" jdbcType="BIGINT" />
-        <result column="s1_city_id" property="s1CityId" jdbcType="BIGINT" />
-        <result column="name" property="name" jdbcType="VARCHAR" />
-        <result column="short_name" property="shortName" jdbcType="VARCHAR" />
-        <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
-        <result column="first_letter" property="firstLetter" jdbcType="VARCHAR" />
-        <result column="full_letter" property="fullLetter" jdbcType="VARCHAR" />
         <result column="lng" property="lng" jdbcType="VARCHAR" />
         <result column="lat" property="lng" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
