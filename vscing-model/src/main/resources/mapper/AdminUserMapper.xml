@@ -58,9 +58,11 @@
         </where>
     </select>
 
-    <!-- 根据 username 查询用户 -->
+    <!-- 根据 username 或 phone 查询用户 -->
     <select id="selectByUsername" parameterType="String" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> WHERE username = #{username,jdbcType=VARCHAR} and deleted_at IS NULL
+        SELECT * FROM <include refid="tableName" />
+        WHERE  (username = #{username,jdbcType=VARCHAR} or phone = #{phone,jdbcType=VARCHAR})
+        and deleted_at IS NULL
     </select>
 
     <!-- 根据 ID 查询用户 -->
@@ -112,6 +114,9 @@
             </if>
             <if test="phone != null">
                 phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
             </if>
             <if test="updatedBy != null">
                 updated_by = #{updatedBy, jdbcType=BIGINT}
