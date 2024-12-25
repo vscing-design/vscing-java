@@ -39,7 +39,7 @@
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
             <if test="type != null">
-                AND type = #{record.type}
+                AND type = #{type}
             </if>
         </where>
     </select>

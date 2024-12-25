@@ -15,7 +15,7 @@
         <result column="contacts" property="contacts" jdbcType="VARCHAR" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="prepaid_amount" property="prepaidAmount" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
-        <result column="coopDesc" property="coopDesc" jdbcType="VARCHAR" />
+        <result column="coop_desc" property="coopDesc" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -62,7 +62,7 @@
             <if test="contacts != null">contacts,</if>
             <if test="phone != null">phone,</if>
             <if test="prepaidAmount != null">prepaid_amount,</if>
-            <if test="coopDesc != null">coop_desc</if>
+            <if test="coopDesc != null">coop_desc,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
