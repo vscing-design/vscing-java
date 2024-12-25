@@ -102,7 +102,7 @@ public class TestController {
 
             for (Map<String, Object> data : dataList) {
 //                String cityCode = (String) data.get("cityCode");
-//                Long cityId = objectMapper.convertValue(data.get("cityId"), Long.class);
+                Long cityId = objectMapper.convertValue(data.get("cityId"), Long.class);
 
                 // 尝试在 city 表中查找 cityCode
 //                City city = cityMapper.findByCode(cityCode);
@@ -128,13 +128,15 @@ public class TestController {
                     for (Map<String, Object> region : regions) {
                         String regionName = (String) region.get("regionName");
                         Long regionId = objectMapper.convertValue(region.get("regionId"), Long.class);
-
-                        District areaByRegionName = areaMapper.findByName(regionName);
                         log.info("regionName: {}, regionId: {}", regionName, regionId);
-                        if (areaByRegionName != null) {
-                            log.info("areaRegion", areaByRegionName.getId());
-                            areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+                        if(regionName != null && regionId != null){
+                            District areaByRegionName = areaMapper.findByName(regionName, cityId);
+                            if (areaByRegionName != null) {
+                                log.info("areaRegion", areaByRegionName.getId());
+                                areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+                            }
                         }
+
                     }
                 }
             }

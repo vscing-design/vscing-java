@@ -21,8 +21,8 @@ public interface DistrictMapper {
   @Select("SELECT * FROM vscing_district WHERE id = #{code}")
   District findByCode(@Param("code") String code);
 
-  @Select("SELECT * FROM vscing_district WHERE name = #{name}")
-  District findByName(@Param("name") String name);
+  @Select("SELECT * FROM vscing_district WHERE name = #{name} and city_id = #{cityId} limit 1")
+  District findByName(@Param("name") String name, @Param("cityId") Long cityId);
 
   @Update("UPDATE vscing_district SET s1_city_id = #{cityId} WHERE id = #{id}")
   void updateCity(@Param("id") Long id, @Param("cityId") Long cityId);
