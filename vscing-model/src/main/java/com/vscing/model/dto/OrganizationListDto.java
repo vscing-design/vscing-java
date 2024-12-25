@@ -17,6 +17,6 @@ public class OrganizationListDto {
     private Integer type;
 
     @Schema(description = "机构ID/机构父ID")
-    private Integer organizationId;
+    private Long organizationId;
 
 }
