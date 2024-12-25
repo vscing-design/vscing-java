@@ -1,5 +1,9 @@
 package com.vscing.admin.service;
 
+import com.vscing.model.vo.ProvinceVo;
+
+import java.util.List;
+
 /**
  * AddressService
  *
@@ -8,6 +12,6 @@ package com.vscing.admin.service;
  */
 public interface AddressService {
 
-
+  List<ProvinceVo> getList();
 
 }
