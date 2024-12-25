@@ -31,6 +31,11 @@ public interface AdminUserService {
   String login(String username, String password, HttpServletRequest request);
 
   /**
+   * 登出
+   */
+  boolean logout(AdminUserDetailVo adminUser, String authToken);
+
+  /**
    * 用户信息
   */
   AdminUserDetailVo self(long id);

@@ -54,6 +54,9 @@ import java.util.Objects;
 @Tag(name = "系统管理员登陆接口", description = "系统管理员登陆接口")
 public class AdminUserController {
 
+  @Value("${jwt.tokenHeader}")
+  private String tokenHeader;
+
   @Value("${jwt.tokenHead}")
   private String tokenHead;
 
@@ -83,6 +86,28 @@ public class AdminUserController {
       tokenMap.put("token", token);
       tokenMap.put("tokenHead", tokenHead);
       return CommonResult.success("登陆成功", tokenMap);
+    }
+  }
+
+  @GetMapping("/logout")
+  @Operation(summary = "后台用户登出")
+  public CommonResult<Object> login(HttpServletRequest request, @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if(userInfo == null) {
+      return CommonResult.failed("上下文异常");
+    }
+    AdminUserDetailVo adminUser = userInfo.getAdminUser();
+    if (adminUser == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    String authHeader = request.getHeader(this.tokenHeader);
+    if(authHeader == null || !authHeader.startsWith(this.tokenHead)) {
+      return CommonResult.failed("token不存在");
+    }
+    String authToken = authHeader.substring(this.tokenHead.length());
+    if (adminUserService.logout(adminUser, authToken)) {
+      return CommonResult.success("登出成功");
+    } else {
+      return CommonResult.failed("登出失败");
     }
   }
 

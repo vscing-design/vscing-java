@@ -174,6 +174,13 @@ public class AdminUserServiceImpl implements AdminUserService {
   }
 
   @Override
+  public boolean logout(AdminUserDetailVo adminUser, String authToken) {
+    // 删除缓存
+    String redisKey = RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + adminUser.getId() + RedisKeyConstants.KEY_SEPARATOR + authToken;
+    return redisService.del(redisKey);
+  }
+
+  @Override
   public List<AdminUserListVo> getList(AdminUserListDto record, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
 
