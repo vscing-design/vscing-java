@@ -1,14 +1,17 @@
 package com.vscing.admin.controller.v1;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.util.SignatureGenerator;
+import com.vscing.model.entity.District;
+import com.vscing.model.mapper.CityMapper;
+import com.vscing.model.mapper.DistrictMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +36,13 @@ public class TestController {
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
+
+    @Autowired
+    private CityMapper cityMapper;
+
+    @Autowired
+    private DistrictMapper areaMapper;
+
 
     // https://docs.qq.com/doc/DWXVlWmtHbnpLUXdT
     @RequestMapping(value = "/info", method = RequestMethod.GET)
@@ -85,14 +96,48 @@ public class TestController {
 
             // 将 JSON 字符串解析为 JsonNode 对象
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(response.body().string());
 
-            result.put("statusCode", response.code());
-            result.put("body", jsonNode);
+            Map<String, Object> responseMap = objectMapper.readValue(response.body().string(), Map.class);
+            List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
 
-            // 使用 writerWithDefaultPrettyPrinter() 打印漂亮的 JSON
-//            String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
-//            System.out.println("Pretty JSON:\n" + prettyJson);
+            for (Map<String, Object> data : dataList) {
+//                String cityCode = (String) data.get("cityCode");
+//                Long cityId = objectMapper.convertValue(data.get("cityId"), Long.class);
+
+                // 尝试在 city 表中查找 cityCode
+//                City city = cityMapper.findByCode(cityCode);
+//                log.info("cityCode: {}, cityId: {}", cityCode, cityId);
+//                if (city != null) {
+//                    log.info("city");
+//                    // 如果找到，则更新 city 表中的 cityId
+//                    cityMapper.updateCityId(city.getId(), cityId);
+//                } else {
+//                    log.info("area");
+//                    // 如果 city 表中找不到，尝试在 area 表中查找 cityCode
+//                    District area = areaMapper.findByCode(cityCode);
+//                    if (area != null) {
+//                        log.info("areaCity");
+//                        // 如果找到，则更新 area 表中的 cityId
+//                        areaMapper.updateCity(area.getId(), cityId);
+//                    }
+//                }
+
+                // 遍历 regions 并更新 area 表中的 regionId
+                List<Map<String, Object>> regions = (List<Map<String, Object>>) data.get("regions");
+                if (regions != null) {
+                    for (Map<String, Object> region : regions) {
+                        String regionName = (String) region.get("regionName");
+                        Long regionId = objectMapper.convertValue(region.get("regionId"), Long.class);
+
+                        District areaByRegionName = areaMapper.findByName(regionName);
+                        log.info("regionName: {}, regionId: {}", regionName, regionId);
+                        if (areaByRegionName != null) {
+                            log.info("areaRegion", areaByRegionName.getId());
+                            areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+                        }
+                    }
+                }
+            }
 
             return CommonResult.success(result);
 

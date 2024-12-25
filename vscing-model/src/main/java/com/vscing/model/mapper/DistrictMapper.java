@@ -4,6 +4,8 @@ import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.entity.District;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -15,6 +17,18 @@ import java.util.List;
  */
 @Mapper
 public interface DistrictMapper {
+
+  @Select("SELECT * FROM vscing_district WHERE id = #{code}")
+  District findByCode(@Param("code") String code);
+
+  @Select("SELECT * FROM vscing_district WHERE name = #{name}")
+  District findByName(@Param("name") String name);
+
+  @Update("UPDATE vscing_district SET s1_city_id = #{cityId} WHERE id = #{id}")
+  void updateCity(@Param("id") Long id, @Param("cityId") Long cityId);
+
+  @Update("UPDATE vscing_district SET s1_region_id = #{regionId} WHERE id = #{id}")
+  void updateRegion(@Param("id") Long id, @Param("regionId") Long regionId);
 
   List<District> getList(@Param("record") AddressListDto record);
 
