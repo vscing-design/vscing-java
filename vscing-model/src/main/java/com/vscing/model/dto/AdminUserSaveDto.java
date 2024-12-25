@@ -30,6 +30,9 @@ public class AdminUserSaveDto {
   @Schema(description = "机构")
   private List<Long> organizationIds;
 
+  @Schema(description = "帐号启用状态：1->启用 2->禁用")
+  private Integer status;
+
   @Schema(description = "最后登陆IP")
   private String lastIp;
 
