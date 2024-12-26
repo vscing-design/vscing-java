@@ -6,9 +6,20 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Cinema">
         <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
         <result column="province_id" property="provinceId" jdbcType="BIGINT" />
+        <result column="province_name" property="provinceName" jdbcType="VARCHAR" />
+        <result column="city_id" property="cityId" jdbcType="BIGINT" />
+        <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+        <result column="district_id" property="districtId" jdbcType="BIGINT" />
+        <result column="district_name" property="districtName" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
         <result column="lng" property="lng" jdbcType="VARCHAR" />
         <result column="lat" property="lng" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -21,14 +32,18 @@
     <sql id="tableName">
         vscing_cinema
     </sql>
+    <sql id="supplierTableName">
+        vscing_supplier
+    </sql>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" />
+        SELECT c.*, s.name as supplierName FROM <include refid="tableName" /> c
+        LEFT JOIN <include refid="supplierTableName" /> s ON c.supplier_id = s.id
         <where>
-            deleted_at IS NULL
-            <if test="record.name != null">
-                AND name LIKE CONCAT('%', #{record.name}, '%')
+            c.deleted_at IS NULL
+            <if test="name != null">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
             </if>
         </where>
     </select>
@@ -43,29 +58,37 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="provinceId != null">province_id,</if>
-            <if test="s1CityId != null">s1_city_id,</if>
+            <if test="cinemaId != null">cinema_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
             <if test="name != null">name,</if>
-            <if test="shortName != null">short_name,</if>
-            <if test="pinyin != null">pinyin,</if>
-            <if test="firstLetter != null">first_letter,</if>
-            <if test="fullLetter != null">full_letter,</if>
+            <if test="provinceId != null">province_id,</if>
+            <if test="provinceName != null">province_name,</if>
+            <if test="cityId != null">city_id,</if>
+            <if test="cityName != null">city_name,</if>
+            <if test="districtId != null">district_id,</if>
+            <if test="districtName != null">district_name,</if>
+            <if test="address != null">address,</if>
             <if test="lng != null">lng,</if>
             <if test="lat != null">lat,</if>
+            <if test="phone != null">phone,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
-            <if test="provinceId != null">#{provinceId, jdbcType=BIGINT},</if>
-            <if test="s1CityId != null">#{s1CityId, jdbcType=BIGINT},</if>
+            <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="name != null">#{name,jdbcType=VARCHAR},</if>
-            <if test="shortName != null">#{shortName,jdbcType=VARCHAR},</if>
-            <if test="pinyin != null">#{pinyin,jdbcType=VARCHAR},</if>
-            <if test="firstLetter != null">#{firstLetter,jdbcType=VARCHAR},</if>
-            <if test="fullLetter != null">#{fullLetter,jdbcType=VARCHAR},</if>
+            <if test="provinceId != null">#{provinceId, jdbcType=BIGINT},</if>
+            <if test="provinceName != null">#{provinceName, jdbcType=VARCHAR},</if>
+            <if test="cityId != null">#{cityId, jdbcType=BIGINT},</if>
+            <if test="cityName != null">#{cityName, jdbcType=VARCHAR},</if>
+            <if test="districtId != null">#{districtId, jdbcType=BIGINT},</if>
+            <if test="districtName != null">#{districtName, jdbcType=VARCHAR},</if>
+            <if test="address != null">#{address,jdbcType=VARCHAR},</if>
             <if test="lng != null">#{lng,jdbcType=VARCHAR},</if>
             <if test="lat != null">#{lat,jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone,jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>

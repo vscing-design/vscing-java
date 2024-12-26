@@ -1,6 +1,6 @@
 package com.vscing.model.mapper;
 
-import com.vscing.model.dto.AddressListDto;
+import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface CinemaMapper {
 
-  List<Cinema> getList(@Param("record") AddressListDto record);
+  List<Cinema> getList(CinemaListDto record);
 
   Cinema selectById(long id);
 

@@ -19,7 +19,7 @@ public class Cinema extends BaseEntity {
   private Long id;
 
   @Schema(description = "三方ID")
-  private Long tpId;
+  private Long cinemaId;
 
   @Schema(description = "供应商ID")
   private Long supplierId;
