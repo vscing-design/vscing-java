@@ -45,6 +45,12 @@
             <if test="name != null">
                 AND c.name LIKE CONCAT('%', #{name}, '%')
             </if>
+            <if test="status != null and status != 0">
+                AND c.status = #{status}
+            </if>
+            <if test="supplierName != null">
+                AND s.name LIKE CONCAT('%', #{supplierName}, '%')
+            </if>
         </where>
     </select>
 

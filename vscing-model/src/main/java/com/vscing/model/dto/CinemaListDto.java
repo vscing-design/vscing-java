@@ -12,7 +12,13 @@ import lombok.Data;
 @Data
 public class CinemaListDto {
 
-  @Schema(description = "名称")
+  @Schema(description = "影院名称")
   private String name;
+
+  @Schema(description = "供应商名称")
+  private String supplierName;
+
+  @Schema(description = "影院状态 0 全部 1 营业中 2 未营业")
+  private Integer status;
 
 }
