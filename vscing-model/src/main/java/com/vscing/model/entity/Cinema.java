@@ -24,6 +24,9 @@ public class Cinema extends BaseEntity {
   @Schema(description = "供应商ID")
   private Long supplierId;
 
+  @Schema(description = "供应商名称")
+  private String supplierName;
+
   @Schema(description = "影院名称")
   private String name;
 
