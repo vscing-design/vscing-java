@@ -8,4 +8,6 @@ package com.vscing.common.service.payment;
  */
 public interface PaymentService {
 
+  String pay(double amount);
+
 }
