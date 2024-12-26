@@ -40,6 +40,7 @@ public class JacksonConfig {
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer customizer() {
     return builder -> {
+      // 禁用默认类型信息
       // 关闭未知属性报错
       builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       // 过滤null
