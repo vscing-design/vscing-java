@@ -17,7 +17,7 @@
         <result column="district_name" property="districtName" jdbcType="VARCHAR" />
         <result column="address" property="address" jdbcType="VARCHAR" />
         <result column="lng" property="lng" jdbcType="VARCHAR" />
-        <result column="lat" property="lng" jdbcType="VARCHAR" />
+        <result column="lat" property="lat" jdbcType="VARCHAR" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />

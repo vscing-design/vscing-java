@@ -1,6 +1,8 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import com.vscing.model.vo.CityVo;
+import io.github.linpeilie.annotations.AutoMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +15,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@AutoMapper(target = CityVo.class)
 public class City extends BaseEntity {
 
   @Schema(description = "城市编码")

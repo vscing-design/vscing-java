@@ -1,6 +1,5 @@
 package com.vscing.model.vo;
 
-import com.vscing.model.entity.City;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -40,6 +39,6 @@ public class ProvinceVo {
   private String lat;
 
   @Schema(description = "城市列表")
-  private List<City> children;
+  private List<CityVo> children;
 
 }
