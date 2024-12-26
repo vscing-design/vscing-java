@@ -3,7 +3,7 @@ regionId	int	否	158	地区id
 
 多线程下 去 跑城市 + 地区，拉取数据
 
-影片
+-- 影片 --
 
 director	string	否	陈凯歌 徐克 林超贤	导演
 cast	string	否	吴京 易烊千玺 段奕宏 朱亚文 李晨 韩东君 胡军	主演
@@ -36,7 +36,8 @@ avatar	string	否	http://xxx	导演图片
 enName	string	否	Hark Tsui	导演英文名称
 scName	string	否	徐克	导演名称
 
-场次
+-- 场次 --
+
 data信息：
 参数名	类型	是否必传	示例值	描述
 longitude	double	是	116.436024	经度
