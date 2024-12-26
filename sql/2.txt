@@ -2,3 +2,82 @@ cityId	int	是	2	城市id
 regionId	int	否	158	地区id
 
 多线程下 去 跑城市 + 地区，拉取数据
+
+影片
+
+director	string	否	陈凯歌 徐克 林超贤	导演
+cast	string	否	吴京 易烊千玺 段奕宏 朱亚文 李晨 韩东君 胡军	主演
+intro	string	否	电影《长津湖》以抗美援朝战争第二次战役中的长津湖战役为背景，讲述了一段...	影片简介
+versionType	string	否	2D IMAX	上映类型
+language	string	否	汉语普通话	影片语言
+movieType	string	否	剧情|历史|战争	影片类型
+posterUrl	string	是	http://xxx	海报图片
+plotUrl	string	否	http://xxx,http://xxx	剧情照，多个用英文逗号隔开
+grade	string	否	7.5	评分
+like	int	否	689187	想看人数
+publishStatus	string	是	HOT	上映类型，HOT为热映，WAIT为待上映
+producer	object	否		导演、饰演信息
+
+producer信息：
+参数名	类型	是否必传	示例值	描述
+actors	arrays	否		演员信息列表
+director	arrays	否		导演信息列表
+
+actors信息：
+参数名	类型	是否必传	示例值	描述
+avatar	string	否	http://xxx	演员图片
+enName	string	否	Hanyu Zhang	演员英文名称
+scName	string	否	张涵予	演员名称
+actName	string	否	宋时轮	演员饰演角色名称
+
+director信息：
+参数名	类型	是否必传	示例值	描述
+avatar	string	否	http://xxx	导演图片
+enName	string	否	Hark Tsui	导演英文名称
+scName	string	否	徐克	导演名称
+
+场次
+data信息：
+参数名	类型	是否必传	示例值	描述
+longitude	double	是	116.436024	经度
+latitude	double	是	39.937246	纬度
+cinemaId	int	是	763	院线id
+cinemaName	string	是	北京新影联东环影城	院线名称
+cinemaAddress	string	是	东城区东中街9号东环广场B座地下一层	院线地址
+showInfor	arrays	否		场次信息
+showInfor信息：
+参数名	类型	是否必传	示例值	描述
+showId	string	是	NzYzI0BpbWFubUAjMTMxNDQ4I0BpbWFubUAjMTYzMzA4NjAwMCNAaW1hbm1AIzIjQGltYW5tQCM0OQ==	场次id
+hallName	string	是	4号激光影厅-3D眼镜需自备或购买	影厅名称
+movieId	int	是	131448	影片id
+duration	int	是	176	放映时长
+showTime	string	是	2021-10-01 19:00:00	放映开始时间
+stopSellTime	string	是	2021-10-01 18:45:00	电影售卖结束时间
+showVersionType	string	否	国语 2D	场次类型
+showPrice	decimal	是	54	场次价格（元）
+userPrice	decimal	是	49.7	影片结算价（元）
+areaPrice	arrays	否		分区定价信息。部分场次内，不同区域的座位结算价存在差异，若返回该字段，格式如下。
+这个分区信息与座位图接口配合使用，座位图接口中包含了每个座位的区域id。
+该字段返回时，商户应使用区域价格作为对最终用户选座时展示和下单处理。
+areaPrice信息：
+参数名	类型	是否必传	示例值	描述
+area	string	是	A	区域id，可能为字母
+showPrice	decimal	是	55	区域内场次价格（元）
+userPrice	decimal	是	50.4	区域内影片结算价（元）
+
+座位
+data信息：
+参数名	类型	是否必传	示例值	描述
+seats	arrays	是		座位图列表
+restrictions	int	是	4	每次下单最多可选座位个数
+seats信息：
+参数名	类型	是否必传	示例值	描述
+columnNo	string	是	4	纵坐标
+rowNo	string	是	3	横坐标
+seatNo	string	是	1排15列	座位名称
+status	string	是	LK	N可售，LK不可售
+loveStatus	int	是	0	0为非情侣座 1为情侣座左 2为情侣座右
+seatId	string	是	MjEwMTNAX0AxMzE0NDhAX0AxNjMzMDA3NDAwQF9ANDdAX0A0OUBfQDHmjpIxNeWIl0BfQDQ5QF9AMEBfQDHmjpIxNeWIl0BfQDMwMDU0QF9AMQ==	座位id
+areaId	string	否	A	区域id,如不支持分区定价，则为空（null）；注意：当返回0时，表示支持分区定价。
+
+
