@@ -14,6 +14,12 @@ import java.util.Map;
 @Component
 public class PaymentServiceFactory {
 
+  public static final String WECHAT = "wechat";
+
+  public static final String ALIPAY = "alipay";
+
+  public static final String UNIONPAY = "unionPay";
+
   private final Map<String, PaymentService> paymentServices;
 
   @Autowired
@@ -22,12 +28,12 @@ public class PaymentServiceFactory {
   }
 
   public PaymentService getPaymentService(String type) {
-    if ("alipay".equalsIgnoreCase(type)) {
-      return paymentServices.get("alipayService");
-    } else if ("wechat".equalsIgnoreCase(type)) {
-      return paymentServices.get("wechatPayService");
-    } else if ("unionpay".equalsIgnoreCase(type)) {
-      return paymentServices.get("unionPayService");
+    if (ALIPAY.equalsIgnoreCase(type)) {
+      return this.paymentServices.get("alipayPaymentService");
+    } else if (WECHAT.equalsIgnoreCase(type)) {
+      return this.paymentServices.get("wechatPaymentService");
+    } else if (UNIONPAY.equalsIgnoreCase(type)) {
+      return this.paymentServices.get("unionpayPaymentService");
     } else {
       throw new IllegalArgumentException("Unknown payment type: " + type);
     }
