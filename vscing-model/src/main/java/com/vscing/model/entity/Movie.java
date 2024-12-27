@@ -69,7 +69,7 @@ public class Movie extends BaseEntity {
     private Integer like;
 
     @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
-    private Integer publishStatus;
+    private String publishStatus;
 
 
 
