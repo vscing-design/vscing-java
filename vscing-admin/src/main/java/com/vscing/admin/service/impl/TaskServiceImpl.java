@@ -311,16 +311,15 @@ public class TaskServiceImpl implements TaskService {
     try {
       // 准备请求参数
       Map<String, String> params = new HashMap<>();
-      params.put("cinemaId", "156442");
+      params.put("cinemaId", "763");
       // 获取当天的 LocalDate 对象
-      LocalDate today = LocalDate.now();
-      // 将 LocalDate 转换为当天零点的 LocalDateTime 对象
-      LocalDateTime startOfDay = today.atStartOfDay();
+      LocalDateTime endOfDayPrecise = LocalDate.now().atTime(23, 59, 59);
       // 定义日期时间格式
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
       // 格式化为字符串
-      String startTimeString = startOfDay.format(formatter);
-      params.put("time", startTimeString);
+      String startTimeString = endOfDayPrecise.format(formatter);
+//      params.put("time", startTimeString);
+      log.info("startTimeString: {}", startTimeString);
 
       // 发送请求并获取响应
       String responseBody = HttpClientUtil.postRequest(
@@ -334,11 +333,10 @@ public class TaskServiceImpl implements TaskService {
       ObjectMapper objectMapper = new ObjectMapper();
 
       Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-      List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+      Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
 
-      for (Map<String, Object> data : dataList) {
-
-      }
+      List<Map<String, Object>> showInfor = (List<Map<String, Object>>) data.get("showInfor");
+      log.info("showInfor: {}", showInfor);
 
     } catch (Exception e) {
       log.error("同步场次失败", e);
