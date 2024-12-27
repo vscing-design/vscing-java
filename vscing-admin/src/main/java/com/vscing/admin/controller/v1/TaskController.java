@@ -4,6 +4,7 @@ import com.vscing.admin.service.TaskService;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.service.payment.PaymentService;
 import com.vscing.common.service.payment.PaymentServiceFactory;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,34 @@ public class TaskController {
         return CommonResult.success(result);
     }
 
-
-    // https://docs.qq.com/doc/DWXVlWmtHbnpLUXdT
     @GetMapping("/address")
-    public CommonResult<Object> listAll() {
+    @Operation(summary = "同步地址库测试")
+    public CommonResult<Object> address() {
         taskService.syncAddress();
         return CommonResult.success();
     }
+
+    @GetMapping("/cinema")
+    @Operation(summary = "同步影院测试")
+    public CommonResult<Object> cinema() {
+        taskService.syncCinema();
+        return CommonResult.success();
+    }
+
+    @GetMapping("/movie")
+    @Operation(summary = "同步影片测试")
+    public CommonResult<Object> movie() {
+        taskService.syncMovie();
+        return CommonResult.success();
+    }
+
+    @GetMapping("/show")
+    @Operation(summary = "同步影院影片场次测试")
+    public CommonResult<Object> show() {
+        taskService.syncShow();
+        return CommonResult.success();
+    }
+
+
+
 }

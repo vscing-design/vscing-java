@@ -1,6 +1,5 @@
 package com.vscing.model.vo;
 
-import com.vscing.model.entity.District;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -40,12 +39,12 @@ public class CityVo {
   private String fullLetter;
 
   @Schema(description = "城市经度")
-  private String lng;
+  private Double lng;
 
   @Schema(description = "城市维度")
-  private String lat;
+  private Double lat;
 
   @Schema(description = "区县列表")
-  private List<District> children;
+  private List<DistrictVo> children;
 
 }

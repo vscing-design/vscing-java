@@ -43,9 +43,9 @@ public class City extends BaseEntity {
   private String fullLetter;
 
   @Schema(description = "城市经度")
-  private String lng;
+  private Double lng;
 
   @Schema(description = "城市维度")
-  private String lat;
+  private Double lat;
 
 }

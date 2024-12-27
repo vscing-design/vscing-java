@@ -5,11 +5,11 @@ import com.vscing.common.service.RedisService;
 import com.vscing.common.util.MapstructUtils;
 import com.vscing.common.util.RedisKeyConstants;
 import com.vscing.model.dto.AddressListDto;
-import com.vscing.model.entity.District;
 import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;
 import com.vscing.model.mapper.ProvinceMapper;
 import com.vscing.model.vo.CityVo;
+import com.vscing.model.vo.DistrictVo;
 import com.vscing.model.vo.ProvinceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,8 +62,11 @@ public class AddressServiceImpl implements AddressService {
           .map(base -> MapstructUtils.convert(base, CityVo.class))
           .toList();
 
-      List<District> districtList = Optional.ofNullable(districtMapper.getList(new AddressListDto()))
-          .orElse(Collections.emptyList());
+      List<DistrictVo> districtList = Optional.ofNullable(districtMapper.getList(new AddressListDto()))
+          .orElse(Collections.emptyList())
+          .stream()
+          .map(base -> MapstructUtils.convert(base, DistrictVo.class))
+          .toList();
 
       for (CityVo city : cityList) {
         city.setChildren(districtList.stream()

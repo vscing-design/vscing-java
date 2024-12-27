@@ -33,10 +33,10 @@ public class ProvinceVo {
   private String fullLetter;
 
   @Schema(description = "省份经度")
-  private String lng;
+  private Double lng;
 
   @Schema(description = "省份维度")
-  private String lat;
+  private Double lat;
 
   @Schema(description = "城市列表")
   private List<CityVo> children;

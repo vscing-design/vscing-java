@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.MovieProducerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.MovieProducer">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="movie_id" property="movieId" jdbcType="BIGINT" />
+        <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+        <result column="en_name" property="enName" jdbcType="VARCHAR" />
+        <result column="sc_name" property="scName" jdbcType="VARCHAR" />
+        <result column="act_name" property="actName" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_movie_producer
+    </sql>
+    <sql id="movieTableName">
+        vscing_movie
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT mp.*, m.name as movieName FROM <include refid="tableName" /> mp
+        LEFT JOIN <include refid="movieTableName" /> m ON mp.movie_id = m.id
+        <where>
+            mp.deleted_at IS NULL
+            <if test="name != null">
+                AND mp.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <!--            <if test="status != null and status != 0">-->
+            <!--                AND c.status = #{status}-->
+            <!--            </if>-->
+            <if test="movieName != null">
+                AND m.name LIKE CONCAT('%', #{movieName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.MovieProducer">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="movieId != null">movie_id,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="enName != null">en_name,</if>
+            <if test="scName != null">sc_name,</if>
+            <if test="actName != null">act_name,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
+            <if test="avatar != null">#{avatar, jdbcType=VARCHAR},</if>
+            <if test="enName != null">#{enName,jdbcType=VARCHAR},</if>
+            <if test="scName != null">#{scName,jdbcType=VARCHAR},</if>
+            <if test="actName != null">#{actName,jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy,jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.MovieProducer">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="avatar != null">avatar = #{avatar,jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

@@ -1,25 +1,16 @@
-package com.vscing.model.entity;
+package com.vscing.model.vo;
 
-import com.vscing.model.domain.BaseEntity;
-import com.vscing.model.vo.DistrictVo;
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
- * District
+ * DistrictVo
  *
  * @author vscing
- * @date 2024/12/23 00:43
+ * @date 2024/12/28 00:55
  */
-@Getter
-@Setter
-@AutoMappers(
-    @AutoMapper(target = DistrictVo.class)
-)
-public class District extends BaseEntity {
+@Data
+public class DistrictVo {
 
   @Schema(description = "区县编码")
   private Long id;
@@ -53,5 +44,5 @@ public class District extends BaseEntity {
 
   @Schema(description = "区县维度")
   private Double lat;
-  
+
 }

@@ -37,9 +37,9 @@ public class Province extends BaseEntity {
   private String fullLetter;
 
   @Schema(description = "省份经度")
-  private String lng;
+  private Double lng;
 
   @Schema(description = "省份维度")
-  private String lat;
+  private Double lat;
 
 }

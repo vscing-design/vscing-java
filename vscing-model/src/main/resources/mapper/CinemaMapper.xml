@@ -6,7 +6,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Cinema">
         <id column="id" property="id" jdbcType="BIGINT" />
-        <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
+        <result column="tp_cinema_id" property="tpCinemaId" jdbcType="BIGINT" />
         <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="name" property="name" jdbcType="VARCHAR" />
         <result column="province_id" property="provinceId" jdbcType="BIGINT" />
@@ -16,8 +16,8 @@
         <result column="district_id" property="districtId" jdbcType="BIGINT" />
         <result column="district_name" property="districtName" jdbcType="VARCHAR" />
         <result column="address" property="address" jdbcType="VARCHAR" />
-        <result column="lng" property="lng" jdbcType="VARCHAR" />
-        <result column="lat" property="lat" jdbcType="VARCHAR" />
+        <result column="lng" property="lng" jdbcType="DOUBLE" />
+        <result column="lat" property="lat" jdbcType="DOUBLE" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
@@ -64,7 +64,7 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="cinemaId != null">cinema_id,</if>
+            <if test="tpCinemaId != null">tp_cinema_id,</if>
             <if test="supplierId != null">supplier_id,</if>
             <if test="name != null">name,</if>
             <if test="provinceId != null">province_id,</if>
@@ -82,7 +82,7 @@
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
-            <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
+            <if test="tpCinemaId != null">#{tpCinemaId, jdbcType=BIGINT},</if>
             <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="name != null">#{name,jdbcType=VARCHAR},</if>
             <if test="provinceId != null">#{provinceId, jdbcType=BIGINT},</if>
@@ -92,8 +92,8 @@
             <if test="districtId != null">#{districtId, jdbcType=BIGINT},</if>
             <if test="districtName != null">#{districtName, jdbcType=VARCHAR},</if>
             <if test="address != null">#{address,jdbcType=VARCHAR},</if>
-            <if test="lng != null">#{lng,jdbcType=VARCHAR},</if>
-            <if test="lat != null">#{lat,jdbcType=VARCHAR},</if>
+            <if test="lng != null">#{lng,jdbcType=DOUBLE},</if>
+            <if test="lat != null">#{lat,jdbcType=DOUBLE},</if>
             <if test="phone != null">#{phone,jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>

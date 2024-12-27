@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.ShowMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Show">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="tp_show_id" property="tpShowId" jdbcType="BIGINT" />
+        <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
+        <result column="movie_id" property="movieId" jdbcType="BIGINT" />
+        <result column="hall_name" property="hallName" jdbcType="VARCHAR" />
+        <result column="duration" property="duration" jdbcType="INTEGER" />
+        <result column="show_time" property="showTime" jdbcType="TIMESTAMP" />
+        <result column="stop_sell_time" property="stopSellTime" jdbcType="TIMESTAMP" />
+        <result column="show_version_type" property="showVersionType" jdbcType="VARCHAR" />
+        <result column="show_price" property="showPrice" jdbcType="DECIMAL" />
+        <result column="user_price" property="userPrice" jdbcType="DECIMAL" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_show
+    </sql>
+    <sql id="cinemaTableName">
+        vscing_cinema
+    </sql>
+    <sql id="movieTableName">
+        vscing_movie
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT s.*, c.name as cinemaName, m.name as movieName FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+        LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
+        <where>
+            s.deleted_at IS NULL
+            <if test="name != null">
+                AND s.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <!--            <if test="status != null and status != 0">-->
+            <!--                AND c.status = #{status}-->
+            <!--            </if>-->
+            <if test="cinemaName != null">
+                AND c.name LIKE CONCAT('%', #{cinemaName}, '%')
+            </if>
+            <if test="movieName != null">
+                AND m.name LIKE CONCAT('%', #{movieName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Show">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="tpShowId != null">tp_show_id,</if>
+            <if test="cinemaId != null">cinema_id,</if>
+            <if test="movieId != null">movie_id,</if>
+            <if test="hallName != null">hall_name,</if>
+            <if test="duration != null">duration,</if>
+            <if test="showTime != null">show_time,</if>
+            <if test="stopSellTime != null">stop_sell_time,</if>
+            <if test="showVersionType != null">show_version_type,</if>
+            <if test="showPrice != null">show_price,</if>
+            <if test="userPrice != null">user_price,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="tpShowId != null">#{tpShowId, jdbcType=BIGINT},</if>
+            <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
+            <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
+            <if test="hallName != null">#{hallName, jdbcType=VARCHAR},</if>
+            <if test="duration != null">#{duration,jdbcType=INTEGER},</if>
+            <if test="showTime != null">#{showTime,jdbcType=TIMESTAMP},</if>
+            <if test="stopSellTime != null">#{stopSellTime,jdbcType=TIMESTAMP},</if>
+            <if test="showVersionType != null">#{showVersionType,jdbcType=VARCHAR},</if>
+            <if test="showPrice != null">#{showPrice, jdbcType=DECIMAL},</if>
+            <if test="userPrice != null">#{userPrice, jdbcType=DECIMAL},</if>
+            <if test="createdBy != null">#{createdBy,jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Show">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="hallName != null">hall_name = #{avatar,jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>
