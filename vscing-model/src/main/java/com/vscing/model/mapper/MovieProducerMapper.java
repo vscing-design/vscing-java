@@ -22,6 +22,8 @@ public interface MovieProducerMapper {
 
   int insert(MovieProducer record);
 
+  int batchInsert(@Param("list") List<MovieProducer> list);
+
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(MovieProducer record);

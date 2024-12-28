@@ -22,7 +22,7 @@ public class Show extends BaseEntity {
   private Long id;
 
   @Schema(description = "三方ID")
-  private Long tpShowId;
+  private String tpShowId;
 
   @Schema(description = "影院ID")
   private Long cinemaId;

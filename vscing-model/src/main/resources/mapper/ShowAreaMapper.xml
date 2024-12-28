@@ -64,6 +64,29 @@
         </trim>
     </insert>
 
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].showId != null">show_id,</if>
+            <if test="list[0].area != null">area,</if>
+            <if test="list[0].showPrice != null">show_price,</if>
+            <if test="list[0].userPrice != null">user_price,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.showId != null">#{item.showId, jdbcType=BIGINT},</if>
+                <if test="item.area != null">#{item.area, jdbcType=VARCHAR},</if>
+                <if test="item.showPrice != null">#{item.showPrice, jdbcType=DECIMAL},</if>
+                <if test="item.userPrice != null">#{item.userPrice, jdbcType=DECIMAL},</if>
+                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+    </insert>
+
     <!-- 更新信息 -->
     <update id="update" parameterType="com.vscing.model.entity.ShowArea">
         UPDATE <include refid="tableName" />

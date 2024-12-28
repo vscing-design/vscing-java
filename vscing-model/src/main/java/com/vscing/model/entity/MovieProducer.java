@@ -21,6 +21,9 @@ public class MovieProducer extends BaseEntity {
   @Schema(description = "影片ID")
   private Long movieId;
 
+  @Schema(description = "类型 1-导演 2-演员")
+  private Integer type;
+
   @Schema(description = "导演/演员图片")
   private String avatar;
 

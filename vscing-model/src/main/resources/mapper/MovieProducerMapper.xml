@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.MovieProducer">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="movie_id" property="movieId" jdbcType="BIGINT" />
+        <result column="type" property="type" jdbcType="INTEGER" />
         <result column="avatar" property="avatar" jdbcType="VARCHAR" />
         <result column="en_name" property="enName" jdbcType="VARCHAR" />
         <result column="sc_name" property="scName" jdbcType="VARCHAR" />
@@ -56,6 +57,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="movieId != null">movie_id,</if>
+            <if test="type != null">type,</if>
             <if test="avatar != null">avatar,</if>
             <if test="enName != null">en_name,</if>
             <if test="scName != null">sc_name,</if>
@@ -66,12 +68,41 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
+            <if test="type != null">#{type, jdbcType=INTEGER},</if>
             <if test="avatar != null">#{avatar, jdbcType=VARCHAR},</if>
             <if test="enName != null">#{enName,jdbcType=VARCHAR},</if>
             <if test="scName != null">#{scName,jdbcType=VARCHAR},</if>
             <if test="actName != null">#{actName,jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy,jdbcType=BIGINT}</if>
         </trim>
+    </insert>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].movieId != null">movie_id,</if>
+            <if test="list[0].type != null">`type`,</if>
+            <if test="list[0].avatar != null">avatar,</if>
+            <if test="list[0].enName != null">en_name,</if>
+            <if test="list[0].scName != null">sc_name,</if>
+            <if test="list[0].actName != null">act_name,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.movieId != null">#{item.movieId, jdbcType=BIGINT},</if>
+                <if test="item.type != null">#{item.type, jdbcType=INTEGER},</if>
+                <if test="item.avatar != null">#{item.avatar, jdbcType=VARCHAR},</if>
+                <if test="item.enName != null">#{item.enName,jdbcType=VARCHAR},</if>
+                <if test="item.scName != null">#{item.scName,jdbcType=VARCHAR},</if>
+                <if test="item.actName != null">#{item.actName,jdbcType=VARCHAR},</if>
+                <if test="item.createdBy != null">#{item.createdBy,jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
     </insert>
 
     <!-- 更新信息 -->

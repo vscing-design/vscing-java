@@ -1,29 +1,40 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vscing.admin.service.MovieService;
+import com.vscing.admin.service.ShowService;
 import com.vscing.admin.service.TaskService;
 import com.vscing.common.util.HttpClientUtil;
 import com.vscing.model.dto.AddressListDto;
+import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
 import com.vscing.model.entity.City;
 import com.vscing.model.entity.District;
 import com.vscing.model.entity.Movie;
+import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.entity.Province;
+import com.vscing.model.entity.Show;
+import com.vscing.model.entity.ShowArea;
 import com.vscing.model.mapper.CinemaMapper;
 import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;
 import com.vscing.model.mapper.MovieMapper;
 import com.vscing.model.mapper.MovieProducerMapper;
 import com.vscing.model.mapper.ProvinceMapper;
+import com.vscing.model.mapper.ShowAreaMapper;
+import com.vscing.model.mapper.ShowMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +48,12 @@ import java.util.Map;
 @Slf4j
 @Service
 public class TaskServiceImpl implements TaskService {
+
+  @Autowired
+  private MovieService movieService;
+
+  @Autowired
+  private ShowService showService;
 
   @Autowired
   private ProvinceMapper provinceMapper;
@@ -55,6 +72,12 @@ public class TaskServiceImpl implements TaskService {
 
   @Autowired
   private MovieProducerMapper movieProducerMapper;
+
+  @Autowired
+  private ShowAreaMapper showAreaMapper;
+
+  @Autowired
+  private ShowMapper showMapper;
 
 
   @Async("threadPoolTaskExecutor")
@@ -247,13 +270,14 @@ public class TaskServiceImpl implements TaskService {
         String grade = (String) data.get("grade");
         Integer like = (Integer) data.get("like");
         String publishStatus = (String) data.get("publishStatus");
-        Object producer = data.get("producer");
+        Map<String, Object> producer = (Map<String, Object>) data.get("producer");
 
-        log.info("movieId: {}, movieName: {}, duration: {}, publishDate: {}, director: {}, cast: {}, intro: {}, versionType: {}, language: {}, movieType: {}, posterUrl: {}, plotUrl: {}, grade: {}, like: {}, publishStatus: {}",
-            movieId, movieName, duration, publishDate, director, cast, intro, versionType, language, movieType, posterUrl, plotUrl, grade, like, publishStatus);
+        log.info("movieId: {}, movieName: {}, duration: {}, publishDate: {}, director: {}, cast: {}, intro: {}, versionType: {}, language: {}, movieType: {}, posterUrl: {}, plotUrl: {}, grade: {}, like: {}, publishStatus: {}, producer: {}",
+            movieId, movieName, duration, publishDate, director, cast, intro, versionType, language, movieType, posterUrl, plotUrl, grade, like, publishStatus, producer);
 
+        // 影片信息
+        Long id = IdUtil.getSnowflakeNextId();
         Movie movie = new Movie();
-        long id = IdUtil.getSnowflakeNextId();
         movie.setId(id);
         movie.setTpMovieId(movieId);
         movie.setName(movieName);
@@ -271,33 +295,54 @@ public class TaskServiceImpl implements TaskService {
         movie.setLike(like);
         movie.setPublishStatus(publishStatus);
 
-        // 收集 actors 和 directors
-        if (producer instanceof Map) {
-          @SuppressWarnings("unchecked")
-          Map<String, Object> producerMap = (Map<String, Object>) producer;
-
-          List<Map<String, Object>> actorsList = (List<Map<String, Object>>) producerMap.get("actors");
-          List<Map<String, Object>> directorsList = (List<Map<String, Object>>) producerMap.get("directors");
-
+        // 影片主演、演员
+        List<MovieProducer> movieProducers = new ArrayList<>();
+        if (producer != null) {
+          List<Map<String, Object>> actorsList = (List<Map<String, Object>>) producer.get("actors");
           if (actorsList != null && !actorsList.isEmpty()) {
             for (Map<String, Object> actors : actorsList) {
               String avatar = (String) actors.get("avatar");
-              log.info("avatar: {}", avatar);
+              String enName = (String) actors.get("enName");
+              String scName = (String) actors.get("scName");
+              String actName = (String) actors.get("actName");
+              log.info("演员 avatar: {}, enName: {}, scName: {}, actName: {}", avatar, enName, scName, actName);
+              MovieProducer movieProducer = new MovieProducer();
+              movieProducer.setId(IdUtil.getSnowflakeNextId());
+              movieProducer.setMovieId(id);
+              movieProducer.setType(2);
+              movieProducer.setAvatar(avatar);
+              movieProducer.setEnName(enName);
+              movieProducer.setScName(scName);
+              movieProducer.setActName(actName);
+              movieProducer.setCreatedBy(0L);
+              movieProducers.add(movieProducer);
             }
           }
 
+          List<Map<String, Object>> directorsList = (List<Map<String, Object>>) producer.get("directors");
           if (directorsList != null && !directorsList.isEmpty()) {
             for (Map<String, Object> directors : directorsList) {
               String avatar = (String) directors.get("avatar");
-              log.info("avatar: {}", avatar);
+              String enName = (String) directors.get("enName");
+              String scName = (String) directors.get("scName");
+              log.info("导演 avatar: {}, enName: {}, scName: {}", avatar, enName, scName);
+              MovieProducer movieProducer = new MovieProducer();
+              movieProducer.setId(IdUtil.getSnowflakeNextId());
+              movieProducer.setMovieId(id);
+              movieProducer.setType(1);
+              movieProducer.setAvatar(avatar);
+              movieProducer.setEnName(enName);
+              movieProducer.setScName(scName);
+              movieProducer.setActName("");
+              movieProducer.setCreatedBy(0L);
+              movieProducers.add(movieProducer);
             }
           }
-
-
-
-
         }
 
+        // 开始保存数据
+        boolean res = movieService.initMovie(movie, movieProducers);
+        log.info("res: {}", res);
       }
       log.info("同步影片结束");
     } catch (Exception e) {
@@ -309,37 +354,103 @@ public class TaskServiceImpl implements TaskService {
   @Override
   public void syncShow() {
     try {
-      // 准备请求参数
-      Map<String, String> params = new HashMap<>();
-      params.put("cinemaId", "763");
-      // 获取当天的 LocalDate 对象
-      LocalDateTime endOfDayPrecise = LocalDate.now().atTime(23, 59, 59);
-      // 定义日期时间格式
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-      // 格式化为字符串
-      String startTimeString = endOfDayPrecise.format(formatter);
-//      params.put("time", startTimeString);
-      log.info("startTimeString: {}", startTimeString);
 
-      // 发送请求并获取响应
-      String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou.cn/ticket/ticket_api/show/preferential/query",
-          params
-      );
+      List<Cinema> cinemaList = cinemaMapper.getList(new CinemaListDto());
 
-      log.info("responseBody: {}", responseBody);
+      if(cinemaList != null && !cinemaList.isEmpty()){
+        for (Cinema cinema : cinemaList) {
+          // 准备请求参数
+          Map<String, String> params = new HashMap<>();
+          params.put("cinemaId", String.valueOf(cinema.getTpCinemaId()));
+//          params.put("cinemaId", "763");
+          // 获取当天的 LocalDate 对象
+          LocalDateTime endOfDayPrecise = LocalDate.now().atTime(23, 59, 59);
+          // 格式化为字符串
+          String startTimeString = endOfDayPrecise.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+  //      params.put("time", startTimeString);
 
-      // 将 JSON 字符串解析为 JsonNode 对象
-      ObjectMapper objectMapper = new ObjectMapper();
+          // 发送请求并获取响应
+          String responseBody = HttpClientUtil.postRequest(
+              "https://test.ot.jfshou.cn/ticket/ticket_api/show/preferential/query",
+              params
+          );
+          // 将 JSON 字符串解析为 JsonNode 对象
+          log.info("responseBody: {}", responseBody);
+          // 将 JSON 字符串解析为 JsonNode 对象
+          ObjectMapper objectMapper = new ObjectMapper();
 
-      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-      Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
+          Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+          Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
 
-      List<Map<String, Object>> showInfor = (List<Map<String, Object>>) data.get("showInfor");
-      log.info("showInfor: {}", showInfor);
+          List<Map<String, Object>> showInforList = (List<Map<String, Object>>) data.get("showInfor");
+          log.info("showInforList: {}", showInforList);
+          if (showInforList != null && !showInforList.isEmpty()) {
+            for (Map<String, Object> showInfor : showInforList) {
+              String showId = (String) showInfor.get("showId");
+              String hallName = (String) showInfor.get("hallName");
+              Integer duration = (Integer) showInfor.get("duration");
+              String showTime = (String) showInfor.get("showTime");
+              String stopSellTime = (String) showInfor.get("stopSellTime");
+              String showVersionType = (String) showInfor.get("showVersionType");
+              BigDecimal showPrice = Convert.toBigDecimal(data.get("showPrice"));
+              BigDecimal userPrice = Convert.toBigDecimal(data.get("userPrice"));
+              // 需要用这个去找影片信息
+              Long tpMovieId = Convert.toLong(showInfor.get("movieId"));
+              Movie movie = movieMapper.findByTpMovieId(tpMovieId);
+              if (movie == null) {
+                continue;
+              }
+              // 补充电影id和影院id
+              log.info("tpMovieId: {}, showId: {}, hallName: {}, duration: {}, showTime: {}, stopSellTime: {}, showVersionType: {}, showPrice: {}, userPrice: {}",
+                  tpMovieId, showId, hallName, duration, showTime, stopSellTime, showVersionType, showPrice, userPrice);
+              Show show = new Show();
+              Long id = IdUtil.getSnowflakeNextId();
+              show.setId(id);
+              show.setTpShowId(showId);
+              show.setCinemaId(cinema.getId());
+              show.setMovieId(movie.getId());
+              show.setHallName(hallName);
+              show.setDuration(duration);
+              show.setShowTime(LocalDateTime.parse(showTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+              show.setStopSellTime(LocalDateTime.parse(stopSellTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+              show.setShowVersionType(showVersionType);
+              show.setShowPrice(showPrice);
+              show.setUserPrice(userPrice);
 
+              // 区间定价
+              List<ShowArea> showAreaList = new ArrayList<>();
+              List<Map<String, Object>> areaPriceList = (List<Map<String, Object>>) showInfor.get("areaPrice");
+
+              if (areaPriceList != null && !areaPriceList.isEmpty()) {
+                for (Map<String, Object> areaPrice : areaPriceList) {
+                  String area = (String) areaPrice.get("area");
+                  BigDecimal areaShowPrice = Convert.toBigDecimal(areaPrice.get("showPrice"));
+                  BigDecimal areaUserPrice = Convert.toBigDecimal(areaPrice.get("userPrice"));
+
+                  log.info("showId: {}, area: {}, areaShowPrice: {}, areaUserPrice: {}", id, area, areaShowPrice, areaUserPrice);
+
+                  ShowArea showArea = new ShowArea();
+                  showArea.setId(IdUtil.getSnowflakeNextId());
+                  showArea.setShowId(id);
+                  showArea.setArea(area);
+                  showArea.setShowPrice(areaShowPrice);
+                  showArea.setUserPrice(areaUserPrice);
+                  showArea.setCreatedBy(0L);
+
+                  showAreaList.add(showArea);
+                }
+              }
+
+              boolean res = showService.initShow(show, showAreaList);
+              log.info("res: {}", res);
+            }
+          }
+        }
+      }
+      log.info("同步场次结束");
     } catch (Exception e) {
       log.error("同步场次失败", e);
     }
   }
+
 }

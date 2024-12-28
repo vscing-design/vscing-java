@@ -56,19 +56,19 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="tpMovieId != null">tp_movie_id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="duration != null">duration,</if>
             <if test="publishDate != null">publish_date,</if>
             <if test="director != null">director,</if>
-            <if test="cast != null">cast,</if>
+            <if test="cast != null">`cast`,</if>
             <if test="intro != null">intro,</if>
             <if test="versionType != null">version_type,</if>
-            <if test="language != null">language,</if>
+            <if test="language != null">`language`,</if>
             <if test="movieType != null">movie_type,</if>
             <if test="posterUrl != null">poster_url,</if>
             <if test="plotUrl != null">plot_url,</if>
             <if test="grade != null">grade,</if>
-            <if test="like != null">like,</if>
+            <if test="like != null">`like`,</if>
             <if test="publishStatus != null">publish_status,</if>
             <if test="createdBy != null">created_by</if>
         </trim>

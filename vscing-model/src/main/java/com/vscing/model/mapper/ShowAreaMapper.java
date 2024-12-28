@@ -22,6 +22,8 @@ public interface ShowAreaMapper {
 
   int insert(ShowArea record);
 
+  int batchInsert(@Param("list") List<ShowArea> list);
+
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(ShowArea record);

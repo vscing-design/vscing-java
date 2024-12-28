@@ -51,7 +51,7 @@
             <if test="id != null">id,</if>
             <if test="provinceId != null">province_id,</if>
             <if test="s1CityId != null">s1_city_id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="shortName != null">short_name,</if>
             <if test="pinyin != null">pinyin,</if>
             <if test="firstLetter != null">first_letter,</if>

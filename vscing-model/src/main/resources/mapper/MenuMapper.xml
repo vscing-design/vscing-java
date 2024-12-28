@@ -51,10 +51,10 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="parentId != null">parent_id,</if>
-            <if test="name != null">name,</if>
-            <if test="system != null">system,</if>
+            <if test="name != null">`name`,</if>
+            <if test="system != null">`system`,</if>
             <if test="icon != null">icon,</if>
-            <if test="path != null">path,</if>
+            <if test="path != null">`path`,</if>
             <if test="component != null">component,</if>
             <if test="status != null">status,</if>
             <if test="createdBy != null">created_by</if>
@@ -78,11 +78,11 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="parentId != null">parent_id = #{parentId, jdbcType=BIGINT},</if>
-            <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
-            <if test="system != null">system = #{system, jdbcType=VARCHAR},</if>
+            <if test="name != null">`name` = #{name, jdbcType=VARCHAR},</if>
+            <if test="system != null">`system` = #{system, jdbcType=VARCHAR},</if>
             <if test="icon != null">icon = #{icon, jdbcType=VARCHAR},</if>
             <if test="component != null">component = #{component, jdbcType=VARCHAR},</if>
-            <if test="path != null">path = #{path, jdbcType=VARCHAR},</if>
+            <if test="path != null">`path` = #{path, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>

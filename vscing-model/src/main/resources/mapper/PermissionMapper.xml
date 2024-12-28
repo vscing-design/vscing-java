@@ -54,7 +54,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="menuId != null">menu_id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="code != null">code,</if>
             <if test="status != null">status,</if>
             <if test="createdBy != null">created_by</if>
@@ -75,7 +75,7 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="menuId != null">menu_id = #{menuId, jdbcType=BIGINT},</if>
-            <if test="name != null">name = #{name, jdbcType=VARCHAR},</if>
+            <if test="name != null">`name` = #{name, jdbcType=VARCHAR},</if>
             <if test="code != null">code = #{code, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>

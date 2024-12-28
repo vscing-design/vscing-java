@@ -46,7 +46,7 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="sortOrder != null">sort_order,</if>
             <if test="notes != null">notes,</if>
             <if test="createdBy != null">created_by</if>

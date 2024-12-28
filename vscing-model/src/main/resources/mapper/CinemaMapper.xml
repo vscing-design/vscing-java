@@ -66,7 +66,7 @@
             <if test="id != null">id,</if>
             <if test="tpCinemaId != null">tp_cinema_id,</if>
             <if test="supplierId != null">supplier_id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="provinceId != null">province_id,</if>
             <if test="provinceName != null">province_name,</if>
             <if test="cityId != null">city_id,</if>

@@ -4,6 +4,7 @@ import com.vscing.model.dto.MovieListDto;
 import com.vscing.model.entity.Movie;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -15,6 +16,9 @@ import java.util.List;
  */
 @Mapper
 public interface MovieMapper {
+
+  @Select("SELECT id FROM vscing_movie WHERE tp_movie_id = #{tpMovieId}")
+  Movie findByTpMovieId(@Param("tpMovieId") Long tpMovieId);
 
   List<Movie> getList(MovieListDto record);
 

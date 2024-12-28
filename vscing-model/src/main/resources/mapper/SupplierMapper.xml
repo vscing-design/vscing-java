@@ -53,7 +53,7 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="status != null">status,</if>
             <if test="accessDate != null">access_date,</if>
             <if test="configAccont != null">config_accont,</if>

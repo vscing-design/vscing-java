@@ -47,7 +47,7 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="name != null">name,</if>
+            <if test="name != null">`name`,</if>
             <if test="shortName != null">short_name,</if>
             <if test="pinyin != null">pinyin,</if>
             <if test="firstLetter != null">first_letter,</if>
