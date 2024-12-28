@@ -5,10 +5,13 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.User">
-        <id column="id" property="id" />
-        <result column="username" property="username" />
-        <result column="password" property="password" />
-        <result column="phone" property="phone" />
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="source" property="source" jdbcType="TINYINT" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="star" property="star" jdbcType="TINYINT" />
+        <result column="openid" property="openid" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" />
         <result column="created_by" property="createdBy" />
         <result column="updated_at" property="updatedAt" />
@@ -17,55 +20,74 @@
         <result column="deleted_by" property="deletedBy" />
     </resultMap>
 
-    <insert id="addInfo" parameterType="com.vscing.model.dto.UserDto">
-        INSERT INTO vscing_user(username, password, phone)
-        values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
-    </insert>
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_user
+    </sql>
 
-    <select id="getAllList" resultType="com.vscing.model.vo.UserVo">
-        SELECT * FROM vscing_user;
-    </select>
-
-    <select id="getList" resultType="com.vscing.model.vo.UserVo">
-        SELECT * FROM vscing_user
+    <!-- 查询用户列表 -->
+    <select id="getList" resultType="com.vscing.model.vo.UserListVo">
+        SELECT * FROM <include refid="tableName" />
         <where>
-            <if test="queryParam.username != null and queryParam.username.trim() != ''">
-                AND username LIKE #{queryParam.username}
+            deleted_at IS NULL
+            <if test="username != null">
+                AND username LIKE CONCAT('%', #{username}, '%')
             </if>
-            <if test="queryParam.phone != null and queryParam.username.trim() != ''">
-                AND phone = #{queryParam.phone}
-            </if>
-            <if test="queryParam.startDate != null and queryParam.startDate.trim() != ''">
-                AND created_at <![CDATA[ >= ]]> #{queryParam.startDate, jdbcType=TIMESTAMP}
-            </if>
-            <if test="queryParam.endDate != null and queryParam.endDate.trim() != ''">
-                AND created_at <![CDATA[ <= ]]> #{queryParam.endDate, jdbcType=TIMESTAMP}
+            <if test="source != null and source != 0">
+                AND `source` = #{source}
             </if>
         </where>
+        order by created_at desc
     </select>
 
-    <select id="getInfo" parameterType="long" resultType="com.vscing.model.vo.UserVo">
-        SELECT * FROM vscing_user where id=#{id};
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
-    <update id="updateInfo">
-        UPDATE vscing_user
-        SET username = #{userInfo.username}, phone = #{userInfo.phone}, password = #{userInfo.password}
-        WHERE id = #{userInfo.id}
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Supplier">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="source != null">`source`,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="phone != null">phone,</if>
+            <if test="star != null">star,</if>
+            <if test="openid != null">openid,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="source != null">#{source, jdbcType=TINYINT},</if>
+            <if test="username != null">#{username, jdbcType=VARCHAR},</if>
+            <if test="password != null">#{password, jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="star != null">#{star, jdbcType=TINYINT},</if>
+            <if test="openid != null">#{openid, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Supplier">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
-    <delete id="deleteInfo" parameterType="long">
-        DELETE FROM vscing_user WHERE id = #{id}
-    </delete>
-
-<!--    <insert id="saveInfo" parameterType="com.vscing.admin.entity.User">-->
-<!--        INSERT INTO tb_user_contact(id, provider_user_id, contact_provider_user_id)-->
-<!--        SELECT #{id}, #{providerUserId}, #{contactProviderUserId} FROM DUAL-->
-<!--        WHERE-->
-<!--        NOT EXISTS-->
-<!--        (SELECT * FROM tb_user_contact-->
-<!--        WHERE provider_user_id=#{providerUserId} and contact_provider_user_id=#{contactProviderUserId})-->
-<!--    </insert>-->
-
+    <!-- 根据 ID 软删除 -->
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
 
 </mapper>

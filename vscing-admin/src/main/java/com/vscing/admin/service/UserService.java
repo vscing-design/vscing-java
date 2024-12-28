@@ -1,24 +1,35 @@
 package com.vscing.admin.service;
 
-import com.vscing.model.dto.UserDto;
 import com.vscing.model.dto.UserListDto;
-import com.vscing.model.dto.UserSaveDto;
-import com.vscing.model.vo.UserVo;
-import org.apache.ibatis.annotations.Param;
+import com.vscing.model.entity.User;
+import com.vscing.model.vo.UserListVo;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserVo> getAllList();
+    /**
+     * 列表
+     */
+    List<UserListVo> getList(UserListDto data, Integer pageSize, Integer pageNum);
 
-    int addInfo(UserDto userInfo);
+    /**
+     * 详情
+     */
+    User getDetails(long id);
 
-    List<UserVo> getList(UserListDto queryParam, Integer pageSize, Integer pageNum);
+    /**
+     * 新增
+     */
+    long created(User user);
 
-    UserVo getInfo(long id);
+    /**
+     * 编辑
+     */
+    long updated(User data);
 
-    int updateInfo(UserSaveDto userInfo);
-
-    int deleteInfo(long id);
+    /**
+     * 删除
+     */
+    long deleted(long id, long deleterId);
 }

@@ -7,8 +7,7 @@ import com.vscing.common.service.RedisService;
 import com.vscing.model.dto.SupplierListDto;
 import com.vscing.model.entity.Supplier;
 import com.vscing.model.mapper.SupplierMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +19,9 @@ import java.util.List;
  * @author vscing
  * @date 2024/12/14 21:08
  */
-
+@Slf4j
 @Service
 public class SupplierServiceImpl implements SupplierService {
-
-  private static final Logger logger = LoggerFactory.getLogger(SupplierServiceImpl.class);
 
   @Autowired
   private SupplierMapper mapper;

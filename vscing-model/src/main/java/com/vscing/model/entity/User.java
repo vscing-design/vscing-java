@@ -1,6 +1,7 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,31 +11,26 @@ import lombok.Setter;
 */
 @Getter
 @Setter
-// 使用lombok 来重写toString和
-//@Data
-//@EqualsAndHashCode(callSuper = true)
-//@ToString(callSuper = true)
 public class User extends BaseEntity {
 
+    @Schema(description = "主键ID")
     private Long id;
 
-    // 用户名称
+    @Schema(description = "来源 1 -> 微信小程序 2 -> 支付宝小程序")
+    private Integer source;
+
+    @Schema(description = "用户名称")
     private String username;
 
-    // 用户邮箱
+    @Schema(description = "用户密码")
     private String password;
 
-    // 用户手机号
+    @Schema(description = "用户手机号")
     private String phone;
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + username + '\'' +
-                ", passWord='" + password + '\'' +
-                ", phone='" + phone + '\'' +
-                super.toString() + // 调用 BaseEntity 的 toString 方法
-                '}';
-    }
+    @Schema(description = "用户星级")
+    private Integer star;
+
+    @Schema(description = "openid")
+    private String openid;
 }

@@ -1,51 +1,56 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
-import com.vscing.model.dto.UserDto;
-import com.vscing.model.dto.UserListDto;
-import com.vscing.model.dto.UserSaveDto;
-import com.vscing.model.mapper.UserMapper;
 import com.vscing.admin.service.UserService;
-import com.vscing.model.vo.UserVo;
+import com.vscing.common.service.RedisService;
+import com.vscing.model.dto.SupplierListDto;
+import com.vscing.model.dto.UserListDto;
+import com.vscing.model.entity.User;
+import com.vscing.model.mapper.SupplierMapper;
+import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.vo.UserListVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
 
-    @Override
-    public List<UserVo> getAllList() {
-        return userMapper.getAllList();
-    }
+    @Autowired
+    private RedisService redisService;
 
     @Override
-    public int addInfo(UserDto userInfo) {
-        return userMapper.addInfo(userInfo);
-    }
-
-    @Override
-    public List<UserVo> getList(UserListDto queryParam, Integer pageSize, Integer pageNum) {
+    public List<UserListVo> getList(UserListDto data, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
-        return userMapper.getList(queryParam);
+        return userMapper.getList(data);
     }
 
     @Override
-    public UserVo getInfo(long id) {
-        return userMapper.getInfo(id);
+    public User getDetails(long id) {
+        return userMapper.selectById(id);
     }
 
     @Override
-    public int updateInfo(UserSaveDto userInfo) {
-        return userMapper.updateInfo(userInfo);
+    public long created(User user) {
+        user.setId(IdUtil.getSnowflakeNextId());
+        return userMapper.insert(user);
     }
 
     @Override
-    public int deleteInfo(long id) {
-        return userMapper.deleteInfo(id);
+    public long updated(User user) {
+        return userMapper.update(user);
     }
+
+    @Override
+    public long deleted(long id, long deleterId) {
+        return userMapper.softDeleteById(id, deleterId);
+    }
+
 }
