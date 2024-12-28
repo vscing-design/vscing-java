@@ -1,7 +1,9 @@
 package com.vscing.admin.service;
 
+import com.vscing.model.dto.ShowListDto;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
+import com.vscing.model.vo.ShowListVo;
 
 import java.util.List;
 
@@ -14,5 +16,7 @@ import java.util.List;
 public interface ShowService {
 
   boolean initShow(Show show, List<ShowArea> showAreaList);
+
+  List<ShowListVo> getManageList(ShowListDto data, Integer pageSize, Integer pageNum);
 
 }

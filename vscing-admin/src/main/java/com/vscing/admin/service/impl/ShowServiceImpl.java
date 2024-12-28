@@ -1,11 +1,14 @@
 package com.vscing.admin.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.ShowService;
 import com.vscing.common.exception.ServiceException;
+import com.vscing.model.dto.ShowListDto;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.vo.ShowListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,7 +30,7 @@ public class ShowServiceImpl implements ShowService {
 
   @Autowired
   private ShowAreaMapper showAreaMapper;
-
+  @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public boolean initShow(Show show, List<ShowArea> showAreaList) {
     try {
@@ -46,6 +49,12 @@ public class ShowServiceImpl implements ShowService {
       throw new ServiceException(e.getMessage());
     }
     return true;
+  }
+
+  @Override
+  public List<ShowListVo> getManageList(ShowListDto data, Integer pageSize, Integer pageNum) {
+    PageHelper.startPage(pageNum, pageSize);
+    return showMapper.getList(data);
   }
 
 }
