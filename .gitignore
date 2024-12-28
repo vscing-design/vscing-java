@@ -38,6 +38,7 @@ target/
 .idea_modules
 
 # 忽略配置文件
-*.application.yml
-*.application-dev.yml
-*.application-prod.yml
+application.yml
+application-dev.yml
+application-prod.yml
+
