@@ -27,3 +27,12 @@ replay_pid*
 .idea
 mvvm
 mvvm.cmd
+
+# 忽略Maven构建输出目录
+target/
+
+# 忽略IDE特定文件（可选）
+*.iml
+.project
+.settings/
+.idea_modules
