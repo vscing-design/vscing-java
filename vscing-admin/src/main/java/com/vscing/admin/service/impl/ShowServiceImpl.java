@@ -52,7 +52,7 @@ public class ShowServiceImpl implements ShowService {
   }
 
   @Override
-  public List<ShowListVo> getManageList(ShowListDto data, Integer pageSize, Integer pageNum) {
+  public List<ShowListVo> getList(ShowListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return showMapper.getList(data);
   }
