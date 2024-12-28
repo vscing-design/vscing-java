@@ -17,6 +17,6 @@ public interface ShowService {
 
   boolean initShow(Show show, List<ShowArea> showAreaList);
 
-  List<ShowListVo> getManageList(ShowListDto data, Integer pageSize, Integer pageNum);
+  List<ShowListVo> getList(ShowListDto data, Integer pageSize, Integer pageNum);
 
 }
