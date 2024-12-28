@@ -108,39 +108,49 @@ public class TaskServiceImpl implements TaskService {
         if(cityCode == null || cityId == null){
           continue;
         }
-        // 尝试在 city 表中查找 cityCode
-        City city = cityMapper.findByCode(cityCode);
-        log.info("cityCode: {}, cityId: {}", cityCode, cityId);
-        if (city != null) {
-          log.info("city");
-          // 如果找到，则更新 city 表中的 cityId
-          cityMapper.updateCityId(city.getId(), cityId);
-        } else {
-          log.info("area");
-          // 如果 city 表中找不到，尝试在 area 表中查找 cityCode
-          District area = areaMapper.findByCode(cityCode);
-          if (area != null) {
-            log.info("areaCity");
-            // 如果找到，则更新 area 表中的 cityId
-            areaMapper.updateCity(area.getId(), cityId);
+
+        try {
+          // 尝试在 city 表中查找 cityCode
+          City city = cityMapper.findByCode(cityCode);
+          log.info("cityCode: {}, cityId: {}", cityCode, cityId);
+          if (city != null) {
+            log.info("city");
+            // 如果找到，则更新 city 表中的 cityId
+            cityMapper.updateCityId(city.getId(), cityId);
+          } else {
+            log.info("area");
+            // 如果 city 表中找不到，尝试在 area 表中查找 cityCode
+            District area = areaMapper.findByCode(cityCode);
+            if (area != null) {
+              log.info("areaCity");
+              // 如果找到，则更新 area 表中的 cityId
+              areaMapper.updateCity(area.getId(), cityId);
+            }
           }
+        } catch (Exception e) {
+          log.error("cityCode: {}, cityId: {}", cityCode, cityId, e);
+          continue;
         }
 
         // 遍历 regions 并更新 area 表中的 regionId
         List<Map<String, Object>> regions = (List<Map<String, Object>>) data.get("regions");
         if (regions != null) {
           for (Map<String, Object> region : regions) {
-            String regionName = (String) region.get("regionName");
-            Long regionId = objectMapper.convertValue(region.get("regionId"), Long.class);
-            log.info("regionName: {}, regionId: {}", regionName, regionId);
-            if(regionName != null && regionId != null){
-              District areaByRegionName = areaMapper.findByName(regionName, cityId);
-              if (areaByRegionName != null) {
-                log.info("areaRegion", areaByRegionName.getId());
-                areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+            try {
+              String regionName = (String) region.get("regionName");
+              Long regionId = objectMapper.convertValue(region.get("regionId"), Long.class);
+              log.info("regionName: {}, regionId: {}", regionName, regionId);
+              if(regionName != null && regionId != null){
+                District areaByRegionName = areaMapper.findByName(regionName, cityId);
+                if (areaByRegionName != null) {
+                  log.info("areaRegion", areaByRegionName.getId());
+                  areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+                }
               }
+            } catch (Exception e) {
+              log.error("regionName: {}, regionId: {}", region.get("regionName"), region.get("regionId"), e);
+              continue;
             }
-
           }
         }
       }
@@ -181,46 +191,51 @@ public class TaskServiceImpl implements TaskService {
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
 
         for (Map<String, Object> data : dataList) {
-          Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
-          String cinemaName = (String) data.get("cinemaName");
-          String cinemaAddress = (String) data.get("cinemaAddress");
-          Double longitude = (Double) data.get("longitude");
-          Double latitude = (Double) data.get("latitude");
-          // 可能没有
-          String cinemaPhone = (String) data.get("cinemaPhone");
-          String regionName = (String) data.get("regionName");
+          try {
+            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
+            String cinemaName = (String) data.get("cinemaName");
+            String cinemaAddress = (String) data.get("cinemaAddress");
+            Double longitude = (Double) data.get("longitude");
+            Double latitude = (Double) data.get("latitude");
+            // 可能没有
+            String cinemaPhone = (String) data.get("cinemaPhone");
+            String regionName = (String) data.get("regionName");
 
-          log.info("cinemaId: {}, cinemaName: {}, cinemaAddress: {}, longitude: {}, latitude: {}, cinemaPhone: {}, regionName: {}",
-              cinemaId, cinemaName, cinemaAddress, longitude, latitude, cinemaPhone, regionName);
+            log.info("cinemaId: {}, cinemaName: {}, cinemaAddress: {}, longitude: {}, latitude: {}, cinemaPhone: {}, regionName: {}",
+                cinemaId, cinemaName, cinemaAddress, longitude, latitude, cinemaPhone, regionName);
 
-          if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
+            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
 
-            Cinema cinema = new Cinema();
-            cinema.setId(IdUtil.getSnowflakeNextId());
-            cinema.setSupplierId(1869799230973227008L);
-            cinema.setTpCinemaId(cinemaId);
-            cinema.setName(cinemaName);
-            cinema.setAddress(cinemaAddress);
-            cinema.setLng(longitude);
-            cinema.setLat(latitude);
+              Cinema cinema = new Cinema();
+              cinema.setId(IdUtil.getSnowflakeNextId());
+              cinema.setSupplierId(1869799230973227008L);
+              cinema.setTpCinemaId(cinemaId);
+              cinema.setName(cinemaName);
+              cinema.setAddress(cinemaAddress);
+              cinema.setLng(longitude);
+              cinema.setLat(latitude);
 
-            cinema.setProvinceId(province.getId());
-            cinema.setProvinceName(province.getName());
-            cinema.setCityId(city.getId());
-            cinema.setCityName(city.getName());
-            cinema.setCreatedBy(0L);
-            if(cinemaPhone != null){
-              cinema.setPhone(cinemaPhone);
-            }
-            if(regionName != null){
-              District district = areaMapper.findByName(regionName, city.getId());
-              if(district != null){
-                cinema.setDistrictId(district.getId());
-                cinema.setDistrictName(district.getName());
+              cinema.setProvinceId(province.getId());
+              cinema.setProvinceName(province.getName());
+              cinema.setCityId(city.getId());
+              cinema.setCityName(city.getName());
+              cinema.setCreatedBy(0L);
+              if(cinemaPhone != null){
+                cinema.setPhone(cinemaPhone);
               }
+              if(regionName != null){
+                District district = areaMapper.findByName(regionName, city.getId());
+                if(district != null){
+                  cinema.setDistrictId(district.getId());
+                  cinema.setDistrictName(district.getName());
+                }
+              }
+              int res = cinemaMapper.insert(cinema);
+              log.info("res: {}", res);
             }
-            int res = cinemaMapper.insert(cinema);
-            log.info("res: {}", res);
+          } catch (Exception e) {
+            log.error("影院同步错误原因", e);
+            continue;
           }
         }
 
@@ -255,94 +270,100 @@ public class TaskServiceImpl implements TaskService {
       List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
 
       for (Map<String, Object> data : dataList) {
-        Long movieId = objectMapper.convertValue(data.get("movieId"), Long.class);
-        String movieName = (String) data.get("movieName");
-        Integer duration = (Integer) data.get("duration");
-        String publishDate = (String) data.get("publishDate");
-        String director = (String) data.get("director");
-        String cast = (String) data.get("cast");
-        String intro = (String) data.get("intro");
-        String versionType = (String) data.get("versionType");
-        String language = (String) data.get("language");
-        String movieType = (String) data.get("movieType");
-        String posterUrl = (String) data.get("posterUrl");
-        String plotUrl = (String) data.get("plotUrl");
-        String grade = (String) data.get("grade");
-        Integer like = (Integer) data.get("like");
-        String publishStatus = (String) data.get("publishStatus");
-        Map<String, Object> producer = (Map<String, Object>) data.get("producer");
+        try {
+          Long movieId = objectMapper.convertValue(data.get("movieId"), Long.class);
+          String movieName = (String) data.get("movieName");
+          Integer duration = (Integer) data.get("duration");
+          String publishDate = (String) data.get("publishDate");
+          String director = (String) data.get("director");
+          String cast = (String) data.get("cast");
+          String intro = (String) data.get("intro");
+          String versionType = (String) data.get("versionType");
+          String language = (String) data.get("language");
+          String movieType = (String) data.get("movieType");
+          String posterUrl = (String) data.get("posterUrl");
+          String plotUrl = (String) data.get("plotUrl");
+          String grade = (String) data.get("grade");
+          Integer like = (Integer) data.get("like");
+          String publishStatus = (String) data.get("publishStatus");
+          Map<String, Object> producer = (Map<String, Object>) data.get("producer");
 
-        log.info("movieId: {}, movieName: {}, duration: {}, publishDate: {}, director: {}, cast: {}, intro: {}, versionType: {}, language: {}, movieType: {}, posterUrl: {}, plotUrl: {}, grade: {}, like: {}, publishStatus: {}, producer: {}",
-            movieId, movieName, duration, publishDate, director, cast, intro, versionType, language, movieType, posterUrl, plotUrl, grade, like, publishStatus, producer);
+          log.info("movieId: {}, movieName: {}, duration: {}, publishDate: {}, director: {}, cast: {}, intro: {}, versionType: {}, language: {}, movieType: {}, posterUrl: {}, plotUrl: {}, grade: {}, like: {}, publishStatus: {}, producer: {}",
+              movieId, movieName, duration, publishDate, director, cast, intro, versionType, language, movieType, posterUrl, plotUrl, grade, like, publishStatus, producer);
 
-        // 影片信息
-        Long id = IdUtil.getSnowflakeNextId();
-        Movie movie = new Movie();
-        movie.setId(id);
-        movie.setTpMovieId(movieId);
-        movie.setName(movieName);
-        movie.setDuration(duration);
-        movie.setPublishDate(LocalDateTime.parse(publishDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        movie.setDirector(director);
-        movie.setCast(cast);
-        movie.setIntro(intro);
-        movie.setVersionType(versionType);
-        movie.setLanguage(language);
-        movie.setMovieType(movieType);
-        movie.setPosterUrl(posterUrl);
-        movie.setPlotUrl(plotUrl);
-        movie.setGrade(grade);
-        movie.setLike(like);
-        movie.setPublishStatus(publishStatus);
+          // 影片信息
+          Long id = IdUtil.getSnowflakeNextId();
+          Movie movie = new Movie();
+          movie.setId(id);
+          movie.setTpMovieId(movieId);
+          movie.setName(movieName);
+          movie.setDuration(duration);
+          movie.setPublishDate(LocalDateTime.parse(publishDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+          movie.setDirector(director);
+          movie.setCast(cast);
+          movie.setIntro(intro);
+          movie.setVersionType(versionType);
+          movie.setLanguage(language);
+          movie.setMovieType(movieType);
+          movie.setPosterUrl(posterUrl);
+          movie.setPlotUrl(plotUrl);
+          movie.setGrade(grade);
+          movie.setLike(like);
+          movie.setPublishStatus(publishStatus);
 
-        // 影片主演、演员
-        List<MovieProducer> movieProducers = new ArrayList<>();
-        if (producer != null) {
-          List<Map<String, Object>> actorsList = (List<Map<String, Object>>) producer.get("actors");
-          if (actorsList != null && !actorsList.isEmpty()) {
-            for (Map<String, Object> actors : actorsList) {
-              String avatar = (String) actors.get("avatar");
-              String enName = (String) actors.get("enName");
-              String scName = (String) actors.get("scName");
-              String actName = (String) actors.get("actName");
-              log.info("演员 avatar: {}, enName: {}, scName: {}, actName: {}", avatar, enName, scName, actName);
-              MovieProducer movieProducer = new MovieProducer();
-              movieProducer.setId(IdUtil.getSnowflakeNextId());
-              movieProducer.setMovieId(id);
-              movieProducer.setType(2);
-              movieProducer.setAvatar(avatar);
-              movieProducer.setEnName(enName);
-              movieProducer.setScName(scName);
-              movieProducer.setActName(actName);
-              movieProducer.setCreatedBy(0L);
-              movieProducers.add(movieProducer);
+          // 影片主演、演员
+          List<MovieProducer> movieProducers = new ArrayList<>();
+          if (producer != null) {
+            List<Map<String, Object>> actorsList = (List<Map<String, Object>>) producer.get("actors");
+            if (actorsList != null && !actorsList.isEmpty()) {
+              for (Map<String, Object> actors : actorsList) {
+                String avatar = (String) actors.get("avatar");
+                String enName = (String) actors.get("enName");
+                String scName = (String) actors.get("scName");
+                String actName = (String) actors.get("actName");
+                log.info("演员 avatar: {}, enName: {}, scName: {}, actName: {}", avatar, enName, scName, actName);
+                MovieProducer movieProducer = new MovieProducer();
+                movieProducer.setId(IdUtil.getSnowflakeNextId());
+                movieProducer.setMovieId(id);
+                movieProducer.setType(2);
+                movieProducer.setAvatar(avatar);
+                movieProducer.setEnName(enName);
+                movieProducer.setScName(scName);
+                movieProducer.setActName(actName);
+                movieProducer.setCreatedBy(0L);
+                movieProducers.add(movieProducer);
+              }
+            }
+
+            List<Map<String, Object>> directorsList = (List<Map<String, Object>>) producer.get("directors");
+            if (directorsList != null && !directorsList.isEmpty()) {
+              for (Map<String, Object> directors : directorsList) {
+                String avatar = (String) directors.get("avatar");
+                String enName = (String) directors.get("enName");
+                String scName = (String) directors.get("scName");
+                log.info("导演 avatar: {}, enName: {}, scName: {}", avatar, enName, scName);
+                MovieProducer movieProducer = new MovieProducer();
+                movieProducer.setId(IdUtil.getSnowflakeNextId());
+                movieProducer.setMovieId(id);
+                movieProducer.setType(1);
+                movieProducer.setAvatar(avatar);
+                movieProducer.setEnName(enName);
+                movieProducer.setScName(scName);
+                movieProducer.setActName("");
+                movieProducer.setCreatedBy(0L);
+                movieProducers.add(movieProducer);
+              }
             }
           }
 
-          List<Map<String, Object>> directorsList = (List<Map<String, Object>>) producer.get("directors");
-          if (directorsList != null && !directorsList.isEmpty()) {
-            for (Map<String, Object> directors : directorsList) {
-              String avatar = (String) directors.get("avatar");
-              String enName = (String) directors.get("enName");
-              String scName = (String) directors.get("scName");
-              log.info("导演 avatar: {}, enName: {}, scName: {}", avatar, enName, scName);
-              MovieProducer movieProducer = new MovieProducer();
-              movieProducer.setId(IdUtil.getSnowflakeNextId());
-              movieProducer.setMovieId(id);
-              movieProducer.setType(1);
-              movieProducer.setAvatar(avatar);
-              movieProducer.setEnName(enName);
-              movieProducer.setScName(scName);
-              movieProducer.setActName("");
-              movieProducer.setCreatedBy(0L);
-              movieProducers.add(movieProducer);
-            }
-          }
+          // 开始保存数据
+          boolean res = movieService.initMovie(movie, movieProducers);
+          log.info("res: {}", res);
+
+        } catch (Exception e) {
+          log.error("影片同步错误原因", e);
+          continue;
         }
-
-        // 开始保存数据
-        boolean res = movieService.initMovie(movie, movieProducers);
-        log.info("res: {}", res);
       }
       log.info("同步影片结束");
     } catch (Exception e) {
@@ -386,63 +407,69 @@ public class TaskServiceImpl implements TaskService {
           log.info("showInforList: {}", showInforList);
           if (showInforList != null && !showInforList.isEmpty()) {
             for (Map<String, Object> showInfor : showInforList) {
-              String showId = (String) showInfor.get("showId");
-              String hallName = (String) showInfor.get("hallName");
-              Integer duration = (Integer) showInfor.get("duration");
-              String showTime = (String) showInfor.get("showTime");
-              String stopSellTime = (String) showInfor.get("stopSellTime");
-              String showVersionType = (String) showInfor.get("showVersionType");
-              BigDecimal showPrice = Convert.toBigDecimal(data.get("showPrice"));
-              BigDecimal userPrice = Convert.toBigDecimal(data.get("userPrice"));
-              // 需要用这个去找影片信息
-              Long tpMovieId = Convert.toLong(showInfor.get("movieId"));
-              Movie movie = movieMapper.findByTpMovieId(tpMovieId);
-              if (movie == null) {
+              try {
+                String showId = (String) showInfor.get("showId");
+                String hallName = (String) showInfor.get("hallName");
+                Integer duration = (Integer) showInfor.get("duration");
+                String showTime = (String) showInfor.get("showTime");
+                String stopSellTime = (String) showInfor.get("stopSellTime");
+                String showVersionType = (String) showInfor.get("showVersionType");
+                BigDecimal showPrice = Convert.toBigDecimal(data.get("showPrice"));
+                BigDecimal userPrice = Convert.toBigDecimal(data.get("userPrice"));
+                // 需要用这个去找影片信息
+                Long tpMovieId = Convert.toLong(showInfor.get("movieId"));
+                Movie movie = movieMapper.findByTpMovieId(tpMovieId);
+                if (movie == null) {
+                  continue;
+                }
+                // 补充电影id和影院id
+                log.info("tpMovieId: {}, showId: {}, hallName: {}, duration: {}, showTime: {}, stopSellTime: {}, showVersionType: {}, showPrice: {}, userPrice: {}",
+                    tpMovieId, showId, hallName, duration, showTime, stopSellTime, showVersionType, showPrice, userPrice);
+                Show show = new Show();
+                Long id = IdUtil.getSnowflakeNextId();
+                show.setId(id);
+                show.setTpShowId(showId);
+                show.setCinemaId(cinema.getId());
+                show.setMovieId(movie.getId());
+                show.setHallName(hallName);
+                show.setDuration(duration);
+                show.setShowTime(LocalDateTime.parse(showTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                show.setStopSellTime(LocalDateTime.parse(stopSellTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                show.setShowVersionType(showVersionType);
+                show.setShowPrice(showPrice);
+                show.setUserPrice(userPrice);
+
+                // 区间定价
+                List<ShowArea> showAreaList = new ArrayList<>();
+                List<Map<String, Object>> areaPriceList = (List<Map<String, Object>>) showInfor.get("areaPrice");
+
+                if (areaPriceList != null && !areaPriceList.isEmpty()) {
+                  for (Map<String, Object> areaPrice : areaPriceList) {
+                    String area = (String) areaPrice.get("area");
+                    BigDecimal areaShowPrice = Convert.toBigDecimal(areaPrice.get("showPrice"));
+                    BigDecimal areaUserPrice = Convert.toBigDecimal(areaPrice.get("userPrice"));
+
+                    log.info("showId: {}, area: {}, areaShowPrice: {}, areaUserPrice: {}", id, area, areaShowPrice, areaUserPrice);
+
+                    ShowArea showArea = new ShowArea();
+                    showArea.setId(IdUtil.getSnowflakeNextId());
+                    showArea.setShowId(id);
+                    showArea.setArea(area);
+                    showArea.setShowPrice(areaShowPrice);
+                    showArea.setUserPrice(areaUserPrice);
+                    showArea.setCreatedBy(0L);
+
+                    showAreaList.add(showArea);
+                  }
+                }
+
+                boolean res = showService.initShow(show, showAreaList);
+                log.info("res: {}", res);
+
+              } catch (Exception e) {
+                log.error("同步场次失败", e);
                 continue;
               }
-              // 补充电影id和影院id
-              log.info("tpMovieId: {}, showId: {}, hallName: {}, duration: {}, showTime: {}, stopSellTime: {}, showVersionType: {}, showPrice: {}, userPrice: {}",
-                  tpMovieId, showId, hallName, duration, showTime, stopSellTime, showVersionType, showPrice, userPrice);
-              Show show = new Show();
-              Long id = IdUtil.getSnowflakeNextId();
-              show.setId(id);
-              show.setTpShowId(showId);
-              show.setCinemaId(cinema.getId());
-              show.setMovieId(movie.getId());
-              show.setHallName(hallName);
-              show.setDuration(duration);
-              show.setShowTime(LocalDateTime.parse(showTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-              show.setStopSellTime(LocalDateTime.parse(stopSellTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-              show.setShowVersionType(showVersionType);
-              show.setShowPrice(showPrice);
-              show.setUserPrice(userPrice);
-
-              // 区间定价
-              List<ShowArea> showAreaList = new ArrayList<>();
-              List<Map<String, Object>> areaPriceList = (List<Map<String, Object>>) showInfor.get("areaPrice");
-
-              if (areaPriceList != null && !areaPriceList.isEmpty()) {
-                for (Map<String, Object> areaPrice : areaPriceList) {
-                  String area = (String) areaPrice.get("area");
-                  BigDecimal areaShowPrice = Convert.toBigDecimal(areaPrice.get("showPrice"));
-                  BigDecimal areaUserPrice = Convert.toBigDecimal(areaPrice.get("userPrice"));
-
-                  log.info("showId: {}, area: {}, areaShowPrice: {}, areaUserPrice: {}", id, area, areaShowPrice, areaUserPrice);
-
-                  ShowArea showArea = new ShowArea();
-                  showArea.setId(IdUtil.getSnowflakeNextId());
-                  showArea.setShowId(id);
-                  showArea.setArea(area);
-                  showArea.setShowPrice(areaShowPrice);
-                  showArea.setUserPrice(areaUserPrice);
-                  showArea.setCreatedBy(0L);
-
-                  showAreaList.add(showArea);
-                }
-              }
-
-              boolean res = showService.initShow(show, showAreaList);
-              log.info("res: {}", res);
             }
           }
         }

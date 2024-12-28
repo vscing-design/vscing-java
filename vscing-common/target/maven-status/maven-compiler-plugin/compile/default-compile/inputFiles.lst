@@ -20,6 +20,7 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/payment/impl/UnionpayPaymentServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/payment/impl/WechatPaymentServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/service/supplier/SupplierService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/HttpClientUtil.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/MapstructUtils.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/RedisKeyConstants.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-common/src/main/java/com/vscing/common/util/RequestUtil.java

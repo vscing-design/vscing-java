@@ -1,6 +1,18 @@
-package com.vscing.admin.service;/**
+package com.vscing.admin.service;
+
+import com.vscing.model.entity.Movie;
+import com.vscing.model.entity.MovieProducer;
+
+import java.util.List;
+
+/**
  * MovieService
- * @date 2024/12/28 19:18
+ *
  * @author vscing
- */public interface MovieService {
+ * @date 2024/12/28 19:18
+ */
+public interface MovieService {
+
+  boolean initMovie(Movie movie, List<MovieProducer> movieProducers);
+
 }

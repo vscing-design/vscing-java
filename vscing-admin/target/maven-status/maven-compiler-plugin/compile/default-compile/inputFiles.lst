@@ -19,9 +19,11 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/AdminUserService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/CinemaService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/MenuService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/MovieService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/OrganizationService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/PermissionService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/RoleService.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/ShowService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/SupplierService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/TaskService.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/UserService.java
@@ -29,9 +31,11 @@
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/AdminUserServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/CinemaServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/MenuServiceImpl.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/MovieServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/OrganizationServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/PermissionServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/RoleServiceImpl.java
+/Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/ShowServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/SupplierServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/TaskServiceImpl.java
 /Users/mac/Home/work/javaWork/vscing-java/vscing-admin/src/main/java/com/vscing/admin/service/impl/UserServiceImpl.java
