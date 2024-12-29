@@ -11,6 +11,14 @@ https://baomidou.com/
 
 Master/Worker 架构
 
+web worker 多线程
+FLIP 
+强制同步布局 
+TransitionGroup 和 resolveComponent
+webrtc
+音视频ffmpeg
+websocket和sse
+
 rtmp和webrtc
 https://cloud.tencent.com/developer/article/2454047
 
