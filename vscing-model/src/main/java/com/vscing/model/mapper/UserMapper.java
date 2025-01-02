@@ -19,6 +19,8 @@ public interface UserMapper {
 
     User selectById(long id);
 
+    User selectByPhone(String phone);
+
     int insert(User record);
 
     int update(User record);

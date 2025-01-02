@@ -50,6 +50,11 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 phone 查询 -->
+    <select id="selectByPhone" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE phone = #{phone, jdbcType=VARCHAR} and deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Supplier">
         INSERT INTO <include refid="tableName" />
