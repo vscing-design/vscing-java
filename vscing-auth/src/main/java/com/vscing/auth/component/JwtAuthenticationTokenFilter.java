@@ -4,7 +4,7 @@ import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.service.VscingUserDetailsService;
 import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.service.RedisService;
-import com.vscing.common.util.RedisKeyConstants;
+import com.vscing.common.utils.RedisKeyConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

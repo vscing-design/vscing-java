@@ -1,9 +1,8 @@
-package com.vscing.common.util;
+package com.vscing.common.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 

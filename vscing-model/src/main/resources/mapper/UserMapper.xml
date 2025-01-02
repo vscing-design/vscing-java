@@ -24,19 +24,24 @@
     <sql id="tableName">
         vscing_user
     </sql>
+    <sql id="orderTableName">
+        vscing_order
+    </sql>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultType="com.vscing.model.vo.UserListVo">
-        SELECT * FROM <include refid="tableName" />
+        SELECT u.*, COUNT(o.id) as order_num FROM <include refid="tableName" /> u
+        LEFT JOIN <include refid="orderTableName" /> o ON u.id = o.user_id
         <where>
-            deleted_at IS NULL
+            u.deleted_at IS NULL
             <if test="username != null">
-                AND username LIKE CONCAT('%', #{username}, '%')
+                AND u.username LIKE CONCAT('%', #{username}, '%')
             </if>
             <if test="source != null and source != 0">
-                AND `source` = #{source}
+                AND u.`source` = #{source}
             </if>
         </where>
+        GROUP BY u.id
         order by created_at desc
     </select>
 

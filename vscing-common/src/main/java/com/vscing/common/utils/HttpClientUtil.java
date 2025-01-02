@@ -1,4 +1,4 @@
-package com.vscing.common.util;
+package com.vscing.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MultipartBody;

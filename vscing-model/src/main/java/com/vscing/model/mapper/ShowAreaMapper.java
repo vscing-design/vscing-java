@@ -28,4 +28,10 @@ public interface ShowAreaMapper {
 
   int update(ShowArea record);
 
+  List<ShowArea> selectByShowIds(@Param("list") List<Long> showIds);
+
+  List<ShowArea> selectByShowIdAreas(@Param("showId") Long showId, @Param("areas") List<String> areas);
+
+  void truncateTable();
+
 }

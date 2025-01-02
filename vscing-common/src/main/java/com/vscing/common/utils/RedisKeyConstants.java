@@ -1,4 +1,4 @@
-package com.vscing.common.util;
+package com.vscing.common.utils;
 
 /**
  * RedisKeyConstants

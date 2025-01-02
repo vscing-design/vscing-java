@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Show">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="tp_show_id" property="tpShowId" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
         <result column="movie_id" property="movieId" jdbcType="BIGINT" />
         <result column="hall_name" property="hallName" jdbcType="VARCHAR" />
@@ -28,6 +29,9 @@
     <sql id="tableName">
         vscing_show
     </sql>
+    <sql id="supplierTableName">
+        vscing_supplier
+    </sql>
     <sql id="cinemaTableName">
         vscing_cinema
     </sql>
@@ -36,23 +40,57 @@
     </sql>
 
     <!-- 查询用户列表 -->
-    <select id="getList" resultMap="BaseResultMap">
-        SELECT s.*, c.name as cinemaName, m.name as movieName FROM <include refid="tableName" /> s
+    <select id="getList" resultType="com.vscing.model.vo.ShowListVo">
+        SELECT
+            s.*,
+            s1.name as supplierName,
+            m.name as movieName,
+            c.name as cinemaName,
+            c.province_name as provinceName,
+            c.city_name as cityName,
+            c.district_name as districtName,
+            c.address as address
+        FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="supplierTableName" /> s1 ON s.supplier_id = s1.id
         LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
             s.deleted_at IS NULL
-            <if test="name != null">
-                AND s.name LIKE CONCAT('%', #{name}, '%')
-            </if>
             <!--            <if test="status != null and status != 0">-->
             <!--                AND c.status = #{status}-->
             <!--            </if>-->
+            <if test="cinemaId != null">
+                AND s.cinema_id = #{cinemaId}
+            </if>
             <if test="cinemaName != null">
                 AND c.name LIKE CONCAT('%', #{cinemaName}, '%')
             </if>
-            <if test="movieName != null">
-                AND m.name LIKE CONCAT('%', #{movieName}, '%')
+            <if test="supplierName != null">
+                AND s1.name LIKE CONCAT('%', #{supplierName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据cinemaId查询全部列表 -->
+    <select id="getListByCinemaId" resultType="com.vscing.model.vo.ShowListVo">
+        SELECT
+            s.supplier_id,
+            s.cinema_id,
+            s.movie_id,
+            s.id,
+            s.hall_name,
+            s.show_time,
+            m.name as movieName
+        FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
+        <where>
+            s.deleted_at IS NULL
+            AND s.stop_sell_time >= DATE_FORMAT(CURDATE(), '%Y-%m-%d 00:00:00')
+            <if test="supplierId != null">
+                AND s.supplier_id = #{supplierId}
+            </if>
+            <if test="cinemaId != null">
+                AND s.cinema_id = #{cinemaId}
             </if>
         </where>
     </select>
@@ -68,6 +106,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="tpShowId != null">tp_show_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
             <if test="cinemaId != null">cinema_id,</if>
             <if test="movieId != null">movie_id,</if>
             <if test="hallName != null">hall_name,</if>
@@ -83,6 +122,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="tpShowId != null">#{tpShowId, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
             <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
             <if test="hallName != null">#{hallName, jdbcType=VARCHAR},</if>
@@ -113,5 +153,10 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 清空表 -->
+    <delete id="truncateTable">
+        TRUNCATE TABLE <include refid="tableName" />
+    </delete>
 
 </mapper>

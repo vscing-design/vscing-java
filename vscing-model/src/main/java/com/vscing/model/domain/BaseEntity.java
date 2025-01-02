@@ -1,5 +1,6 @@
 package com.vscing.model.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,23 +18,22 @@ public class BaseEntity implements Serializable {
     */
     private static final long serialVersionUID = 1L;
 
-    /** 创建时间 */
+    @Schema(description = "创建时间")
     private LocalDateTime createdAt;
 
-    /** 创建者 */
+    @Schema(description = "创建者ID")
     private Long createdBy;
 
-    /** 更新时间 */
+    @Schema(description = "更新时间")
     private LocalDateTime updatedAt;
 
-    /** 更新者 */
+    @Schema(description = "更新者ID")
     private Long updatedBy;
 
-    /** 删除时间 */
-
+    @Schema(description = "删除时间")
     private LocalDateTime deletedAt;
 
-    /** 删除者 */
+    @Schema(description = "删除者ID")
     private Long deletedBy;
 
 }

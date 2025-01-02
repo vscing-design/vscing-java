@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.admin.service.MovieService;
 import com.vscing.admin.service.ShowService;
 import com.vscing.admin.service.TaskService;
-import com.vscing.common.util.HttpClientUtil;
+import com.vscing.common.api.ResultCode;
+import com.vscing.common.utils.HttpClientUtil;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
@@ -172,6 +173,7 @@ public class TaskServiceImpl implements TaskService {
       if(province == null){
         continue;
       }
+      log.info("cityName: {}", city.getName());
 
       try {
         // 准备请求参数
@@ -184,13 +186,23 @@ public class TaskServiceImpl implements TaskService {
             params
         );
 
+        log.info("responseBody: {}", responseBody);
+
         // 将 JSON 字符串解析为 JsonNode 对象
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+        Integer code = (Integer) responseMap.getOrDefault("code", 0);
+        String message = (String) responseMap.getOrDefault("message", "未知错误");
+        if(code != ResultCode.SUCCESS.getCode()) {
+          log.info("code: {}, message: {}", code, message);
+          continue;
+        }
+
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
 
         for (Map<String, Object> data : dataList) {
+          log.info("开始处理数据");
           try {
             Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
             String cinemaName = (String) data.get("cinemaName");
@@ -235,7 +247,6 @@ public class TaskServiceImpl implements TaskService {
             }
           } catch (Exception e) {
             log.error("影院同步错误原因", e);
-            continue;
           }
         }
 
@@ -262,11 +273,18 @@ public class TaskServiceImpl implements TaskService {
           "https://test.ot.jfshou.cn/ticket/ticket_api/film/query",
           params
       );
+      log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();
 
       Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+      Integer code = (Integer) responseMap.getOrDefault("code", 0);
+      String message = (String) responseMap.getOrDefault("message", "未知错误");
+      if(code != ResultCode.SUCCESS.getCode()) {
+        log.info("code: {}, message: {}", code, message);
+        return;
+      }
       List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
 
       for (Map<String, Object> data : dataList) {
@@ -295,6 +313,7 @@ public class TaskServiceImpl implements TaskService {
           Long id = IdUtil.getSnowflakeNextId();
           Movie movie = new Movie();
           movie.setId(id);
+          movie.setSupplierId(1869799230973227008L);
           movie.setTpMovieId(movieId);
           movie.setName(movieName);
           movie.setDuration(duration);
@@ -362,7 +381,6 @@ public class TaskServiceImpl implements TaskService {
 
         } catch (Exception e) {
           log.error("影片同步错误原因", e);
-          continue;
         }
       }
       log.info("同步影片结束");
@@ -383,7 +401,6 @@ public class TaskServiceImpl implements TaskService {
           // 准备请求参数
           Map<String, String> params = new HashMap<>();
           params.put("cinemaId", String.valueOf(cinema.getTpCinemaId()));
-//          params.put("cinemaId", "763");
           // 获取当天的 LocalDate 对象
           LocalDateTime endOfDayPrecise = LocalDate.now().atTime(23, 59, 59);
           // 格式化为字符串
@@ -395,12 +412,20 @@ public class TaskServiceImpl implements TaskService {
               "https://test.ot.jfshou.cn/ticket/ticket_api/show/preferential/query",
               params
           );
+
           // 将 JSON 字符串解析为 JsonNode 对象
           log.info("responseBody: {}", responseBody);
+
           // 将 JSON 字符串解析为 JsonNode 对象
           ObjectMapper objectMapper = new ObjectMapper();
 
           Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+          Integer code = (Integer) responseMap.getOrDefault("code", 0);
+          String message = (String) responseMap.getOrDefault("message", "未知错误");
+          if(code != ResultCode.SUCCESS.getCode()) {
+            log.info("code: {}, message: {}", code, message);
+            continue;
+          }
           Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
 
           List<Map<String, Object>> showInforList = (List<Map<String, Object>>) data.get("showInfor");
@@ -429,6 +454,7 @@ public class TaskServiceImpl implements TaskService {
                 Long id = IdUtil.getSnowflakeNextId();
                 show.setId(id);
                 show.setTpShowId(showId);
+                show.setSupplierId(1869799230973227008L);
                 show.setCinemaId(cinema.getId());
                 show.setMovieId(movie.getId());
                 show.setHallName(hallName);

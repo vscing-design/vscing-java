@@ -21,4 +21,13 @@ public class CinemaListDto {
   @Schema(description = "影院状态 0 全部 1 营业中 2 未营业")
   private Integer status;
 
+  @Schema(description = "省份ID")
+  private Long provinceId;
+
+  @Schema(description = "城市ID")
+  private Long cityId;
+
+  @Schema(description = "区县ID")
+  private Long districtId;
+
 }

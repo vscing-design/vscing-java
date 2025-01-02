@@ -1,4 +1,4 @@
-package com.vscing.common.util;
+package com.vscing.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;

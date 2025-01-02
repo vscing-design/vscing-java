@@ -42,6 +42,28 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 show_id in () 查询 -->
+    <select id="selectByShowIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE show_id IN
+        <foreach item="showId" collection="list" open="(" separator="," close=")">
+            #{showId,jdbcType=BIGINT}
+        </foreach>
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据 show_id 和 areas in () 查询 -->
+    <select id="selectByShowIdAreas" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE
+        show_id = #{showId,jdbcType=BIGINT}
+        AND area IN
+        <foreach item="area" collection="areas" open="(" separator="," close=")">
+            #{area,jdbcType=VARCHAR}
+        </foreach>
+        AND deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.ShowArea">
         INSERT INTO <include refid="tableName" />
@@ -104,5 +126,10 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 清空表 -->
+    <delete id="truncateTable">
+        TRUNCATE TABLE <include refid="tableName" />
+    </delete>
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.ShowAllDto;
 import com.vscing.model.dto.ShowListDto;
 import com.vscing.model.entity.Show;
 import com.vscing.model.vo.ShowListVo;
@@ -17,6 +18,8 @@ import java.util.List;
 @Mapper
 public interface ShowMapper {
 
+  List<ShowListVo> getListByCinemaId(ShowAllDto record);
+
   List<ShowListVo> getList(ShowListDto record);
 
   Show selectById(long id);
@@ -26,5 +29,7 @@ public interface ShowMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(Show record);
+
+  void truncateTable();
 
 }

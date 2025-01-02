@@ -1,6 +1,8 @@
 package com.vscing.model.vo;
 
 import com.vscing.model.entity.ShowArea;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,6 +17,10 @@ import java.util.List;
  * @date 2024/12/29 00:23
  */
 @Data
+@AutoMappers({
+    @AutoMapper(target = MovieTreeVo.class),
+    @AutoMapper(target = ShowTreeVo.class)
+})
 public class ShowListVo {
 
   @Schema(description = "主键ID")
@@ -23,17 +29,35 @@ public class ShowListVo {
   @Schema(description = "影厅名称")
   private String hallName;
 
+  @Schema(description = "供应商ID")
+  private Long supplierId;
+
+  @Schema(description = "供应商名称")
+  private String supplierName;
+
   @Schema(description = "影院ID")
   private Long cinemaId;
 
   @Schema(description = "影院名称")
-  private Long cinemaName;
+  private String cinemaName;
+
+  @Schema(description = "影院所在省份")
+  private String provinceName;
+
+  @Schema(description = "影院所在城市")
+  private String cityName;
+
+  @Schema(description = "影院所在区县")
+  private String districtName;
+
+  @Schema(description = "影院详细地址")
+  private String address;
 
   @Schema(description = "影片ID")
   private Long movieId;
 
   @Schema(description = "影片名称")
-  private Long movieName;
+  private String movieName;
 
   @Schema(description = "放映开始时间")
   private LocalDateTime showTime;

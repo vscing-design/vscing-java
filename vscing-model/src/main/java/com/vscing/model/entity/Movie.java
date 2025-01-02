@@ -26,6 +26,9 @@ public class Movie extends BaseEntity {
   @Schema(description = "影片名称")
   private String name;
 
+  @Schema(description = "供应商ID")
+  private Long supplierId;
+
   @Schema(description = "影片时长（分钟）")
   private Integer duration;
 

@@ -42,6 +42,15 @@
         LEFT JOIN <include refid="supplierTableName" /> s ON c.supplier_id = s.id
         <where>
             c.deleted_at IS NULL
+            <if test="provinceId != null">
+                AND c.province_id = #{provinceId}
+            </if>
+            <if test="cityId != null">
+                AND c.city_id = #{cityId}
+            </if>
+            <if test="districtId != null">
+                AND c.district_id = #{districtId}
+            </if>
             <if test="name != null">
                 AND c.name LIKE CONCAT('%', #{name}, '%')
             </if>

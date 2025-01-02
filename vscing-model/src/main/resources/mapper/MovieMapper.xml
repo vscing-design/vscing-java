@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Movie">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="tp_movie_id" property="tpMovieId" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="name" property="name" jdbcType="VARCHAR" />
         <result column="duration" property="duration" jdbcType="INTEGER" />
         <result column="publish_date" property="publishDate" jdbcType="TIMESTAMP" />
@@ -56,6 +57,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="tpMovieId != null">tp_movie_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
             <if test="name != null">`name`,</if>
             <if test="duration != null">duration,</if>
             <if test="publishDate != null">publish_date,</if>
@@ -76,6 +78,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="tpMovieId != null">#{tpMovieId, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="name != null">#{name,jdbcType=VARCHAR},</if>
             <if test="duration != null">#{duration,jdbcType=INTEGER},</if>
             <if test="publishDate != null">#{publishDate,jdbcType=TIMESTAMP},</if>

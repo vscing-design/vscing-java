@@ -1,5 +1,8 @@
 TODO：用户增加校验是否名称唯一
 TODO: 增加修改密码接口
+TODO: 不校验的url，header头部增加Authorization就会被拦截
+TODO: redis存储list集合或hash集合异常
+TODO: 多表查询，多表更新，多表删除，多表插入 1+1
 
 技术栈全面扩展开花🌼, JDK17+ SpringBoot3.0+Mybatis-Plus+GRPC+Webclient(非阻塞调用第三方接口) Java鸡架（微服务）+ MySQL+Redis+ElasticSearch数据库+ Nacos(2.0版本)+Apollo 服务注册/配置中心+ Mycat(分表) 一致性hash+RocketMQ4.7 + AmazonSQS 消息队列+ Redission分布式锁+日志存储 log4j+slf4j / 分布式日志存储ELK+Flume+Logstash
 链接：https://juejin.cn/post/7374683456728760374
@@ -11,17 +14,8 @@ https://baomidou.com/
 
 Master/Worker 架构
 
-web worker 多线程
-FLIP 
-强制同步布局 
-TransitionGroup 和 resolveComponent
-webrtc
-音视频ffmpeg
-websocket和sse
-
 rtmp和webrtc
 https://cloud.tencent.com/developer/article/2454047
-https://juejin.cn/post/6844903811409149965?from=search-suggest
 
 php
 https://github.com/Double-Jin/jin-microservices

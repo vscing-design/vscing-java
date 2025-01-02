@@ -1,21 +1,22 @@
 package com.vscing.auth.config;
 
-import com.vscing.auth.component.*;
+import com.vscing.auth.component.JwtAuthenticationTokenFilter;
+import com.vscing.auth.component.RestfulAccessDeniedHandler;
+import com.vscing.auth.component.RestfulAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.Customizer;
 
 /**
  * SecurityConfig
@@ -35,6 +36,9 @@ public class SecurityConfig {
     private RestfulAuthenticationEntryPoint restfulAuthenticationEntryPoint;
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
+    @Autowired
+    private GlobalCorsConfig globalCorsConfig;
 
     @Bean
     public SecurityFilterChain swaggerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -73,7 +77,9 @@ public class SecurityConfig {
             // 禁用CSRF保护
             .csrf(AbstractHttpConfigurer::disable)
             // 由于使用的是JWT，CORS保护也可以禁用
-            .cors(AbstractHttpConfigurer::disable)
+//            .cors(AbstractHttpConfigurer::disable)
+            // 应用自定义的 CORS 配置
+            .cors(cors -> cors.configurationSource(globalCorsConfig.corsConfigurationSource()))
             // 禁用session
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

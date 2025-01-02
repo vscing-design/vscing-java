@@ -12,10 +12,13 @@ import lombok.Data;
 @Data
 public class ShowListDto {
 
+  @Schema(description = "影院ID")
+  private Long cinemaId;
+
   @Schema(description = "影院名称")
-  private Long cinemaName;
+  private String cinemaName;
 
   @Schema(description = "供应商名称")
-  private Long supplierName;
+  private String supplierName;
 
 }

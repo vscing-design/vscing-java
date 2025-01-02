@@ -3,7 +3,7 @@ package com.vscing.admin.service.impl;
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.OrganizationService;
-import com.vscing.common.util.MapstructUtils;
+import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrganizationListDto;
 import com.vscing.model.entity.Organization;
 import com.vscing.model.mapper.OrganizationMapper;

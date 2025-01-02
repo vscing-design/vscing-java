@@ -2,8 +2,8 @@ package com.vscing.admin.service.impl;
 
 import com.vscing.admin.service.AddressService;
 import com.vscing.common.service.RedisService;
-import com.vscing.common.util.MapstructUtils;
-import com.vscing.common.util.RedisKeyConstants;
+import com.vscing.common.utils.MapstructUtils;
+import com.vscing.common.utils.RedisKeyConstants;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;

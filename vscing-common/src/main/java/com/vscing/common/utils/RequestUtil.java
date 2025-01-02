@@ -1,4 +1,4 @@
-package com.vscing.common.util;
+package com.vscing.common.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.InetAddress;

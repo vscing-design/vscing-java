@@ -1,6 +1,12 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.OrderListDto;
+import com.vscing.model.entity.Order;
+import com.vscing.model.vo.OrderVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author vscing (vscing@foxmail.com)
@@ -8,4 +14,15 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface OrderMapper {
+
+  List<OrderVo> getList(OrderListDto record);
+
+  Order selectById(long id);
+
+  int insert(Order record);
+
+  int update(Order record);
+
+  int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
+  
 }

@@ -24,6 +24,9 @@ public class Show extends BaseEntity {
   @Schema(description = "三方ID")
   private String tpShowId;
 
+  @Schema(description = "供应商ID")
+  private Long supplierId;
+
   @Schema(description = "影院ID")
   private Long cinemaId;
 
