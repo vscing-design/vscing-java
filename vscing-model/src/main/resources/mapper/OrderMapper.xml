@@ -11,16 +11,21 @@
         <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
         <result column="movie_id" property="movieId" jdbcType="BIGINT" />
         <result column="show_id" property="showId" jdbcType="BIGINT" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="order_type" property="orderType" jdbcType="TINYINT" />
         <result column="platform" property="platform" jdbcType="TINYINT" />
+        <result column="payment_status" property="paymentStatus" jdbcType="TINYINT" />
+        <result column="settle_status" property="settleStatus" jdbcType="TINYINT" />
         <result column="purchase_quantity" property="purchaseQuantity" jdbcType="INTEGER" />
         <result column="seat_info" property="seatInfo" jdbcType="VARCHAR" />
         <result column="is_adjusted" property="isAdjusted" jdbcType="TINYINT" />
         <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
         <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
         <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+        <result column="response_body" property="responseBody" jdbcType="VARCHAR" />
+        <result column="memo" property="memo" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -33,16 +38,99 @@
     <sql id="tableName">
         vscing_order
     </sql>
+    <sql id="userTableName">
+        vscing_user
+    </sql>
+    <sql id="supplierTableName">
+        vscing_supplier
+    </sql>
+    <sql id="cinemaTableName">
+        vscing_cinema
+    </sql>
+    <sql id="movieTableName">
+        vscing_movie
+    </sql>
+    <sql id="showTableName">
+        vscing_show
+    </sql>
+
+    <!-- 公共查询条件 -->
+    <sql id="commonWhereClause">
+        <where>
+            `order`.deleted_at IS NULL
+            <if test="orderSn != null and orderSn.trim() != ''">
+                AND `order`.order_sn LIKE CONCAT('%', #{orderSn}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                <foreach collection="status.split(',')" item="item" open="AND `order`.status IN (" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="orderType != null and orderType != 0">
+                AND `order`.order_type = #{orderType}
+            </if>
+            <if test="platform != null and platform != 0">
+                AND `order`.platform = #{platform}
+            </if>
+            <if test="createdAt != null">
+                AND `order`.created_at &gt;= #{createdAt}
+            </if>
+            <if test="cinemaName != null and cinemaName.trim().length() > 0">
+                AND cinema.name LIKE CONCAT('%', #{cinemaName}, '%')
+            </if>
+            <if test="movieName != null and movieName.trim().length() > 0">
+                AND movie.name LIKE CONCAT('%', #{movieName}, '%')
+            </if>
+            <if test="username != null and username.trim().length() > 0">
+                AND `user`.username LIKE CONCAT('%', #{username}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 根据 ID 查询 -->
+    <select id="getOrderPrice" resultType="com.vscing.model.vo.OrderPriceVo">
+        SELECT
+            SUM(`order`.total_price) as totalPrice,
+            SUM(`order`.official_price) as officialPrice,
+            SUM(`order`.settlement_price) as settlementPrice
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
+        <include refid="commonWhereClause" />
+    </select>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultType="com.vscing.model.vo.OrderVo">
-        SELECT * FROM <include refid="tableName" />
-        <where>
-            deleted_at IS NULL
-<!--            <if test="id != null">-->
-<!--                AND id = #{id}-->
-<!--            </if>-->
-        </where>
+        SELECT
+        `order`.*,
+        `user`.username AS username,
+        supplier.name AS supplierName,
+        cinema.name AS cinemaName,
+        cinema.province_id AS provinceId,
+        cinema.province_name AS provinceName,
+        cinema.city_id AS cityId,
+        cinema.city_name AS cityName,
+        cinema.district_id AS districtId,
+        cinema.district_name AS districtName,
+        cinema.address AS address,
+        movie.name AS movieName,
+        movie.language AS `language`,
+        movie.movie_type AS movieType,
+        `show`.show_time AS showTime,
+        `show`.stop_sell_time AS stopSellTime,
+        `show`.duration AS duration,
+        `show`.hall_name AS hallName
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
+        <include refid="commonWhereClause" />
+        ORDER BY `order`.created_at DESC
     </select>
 
     <!-- 根据 ID 查询 -->
@@ -60,16 +148,20 @@
             <if test="cinemaId != null">cinema_id,</if>
             <if test="movieId != null">movie_id,</if>
             <if test="showId != null">show_id,</if>
+            <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
             <if test="status != null">status,</if>
             <if test="orderType != null">order_type,</if>
             <if test="platform != null">platform,</if>
+            <if test="paymentStatus != null">payment_status,</if>
+            <if test="settleStatus != null">settle_status,</if>
             <if test="purchaseQuantity != null">purchase_quantity,</if>
             <if test="seatInfo != null">seat_info,</if>
             <if test="isAdjusted != null">is_adjusted,</if>
             <if test="totalPrice != null">total_price,</if>
             <if test="officialPrice != null">official_price,</if>
             <if test="settlementPrice != null">settlement_price,</if>
+            <if test="memo != null">memo,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
@@ -80,16 +172,20 @@
             <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
             <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
             <if test="showId != null">#{showId, jdbcType=BIGINT},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">#{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
+            <if test="paymentStatus != null">#{paymentStatus, jdbcType=TINYINT},</if>
+            <if test="settleStatus != null">#{settleStatus, jdbcType=TINYINT},</if>
             <if test="purchaseQuantity != null">#{purchaseQuantity, jdbcType=INTEGER},</if>
             <if test="seatInfo != null">#{seatInfo, jdbcType=VARCHAR},</if>
             <if test="isAdjusted != null">#{isAdjusted, jdbcType=TINYINT},</if>
             <if test="totalPrice != null">#{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">#{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="memo != null">#{memo, jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
@@ -103,16 +199,21 @@
             <if test="cinemaId != null">cinema_id = #{cinemaId, jdbcType=BIGINT},</if>
             <if test="movieId != null">movie_id = #{movieId, jdbcType=BIGINT},</if>
             <if test="showId != null">show_id = #{showId, jdbcType=BIGINT},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">order_type = #{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">platform = #{platform, jdbcType=TINYINT},</if>
+            <if test="paymentStatus != null">payment_status = #{paymentStatus, jdbcType=TINYINT},</if>
+            <if test="settleStatus != null">settle_status = #{settleStatus, jdbcType=TINYINT},</if>
             <if test="purchaseQuantity != null">purchase_quantity = #{purchaseQuantity, jdbcType=INTEGER},</if>
             <if test="seatInfo != null">seat_info = #{seatInfo, jdbcType=VARCHAR},</if>
             <if test="isAdjusted != null">is_adjusted = #{isAdjusted, jdbcType=TINYINT},</if>
             <if test="totalPrice != null">total_price = #{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">official_price = #{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">settlement_price = #{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="responseBody != null">response_body = #{responseBody, jdbcType=VARCHAR},</if>
+            <if test="memo != null">memo = #{memo, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}

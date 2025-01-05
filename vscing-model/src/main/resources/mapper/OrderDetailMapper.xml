@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.OrderDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.OrderDetail">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="order_id" property="orderId" jdbcType="BIGINT" />
+        <result column="tp_area_id" property="tpAreaId" jdbcType="VARCHAR" />
+        <result column="tp_seat_id" property="tpSeatId" jdbcType="VARCHAR" />
+        <result column="tp_seat_name" property="tpSeatName" jdbcType="VARCHAR" />
+        <result column="ticket_type" property="ticketType" jdbcType="VARCHAR" />
+        <result column="ticket_code" property="ticketCode" jdbcType="VARCHAR" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
+        <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_order_detail
+    </sql>
+
+    <!-- 查询订单座位列表 -->
+    <select id="selectByOrderId" parameterType="long" resultType="com.vscing.model.dto.ShowInforDto">
+        SELECT
+            tp_seat_id as seatId,
+            tp_seat_name as seatName
+        FROM <include refid="tableName" />
+        <where>
+            order_id = #{orderId, jdbcType=BIGINT} and deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].orderId != null">order_id,</if>
+            <if test="list[0].tpAreaId != null">tp_area_id,</if>
+            <if test="list[0].tpSeatId != null">tp_seat_id,</if>
+            <if test="list[0].tpSeatName != null">tp_seat_name,</if>
+            <if test="list[0].totalPrice != null">total_price,</if>
+            <if test="list[0].officialPrice != null">official_price,</if>
+            <if test="list[0].settlementPrice != null">settlement_price,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.orderId != null">#{item.orderId, jdbcType=BIGINT},</if>
+                <if test="item.tpAreaId != null">#{item.tpAreaId, jdbcType=VARCHAR},</if>
+                <if test="item.tpSeatId != null">#{item.tpSeatId,jdbcType=VARCHAR},</if>
+                <if test="item.tpSeatName != null">#{item.tpSeatName,jdbcType=VARCHAR},</if>
+                <if test="item.totalPrice != null">#{item.totalPrice, jdbcType=DECIMAL},</if>
+                <if test="item.officialPrice != null">#{item.officialPrice, jdbcType=DECIMAL},</if>
+                <if test="item.settlementPrice != null">#{item.settlementPrice, jdbcType=DECIMAL},</if>
+                <if test="item.createdBy != null">#{item.createdBy,jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+    </insert>
+
+</mapper>

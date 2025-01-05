@@ -19,7 +19,7 @@ public class OrderSaveRequest {
 
   @NotNull(message = "用户来源不能为空")
   @Schema(description = "用户来源 1 微信小程序 2 支付宝小程序 3 淘宝 4 咸鱼 5 拼多多 6 微信")
-  private String userSource;
+  private Integer userSource;
 
   @NotNull(message = "用户信息不能为空")
   @Schema(description = "用户信息")
@@ -48,7 +48,7 @@ public class OrderSaveRequest {
 
   @NotNull(message = "支付状态不能为空")
   @Schema(description = "支付状态 1 待支付 2 已支付")
-  private String status;
+  private Integer status;
 
   @Schema(description = "备注信息")
   private String memo;
