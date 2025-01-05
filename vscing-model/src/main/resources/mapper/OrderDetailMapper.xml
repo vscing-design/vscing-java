@@ -69,4 +69,12 @@
         </foreach>
     </insert>
 
+    <!-- 根据 orderId 软删除 -->
+    <update id="softDeleteByOrderId" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE order_id = #{orderId, jdbcType=BIGINT}
+    </update>
+
 </mapper>

@@ -26,6 +26,7 @@ import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.OrderPriceVo;
@@ -287,6 +288,130 @@ public class OrderServiceImpl implements OrderService {
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
     }
+    return true;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+  public boolean changeOrder(OrderChangeRequest orderChange, Long by) {
+    // 获取场次ID
+    Long orderId = orderChange.getId();
+    Order orderData = orderMapper.selectById(orderId);
+    if(orderData == null) {
+      return false;
+    }
+    // 获取场次ID
+    Long showId = orderData.getShowId();
+    // 获取场次全局价格
+    Show show = showMapper.selectById(showId);
+    // 获取结算规则列表
+    List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
+    if(show == null || pricingRules == null) {
+      return false;
+    }
+    // 获取区域ID
+    List<String> areas = orderChange.getSeatList().stream()
+        // 提取areaId
+        .map(SeatListDto::getAreaId)
+        // 过滤掉null
+        .filter(Objects::nonNull)
+        // 过滤掉空字符串
+        .filter(areaId -> !areaId.trim().isEmpty())
+        .collect(Collectors.toList());
+    // 构建区域价格映射
+    Map<String, ShowArea> areaPriceMap = new HashMap<>(0);
+    // 计算价格
+    if(areas != null && !areas.isEmpty()) {
+      // 获取区域价格
+      List<ShowArea> showAreaList = showAreaMapper.selectByShowIdAreas(showId, areas);
+      // 构建区域价格映射
+      areaPriceMap = showAreaList.stream()
+          .collect(Collectors.toMap(
+              ShowArea::getArea,
+              area -> area,
+              // 处理重复键的情况（如果有的话）
+              (existing, replacement) -> existing
+          ));
+    }
+    // 计算订单总价格
+    BigDecimal totalPrice = BigDecimal.ZERO;
+    BigDecimal officialPrice = BigDecimal.ZERO;
+    BigDecimal settlementPrice = BigDecimal.ZERO;
+    List<String> seatInfo = new ArrayList<>();
+    // 遍历区域ID，填充最终结果
+    List<OrderDetail> orderDetailList = new ArrayList<>();
+    // 循环座位数据
+    for (SeatListDto seatList : orderChange.getSeatList()) {
+      ShowArea areaPrice = areaPriceMap.get(seatList.getAreaId());
+      // 场次价格（元）
+      BigDecimal showPrice = show.getShowPrice();
+      // 影片结算价（元）
+      BigDecimal userPrice = show.getUserPrice();
+      if (areaPrice != null) {
+        // 场次价格（元）
+        showPrice = areaPrice.getShowPrice();
+        // 影片结算价（元）
+        userPrice = areaPrice.getUserPrice();
+      }
+      // 实际销售价格
+      BigDecimal price = PricingUtil.calculateActualPrice(showPrice, userPrice, pricingRules);
+      // 订单总价
+      totalPrice = totalPrice.add(price);
+      officialPrice = officialPrice.add(showPrice);
+      settlementPrice = settlementPrice.add(userPrice);
+      // 座位
+      seatInfo.add(seatList.getSeatName());
+      // 订单详情
+      OrderDetail orderDetail = new OrderDetail();
+      orderDetail.setId(IdUtil.getSnowflakeNextId());
+      orderDetail.setOrderId(orderId);
+      orderDetail.setTpAreaId(seatList.getAreaId());
+      orderDetail.setTpSeatId(seatList.getSeatId());
+      orderDetail.setTpSeatName(seatList.getSeatName());
+      orderDetail.setTotalPrice(price);
+      orderDetail.setOfficialPrice(showPrice);
+      orderDetail.setSettlementPrice(userPrice);
+      orderDetail.setCreatedBy(by);
+      orderDetailList.add(orderDetail);
+    }
+    // 创建数据
+    try {
+      int rowsAffected = 0;
+      // 删除订单详情数据
+      rowsAffected = orderDetailMapper.softDeleteByOrderId(orderId, by);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("删除订单详情失败");
+      }
+      // 创建订单数据
+      Order order = new Order();
+      order.setId(orderId);
+      // 数量金额
+      order.setPurchaseQuantity(orderChange.getSeatList().size());
+      order.setTotalPrice(totalPrice);
+      order.setOfficialPrice(officialPrice);
+      order.setSettlementPrice(settlementPrice);
+      // 座位信息
+      String seatInfoStr = seatInfo.stream()
+          .collect(Collectors.joining(","));
+      order.setSeatInfo(seatInfoStr);
+      order.setUpdatedBy(by);
+      // 开始创建
+      rowsAffected = orderMapper.update(order);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("编辑订单失败");
+      }
+      // 创建订单详情数据
+      if(!orderDetailList.isEmpty()) {
+        rowsAffected = orderDetailMapper.batchInsert(orderDetailList);
+        if (rowsAffected != orderDetailList.size()) {
+          throw new ServiceException("创建订单详情数据失败");
+        }
+      }
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
+
+
     return true;
   }
 

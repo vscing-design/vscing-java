@@ -1,6 +1,7 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.OrderListDto;
+import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
@@ -29,6 +30,11 @@ public interface OrderService {
    * 手动下单
   */
   boolean createOrder(OrderSaveRequest orderSave, Long by);
+
+  /**
+   * 调座
+  */
+  boolean changeOrder(OrderChangeRequest orderChange, Long by);
 
   /**
    * 取消订单

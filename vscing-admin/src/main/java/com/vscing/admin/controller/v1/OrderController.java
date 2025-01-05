@@ -5,6 +5,7 @@ import com.vscing.admin.service.OrderService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.OrderListDto;
+import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
@@ -128,7 +129,7 @@ public class OrderController {
   }
 
   @PostMapping("/ticket/{id}")
-  @Operation(summary = "取票")
+  @Operation(summary = "出票")
   public CommonResult<Object> ticket(@PathVariable("id") Long id,
                                      @AuthenticationPrincipal AdminUserDetails userInfo) {
     // 操作人ID
@@ -142,6 +143,34 @@ public class OrderController {
         return CommonResult.success("取票接口返回成功");
       } else {
         return CommonResult.failed("取票接口返回失败");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/change/{id}")
+  @Operation(summary = "调座")
+  public CommonResult<Object> exchange(@Validated @RequestBody OrderChangeRequest data,
+                                       BindingResult bindingResult,
+                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    // 操作人ID
+    Long by = 0L;
+    if(userInfo != null && userInfo.getUserId() != null) {
+      by = userInfo.getUserId();
+    }
+    try {
+      boolean res = orderService.changeOrder(data, by);
+      if (res) {
+        return CommonResult.success("调座接口返回成功");
+      } else {
+        return CommonResult.failed("调座接口返回失败");
       }
     } catch (Exception e) {
       log.error("请求错误: ", e);

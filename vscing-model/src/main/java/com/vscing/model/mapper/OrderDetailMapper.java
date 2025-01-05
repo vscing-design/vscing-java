@@ -20,4 +20,6 @@ public interface OrderDetailMapper {
 
   List<ShowInforDto> selectByOrderId(@Param("orderId") Long orderId);
 
+  int softDeleteByOrderId(@Param("orderId") long orderId, @Param("deleterId") long deleterId);
+
 }
