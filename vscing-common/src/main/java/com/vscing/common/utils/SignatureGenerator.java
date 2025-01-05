@@ -1,5 +1,7 @@
 package com.vscing.common.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +14,7 @@ import java.util.TreeMap;
  * @date 2024/12/11 00:57
  * @auth vscing(vscing @ foxmail.com)
  */
+@Slf4j
 public class SignatureGenerator {
 
 //    public static void main(String[] args) {
