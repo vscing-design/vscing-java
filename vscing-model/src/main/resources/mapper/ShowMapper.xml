@@ -80,6 +80,9 @@
             s.id,
             s.hall_name,
             s.show_time,
+            s.duration,
+            s.show_version_type,
+            s.stop_sell_time,
             m.name as movieName
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id

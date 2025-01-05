@@ -35,4 +35,13 @@ public class ShowTreeVo {
   @Schema(description = "放映开始时间")
   private LocalDateTime showTime;
 
+  @Schema(description = "电影售卖结束时间")
+  private LocalDateTime stopSellTime;
+
+  @Schema(description = "放映时长（分钟）")
+  private Integer duration;
+
+  @Schema(description = "场次类型")
+  private String showVersionType;
+
 }
