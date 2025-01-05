@@ -72,8 +72,11 @@
             <if test="platform != null and platform != 0">
                 AND `order`.platform = #{platform}
             </if>
-            <if test="createdAt != null">
-                AND `order`.created_at &gt;= #{createdAt}
+            <if test="startDate != null">
+                AND `order`.created_at <![CDATA[ >= ]]> #{startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                AND `order`.created_at <![CDATA[ <= ]]> #{endDate, jdbcType=TIMESTAMP}
             </if>
             <if test="cinemaName != null and cinemaName.trim().length() > 0">
                 AND cinema.name LIKE CONCAT('%', #{cinemaName}, '%')

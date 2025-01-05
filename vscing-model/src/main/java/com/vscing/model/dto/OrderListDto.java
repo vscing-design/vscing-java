@@ -2,6 +2,7 @@ package com.vscing.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +36,12 @@ public class OrderListDto {
   @Schema(description = "下单平台 1 微信小程序 2 支付宝小程序 3 淘宝 4 咸鱼 5 拼多多 6 微信")
   private Integer platform;
 
-  @Schema(description = "订单生成日期")
-  private LocalDateTime createdAt;
+  @Schema(description = "开始创建日期")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime startDate;
+
+  @Schema(description = "结束创建日期")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime endDate;
 
 }
