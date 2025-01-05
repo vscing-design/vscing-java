@@ -10,6 +10,7 @@ import com.vscing.model.vo.MenuTreeVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -43,7 +44,7 @@ public class MenuController {
 
   @GetMapping
   @Operation(summary = "列表")
-  public CommonResult<CommonPage<Menu>> lists(MenuListDto queryParam,
+  public CommonResult<CommonPage<Menu>> lists(@ParameterObject MenuListDto queryParam,
                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Menu> list = menuService.getList(queryParam, pageSize, pageNum);
@@ -52,7 +53,7 @@ public class MenuController {
 
   @GetMapping("/tree")
   @Operation(summary = "树形列表")
-  public CommonResult<List<MenuTreeVo>> lists(MenuListDto queryParam) {
+  public CommonResult<List<MenuTreeVo>> lists(@ParameterObject MenuListDto queryParam) {
     List<MenuTreeVo> list = menuService.getAllList(queryParam);
     return CommonResult.success(list);
   }

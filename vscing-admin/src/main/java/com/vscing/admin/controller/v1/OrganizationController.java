@@ -10,6 +10,7 @@ import com.vscing.model.vo.OrganizationTreeVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -43,7 +44,7 @@ public class OrganizationController {
 
   @GetMapping
   @Operation(summary = "列表")
-  public CommonResult<CommonPage<Organization>> lists(OrganizationListDto queryParam,
+  public CommonResult<CommonPage<Organization>> lists(@ParameterObject OrganizationListDto queryParam,
                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Organization> list = organizationService.getList(queryParam, pageSize, pageNum);
@@ -52,7 +53,7 @@ public class OrganizationController {
 
   @GetMapping("/tree")
   @Operation(summary = "树形列表")
-  public CommonResult<List<OrganizationTreeVo>> lists(OrganizationListDto queryParam) {
+  public CommonResult<List<OrganizationTreeVo>> lists(@ParameterObject OrganizationListDto queryParam) {
     List<OrganizationTreeVo> list = organizationService.getAllList(queryParam);
     return CommonResult.success(list);
   }

@@ -14,6 +14,7 @@ import com.vscing.model.vo.ShowListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +44,7 @@ public class ShowController {
 
   @GetMapping
   @Operation(summary = "分页列表")
-  public CommonResult<CommonPage<ShowListVo>> lists(ShowListDto queryParam,
+  public CommonResult<CommonPage<ShowListVo>> lists(@ParameterObject ShowListDto queryParam,
                                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                     @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<ShowListVo> list = showService.getList(queryParam, pageSize, pageNum);
@@ -52,7 +53,7 @@ public class ShowController {
 
   @GetMapping("/all")
   @Operation(summary = "手动下单筛选项")
-  public CommonResult<List<MovieTreeVo>> all(ShowAllDto queryParam) {
+  public CommonResult<List<MovieTreeVo>> all(@ParameterObject ShowAllDto queryParam) {
     return CommonResult.success(showService.getAll(queryParam));
   }
 

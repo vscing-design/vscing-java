@@ -11,6 +11,7 @@ import com.vscing.model.request.RoleMenusRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -72,7 +73,7 @@ public class RoleController {
 
   @GetMapping
   @Operation(summary = "列表")
-  public CommonResult<CommonPage<Role>> lists(RoleListDto queryParam,
+  public CommonResult<CommonPage<Role>> lists(@ParameterObject RoleListDto queryParam,
                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Role> list = roleService.getList(queryParam, pageSize, pageNum);

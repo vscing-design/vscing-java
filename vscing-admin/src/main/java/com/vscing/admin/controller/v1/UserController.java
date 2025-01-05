@@ -8,6 +8,7 @@ import com.vscing.model.vo.UserListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "列表")
-    public CommonResult<CommonPage<UserListVo>> lists(UserListDto queryParam,
+    public CommonResult<CommonPage<UserListVo>> lists(@ParameterObject UserListDto queryParam,
                                                       @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                       @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         List<UserListVo> list = userService.getList(queryParam, pageSize, pageNum);

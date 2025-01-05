@@ -9,6 +9,7 @@ import com.vscing.model.entity.Cinema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -42,7 +43,7 @@ public class CinemaController {
 
   @GetMapping
   @Operation(summary = "列表")
-  public CommonResult<CommonPage<Cinema>> lists(CinemaListDto queryParam,
+  public CommonResult<CommonPage<Cinema>> lists(@ParameterObject CinemaListDto queryParam,
                                                 @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                 @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Cinema> list = cinemaService.getList(queryParam, pageSize, pageNum);
