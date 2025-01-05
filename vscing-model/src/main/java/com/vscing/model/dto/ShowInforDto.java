@@ -1,25 +1,17 @@
 package com.vscing.model.dto;
 
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * seatListDto
+ * ShowInforDto
  *
  * @author vscing
- * @date 2024/12/31 01:44
+ * @date 2025/1/2 20:56
  */
 @Data
-@AutoMappers({
-    @AutoMapper(target = ShowInforDto.class)
-})
-public class SeatListDto {
-
-  @Schema(description = "区域ID")
-  private String areaId;
+public class ShowInforDto {
 
   @NotNull(message = "座位ID不能为空")
   @Schema(description = "座位ID")
