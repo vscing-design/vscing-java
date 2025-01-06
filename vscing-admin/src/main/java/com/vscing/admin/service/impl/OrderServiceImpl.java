@@ -1,7 +1,9 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +12,7 @@ import com.vscing.admin.service.OrderService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.utils.HttpClientUtil;
+import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
@@ -97,6 +100,23 @@ public class OrderServiceImpl implements OrderService {
   public List<OrderVo> getList(OrderListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return orderMapper.getList(data);
+  }
+
+  @Override
+  public OrderSaveRequest getDetails(Long id) {
+    OrderSaveRequest orderSave = orderMapper.selectEditById(id);
+    if (ObjectUtil.isNull(orderSave)) {
+      return null;
+    }
+
+    // 查询座位列表，并初始化为空列表以防查询结果为 null
+    List<SeatListDto> seatList = CollUtil.isEmpty(orderDetailMapper.selectByOrderId(id))
+        ? CollUtil.newArrayList() : orderDetailMapper.selectByOrderId(id);
+
+    // 设置座位列表到 OrderSaveRequest 对象中
+    orderSave.setSeatList(seatList);
+
+    return orderSave;
   }
 
   @Override
@@ -430,10 +450,11 @@ public class OrderServiceImpl implements OrderService {
         throw new ServiceException("场次数据不存在");
       }
       // 获取订单详情
-      List<ShowInforDto> showInfor = orderDetailMapper.selectByOrderId(id);
-      if(showInfor == null || showInfor.isEmpty()) {
+      List<SeatListDto> seatList = orderDetailMapper.selectByOrderId(id);
+      if(seatList == null || seatList.isEmpty()) {
         throw new ServiceException("订单详情数据不存在");
       }
+      List<ShowInforDto> showInfor = MapstructUtils.convert(seatList, ShowInforDto.class);
       // 先改变订单状态
       Order updateOrder = new Order();
       updateOrder.setStatus(3);

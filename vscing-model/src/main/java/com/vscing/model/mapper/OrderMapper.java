@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.entity.Order;
+import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,6 +22,8 @@ public interface OrderMapper {
   OrderPriceVo getOrderPrice(OrderListDto data);
 
   Order selectById(long id);
+
+  OrderSaveRequest selectEditById(long id);
 
   int insert(Order record);
 

@@ -29,8 +29,9 @@
     </sql>
 
     <!-- 查询订单座位列表 -->
-    <select id="selectByOrderId" parameterType="long" resultType="com.vscing.model.dto.ShowInforDto">
+    <select id="selectByOrderId" parameterType="long" resultType="com.vscing.model.dto.SeatListDto">
         SELECT
+            tp_area_id as areaId,
             tp_seat_id as seatId,
             tp_seat_name as seatName
         FROM <include refid="tableName" />

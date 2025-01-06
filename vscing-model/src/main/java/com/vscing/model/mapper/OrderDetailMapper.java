@@ -1,6 +1,6 @@
 package com.vscing.model.mapper;
 
-import com.vscing.model.dto.ShowInforDto;
+import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.entity.OrderDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +18,7 @@ public interface OrderDetailMapper {
 
   int batchInsert(@Param("list") List<OrderDetail> list);
 
-  List<ShowInforDto> selectByOrderId(@Param("orderId") Long orderId);
+  List<SeatListDto> selectByOrderId(@Param("orderId") Long orderId);
 
   int softDeleteByOrderId(@Param("orderId") long orderId, @Param("deleterId") long deleterId);
 

@@ -5,6 +5,7 @@ import com.vscing.admin.service.OrderService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.OrderListDto;
+import com.vscing.model.entity.Cinema;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.vo.OrderPriceVo;
@@ -49,6 +50,16 @@ public class OrderController {
                                                  @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<OrderVo> list = orderService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @GetMapping("/{id}")
+  @Operation(summary = "详情")
+  public CommonResult<OrderSaveRequest> details(@PathVariable("id") Long id) {
+    OrderSaveRequest orderSave = orderService.getDetails(id);
+    if (orderSave == null) {
+      return CommonResult.failed("信息不存在");
+    }
+    return CommonResult.success(orderSave);
   }
 
   @GetMapping("/amount")

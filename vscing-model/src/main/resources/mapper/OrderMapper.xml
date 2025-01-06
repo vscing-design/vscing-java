@@ -141,6 +141,17 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 ID 查询订单编辑信息 -->
+    <select id="selectEditById" parameterType="long" resultType="com.vscing.model.request.OrderSaveRequest">
+        SELECT
+        `order`.*,
+        `user`.username AS username,
+        `user`.source AS userSource
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        WHERE `order`.id = #{id, jdbcType=BIGINT} and `order`.deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Order">
         INSERT INTO <include refid="tableName" />

@@ -22,6 +22,11 @@ public interface OrderService {
   List<OrderVo> getList(OrderListDto data, Integer pageSize, Integer pageNum);
 
   /**
+   * 详情
+  */
+  OrderSaveRequest getDetails(Long id);
+
+  /**
    * 统计订单价格
   */
   OrderPriceVo getOrderPrice(OrderListDto data);
