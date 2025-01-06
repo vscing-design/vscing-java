@@ -3,6 +3,7 @@ package com.vscing.admin.service;
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
+import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
 
@@ -24,7 +25,7 @@ public interface OrderService {
   /**
    * 详情
   */
-  OrderSaveRequest getDetails(Long id);
+  OrderDetailVo getDetails(Long id);
 
   /**
    * 统计订单价格

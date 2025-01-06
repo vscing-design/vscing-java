@@ -35,8 +35,8 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 3 * * ?") // 每天凌晨3点执行场次清空
     public void truncateTableTask() {
         System.out.println("执行定时任务 每天凌晨3点执行场次清空：" + LocalDateTime.now());
-        showMapper.truncateTable();
-        showAreaMapper.truncateTable();
+//        showMapper.truncateTable();
+//        showAreaMapper.truncateTable();
     }
 
     @Scheduled(cron = "0 0 22 ? * 5") // 每周5晚上10点同步影院

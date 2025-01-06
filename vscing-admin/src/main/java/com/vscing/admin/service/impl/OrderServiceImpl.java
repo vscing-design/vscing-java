@@ -32,6 +32,7 @@ import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.utils.PricingUtil;
+import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
 import lombok.extern.slf4j.Slf4j;
@@ -103,8 +104,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderSaveRequest getDetails(Long id) {
-    OrderSaveRequest orderSave = orderMapper.selectEditById(id);
+  public OrderDetailVo getDetails(Long id) {
+    OrderDetailVo orderSave = orderMapper.selectEditById(id);
     if (ObjectUtil.isNull(orderSave)) {
       return null;
     }
@@ -441,9 +442,9 @@ public class OrderServiceImpl implements OrderService {
     try {
       // 订单详情
       Order order = orderMapper.selectById(id);
-      if(order == null || order.getStatus() != 2) {
-        throw new ServiceException("订单数据不存在");
-      }
+//      if(order == null || order.getStatus() != 2) {
+//        throw new ServiceException("订单数据不存在");
+//      }
       // 场次详情
       Show show = showMapper.selectById(order.getShowId());
       if(show == null) {
@@ -455,13 +456,17 @@ public class OrderServiceImpl implements OrderService {
         throw new ServiceException("订单详情数据不存在");
       }
       List<ShowInforDto> showInfor = MapstructUtils.convert(seatList, ShowInforDto.class);
-      // 先改变订单状态
+      // 判断是否需要先改变订单状态
       Order updateOrder = new Order();
-      updateOrder.setStatus(3);
-      updateOrder.setUpdatedBy(by);
-      int res = orderMapper.update(updateOrder);
-      if (res <= 0) {
-        throw new ServiceException("改变订单状态失败");
+      updateOrder.setId(order.getId());
+      if(order.getStatus() != 3) {
+        // 改变订单状态
+        updateOrder.setStatus(3);
+        updateOrder.setUpdatedBy(by);
+        int res = orderMapper.update(updateOrder);
+        if (res <= 0) {
+          throw new ServiceException("改变订单状态失败");
+        }
       }
       // 将 List 转换为 JSON 字符串
       String showInforStr = JSONUtil.toJsonStr(showInfor);
@@ -477,7 +482,7 @@ public class OrderServiceImpl implements OrderService {
 
       // 发送请求并获取响应
       String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou1111.cn/ticket/ticket_api/order/preferential/submit",
+          "https://test.ot.jfshou.cn/ticket/ticket_api/order/preferential/submit",
           params
       );
 
@@ -494,7 +499,7 @@ public class OrderServiceImpl implements OrderService {
       orderMapper.update(updateOrder);
       // 调用三方成功
       if(SUCCESS_CODES.contains(code)) {
-        log.error("调用三方下单写入数据：", order.getOrderSn(), res);
+        log.error("调用三方下单写入数据：", order.getOrderSn());
         return true;
       }
       throw new ServiceException(message);

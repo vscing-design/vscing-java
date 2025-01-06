@@ -2,7 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.entity.Order;
-import com.vscing.model.request.OrderSaveRequest;
+import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,12 +23,16 @@ public interface OrderMapper {
 
   Order selectById(long id);
 
-  OrderSaveRequest selectEditById(long id);
+  OrderDetailVo selectEditById(long id);
 
   int insert(Order record);
 
   int update(Order record);
 
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
+
+  int cancelPendingPayments();
+
+  List<Order> getPendingTicketOrders();
   
 }

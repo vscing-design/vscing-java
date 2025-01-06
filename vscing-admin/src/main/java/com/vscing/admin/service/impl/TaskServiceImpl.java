@@ -15,6 +15,7 @@ import com.vscing.model.entity.City;
 import com.vscing.model.entity.District;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.entity.MovieProducer;
+import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Province;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
@@ -23,6 +24,7 @@ import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;
 import com.vscing.model.mapper.MovieMapper;
 import com.vscing.model.mapper.MovieProducerMapper;
+import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ProvinceMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
@@ -70,6 +72,9 @@ public class TaskServiceImpl implements TaskService {
 
   @Autowired
   private MovieMapper movieMapper;
+
+  @Autowired
+  private OrderMapper orderMapper;
 
   @Autowired
   private MovieProducerMapper movieProducerMapper;
@@ -503,6 +508,58 @@ public class TaskServiceImpl implements TaskService {
       log.info("同步场次结束");
     } catch (Exception e) {
       log.error("同步场次失败", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncPendingPaymentOrder() {
+    try {
+      orderMapper.cancelPendingPayments();
+      log.info("同步待支付订单结束");
+    } catch (Exception e) {
+      log.error("同步待支付订单失败", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncPendingTicketOrder() {
+    try {
+
+      List<Order> orderList = orderMapper.getPendingTicketOrders();
+
+      if(orderList != null && !orderList.isEmpty()){
+        for (Order orderItem : orderList) {
+          // 准备请求参数
+          Map<String, String> params = new HashMap<>();
+          params.put("tradeNo", orderItem.getOrderSn());
+
+          // 发送请求并获取响应
+          String responseBody = HttpClientUtil.postRequest(
+              "https://test.ot.jfshou.cn/ticket/ticket_api/order/query",
+              params
+          );
+
+          // 将 JSON 字符串解析为 JsonNode 对象
+          log.info("responseBody: {}", responseBody);
+
+          // 将 JSON 字符串解析为 JsonNode 对象
+          ObjectMapper objectMapper = new ObjectMapper();
+
+          Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+          Integer code = (Integer) responseMap.getOrDefault("code", 0);
+          String message = (String) responseMap.getOrDefault("message", "未知错误");
+          if(code != ResultCode.SUCCESS.getCode()) {
+            log.info("code: {}, message: {}", code, message);
+            continue;
+          }
+
+        }
+      }
+      log.info("同步出票中订单结束");
+    } catch (Exception e) {
+      log.error("同步出票中订单失败", e);
     }
   }
 

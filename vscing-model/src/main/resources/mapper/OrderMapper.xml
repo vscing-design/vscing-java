@@ -136,19 +136,40 @@
         ORDER BY `order`.created_at DESC
     </select>
 
+    <!-- 定时更新待支付订单状态 -->
+    <update id="cancelPendingPayments">
+        UPDATE <include refid="tableName" />
+        SET status = 5, -- 已取消状态
+        WHERE status = 1 -- 待支付状态
+        AND DATE_ADD(created_at, INTERVAL 10 MINUTE) > CURRENT_TIMESTAMP;
+    </update>
+
+    <!-- 查询待出票订单列表 -->
+    <select id="getPendingTicketOrders" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE status = 3 AND DATE_ADD(updated_at, INTERVAL 3 MINUTE) > CURRENT_TIMESTAMP;
+    </select>
+
     <!-- 根据 ID 查询 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
     <!-- 根据 ID 查询订单编辑信息 -->
-    <select id="selectEditById" parameterType="long" resultType="com.vscing.model.request.OrderSaveRequest">
+    <select id="selectEditById" parameterType="long" resultType="com.vscing.model.vo.OrderDetailVo">
         SELECT
         `order`.*,
         `user`.username AS username,
-        `user`.source AS userSource
+        `user`.source AS userSource,
+        cinema.province_id AS provinceId,
+        cinema.province_name AS provinceName,
+        cinema.city_id AS cityId,
+        cinema.city_name AS cityName,
+        cinema.district_id AS districtId,
+        cinema.district_name AS districtName
         FROM <include refid="tableName" /> `order`
         LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
         WHERE `order`.id = #{id, jdbcType=BIGINT} and `order`.deleted_at IS NULL
     </select>
 
