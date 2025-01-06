@@ -29,9 +29,9 @@ Base logback configuration provided for compatibility with Spring Boot 1.1
     </appender>
     <!-- 输出除 ERROR 以外的日志到 biz.log -->
     <appender name="BIZ-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/biz.log</file>
+        <file>${LOG_HOME}/admin.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/biz.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/admin.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
             <maxFileSize>200MB</maxFileSize>
             <maxHistory>7</maxHistory>
             <totalSizeCap>20GB</totalSizeCap>
