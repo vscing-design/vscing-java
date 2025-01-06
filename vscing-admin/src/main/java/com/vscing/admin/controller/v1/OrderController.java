@@ -5,9 +5,9 @@ import com.vscing.admin.service.OrderService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.OrderListDto;
-import com.vscing.model.entity.Cinema;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
+import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,8 +54,8 @@ public class OrderController {
 
   @GetMapping("/{id}")
   @Operation(summary = "详情")
-  public CommonResult<OrderSaveRequest> details(@PathVariable("id") Long id) {
-    OrderSaveRequest orderSave = orderService.getDetails(id);
+  public CommonResult<OrderDetailVo> details(@PathVariable("id") Long id) {
+    OrderDetailVo orderSave = orderService.getDetails(id);
     if (orderSave == null) {
       return CommonResult.failed("信息不存在");
     }
