@@ -1,6 +1,5 @@
 package com.vscing.auth.service;
 
-import com.vscing.model.vo.AdminUserDetailVo;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -12,5 +11,4 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface VscingUserDetails extends UserDetails {
   Long getUserId();
 
-  AdminUserDetailVo getAdminUser();
 }

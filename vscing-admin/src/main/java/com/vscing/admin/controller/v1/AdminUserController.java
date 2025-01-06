@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -126,7 +127,7 @@ public class AdminUserController {
 
   @GetMapping("/users")
   @Operation(summary = "后台用户列表")
-  public CommonResult<CommonPage<AdminUserListVo>> users(AdminUserListDto queryParam,
+  public CommonResult<CommonPage<AdminUserListVo>> users(@ParameterObject AdminUserListDto queryParam,
                                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                          @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<AdminUserListVo> userList = adminUserService.getList(queryParam, pageSize, pageNum);

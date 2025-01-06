@@ -3,7 +3,7 @@ package com.vscing.admin.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
-import com.vscing.admin.po.AdminUserDetails;
+import com.vscing.admin.po.impl.AdminUserDetailsImpl;
 import com.vscing.admin.service.AdminUserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
@@ -94,7 +94,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   public VscingUserDetails adminUserInfo(long id) {
     // 获取用户信息
     AdminUserDetailVo adminUser = this.self(id);
-    return new AdminUserDetails(adminUser);
+    return new AdminUserDetailsImpl(adminUser);
   }
 
   @Override
@@ -152,7 +152,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       }
       // 获取用户信息
       AdminUserDetailVo adminUser = this.self(entity.getId());
-      VscingUserDetails userDetails = new AdminUserDetails(adminUser);
+      VscingUserDetails userDetails = new AdminUserDetailsImpl(adminUser);
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
       token = jwtTokenUtil.generateToken(userDetails.getUserId());
