@@ -1,6 +1,7 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.OrderListDto;
+import com.vscing.model.http.HttpOrder;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.vo.OrderDetailVo;
@@ -56,5 +57,10 @@ public interface OrderService {
    * 取票
   */
   boolean ticketOrder(Long id, Long by);
+
+  /**
+   * 同步三方订单列表
+   */
+  boolean supplierOrder(HttpOrder httpOrder);
 
 }

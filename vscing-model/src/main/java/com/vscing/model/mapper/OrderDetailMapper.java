@@ -22,4 +22,6 @@ public interface OrderDetailMapper {
 
   int softDeleteByOrderId(@Param("orderId") long orderId, @Param("deleterId") long deleterId);
 
+  int batchUpdateOrderDetail(List<OrderDetail> updateOrderDetailList);
+
 }

@@ -25,6 +25,8 @@ public interface OrderMapper {
 
   OrderDetailVo selectEditById(long id);
 
+  Order selectByOrderSn(String orderSn);
+
   int insert(Order record);
 
   int update(Order record);

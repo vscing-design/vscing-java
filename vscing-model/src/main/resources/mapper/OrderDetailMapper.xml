@@ -10,8 +10,8 @@
         <result column="tp_area_id" property="tpAreaId" jdbcType="VARCHAR" />
         <result column="tp_seat_id" property="tpSeatId" jdbcType="VARCHAR" />
         <result column="tp_seat_name" property="tpSeatName" jdbcType="VARCHAR" />
-        <result column="ticket_type" property="ticketType" jdbcType="VARCHAR" />
-        <result column="ticket_code" property="ticketCode" jdbcType="VARCHAR" />
+        <result column="ticket_tips" property="ticketTips" jdbcType="VARCHAR" />
+        <result column="ticket_code_json" property="ticketCodeJson" jdbcType="VARCHAR" />
         <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
         <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
         <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
@@ -75,7 +75,21 @@
         UPDATE <include refid="tableName" />
         SET deleted_at = NOW(),
         deleted_by = #{deleterId, jdbcType=BIGINT}
-        WHERE order_id = #{orderId, jdbcType=BIGINT}
+        WHERE order_id = #{orderId, jdbcType=BIGINT} and deleted_at IS NULL
+    </update>
+
+    <!-- 根据 orderId、seatName 批量更新配置 -->
+    <update id="batchUpdateOrderDetail" parameterType="java.util.List">
+        START TRANSACTION;
+        <foreach collection="list" item="orderDetail">
+            UPDATE <include refid="tableName" />
+            SET ticket_tips = #{orderDetail.ticketTips, jdbcType=VARCHAR},
+            ticket_code_json = #{orderDetail.ticketCodeJson, jdbcType=VARCHAR}
+            WHERE
+                order_id = #{orderDetail.orderId, jdbcType=BIGINT}
+                and tp_seat_name = #{orderDetail.tpSeatName, jdbcType=VARCHAR};
+        </foreach>
+        COMMIT;
     </update>
 
 </mapper>

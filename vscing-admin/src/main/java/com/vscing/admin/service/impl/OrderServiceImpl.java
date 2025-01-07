@@ -11,7 +11,8 @@ import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.OrderService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
-import com.vscing.common.utils.HttpClientUtil;
+import com.vscing.common.service.supplier.SupplierService;
+import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
@@ -23,6 +24,8 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.User;
+import com.vscing.model.http.HttpOrder;
+import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
@@ -60,6 +63,9 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl implements OrderService {
   private static final List<Integer> SUCCESS_CODES = Arrays.asList(200, -530, 9999, 9008, 9011);
+
+  @Autowired
+  private SupplierServiceFactory supplierServiceFactory;
 
   @Autowired
   private RedisService redisService;
@@ -442,9 +448,9 @@ public class OrderServiceImpl implements OrderService {
     try {
       // 订单详情
       Order order = orderMapper.selectById(id);
-//      if(order == null || order.getStatus() != 2) {
-//        throw new ServiceException("订单数据不存在");
-//      }
+      if(order == null || order.getStatus() != 2) {
+        throw new ServiceException("订单数据不存在");
+      }
       // 场次详情
       Show show = showMapper.selectById(order.getShowId());
       if(show == null) {
@@ -479,12 +485,9 @@ public class OrderServiceImpl implements OrderService {
       params.put("tradeNo", order.getOrderSn());
       params.put("supportChangeSeat", "1");
       params.put("addFlag", "1");
-
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
-      String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou.cn/ticket/ticket_api/order/preferential/submit",
-          params
-      );
+      String responseBody = supplierService.sendRequest("/order/preferential/submit", params);
 
       log.info("responseBody: {}", responseBody);
 
@@ -507,6 +510,55 @@ public class OrderServiceImpl implements OrderService {
       log.error("调用三方下单异常：{}", e);
     }
     return false;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+  public boolean supplierOrder(HttpOrder httpOrder) {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    try {
+      int rowsAffected = 0;
+      // 根据订单号获取订单
+      Order order = orderMapper.selectByOrderSn(httpOrder.getTradeNo());
+      if(order == null) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 改变订单状态
+      Order updateOrder = new Order();
+      updateOrder.setId(order.getId());
+      updateOrder.setStatus(4);
+      updateOrder.setSupplierOrderSn(httpOrder.getOrderNo());
+      rowsAffected = orderMapper.update(updateOrder);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("改变订单状态失败");
+      }
+      // 改变订单详情信息
+      String[] seatInfoArray = httpOrder.getSeatInfos().split(",");
+      List<HttpTicketCode> ticketCodeList = httpOrder.getTicketCode();
+      if(seatInfoArray.length == 0 || ticketCodeList == null || ticketCodeList.isEmpty() || ticketCodeList.size() != seatInfoArray.length) {
+        throw new ServiceException("订单详情数据不存在");
+      }
+      // 更新数据源
+      List<OrderDetail> updateOrderDetailList = new ArrayList<>();
+      for (int i = 0; i < seatInfoArray.length; i++) {
+        OrderDetail updateOrderDetail = new OrderDetail();
+        String ticketCodeJson = objectMapper.writeValueAsString(ticketCodeList.get(i).getCode());
+        updateOrderDetail.setTicketTips(ticketCodeList.get(i).getMachineInfo());
+        updateOrderDetail.setTicketCodeJson(ticketCodeJson);
+        updateOrderDetail.setOrderId(order.getId());
+        updateOrderDetail.setTpSeatName(seatInfoArray[i]);
+        updateOrderDetailList.add(updateOrderDetail);
+      }
+      rowsAffected = orderDetailMapper.batchUpdateOrderDetail(updateOrderDetailList);
+      if (rowsAffected <= 0 || rowsAffected != updateOrderDetailList.size()) {
+        throw new ServiceException("改变订单详情数据失败");
+      }
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
+    return true;
   }
 
 }

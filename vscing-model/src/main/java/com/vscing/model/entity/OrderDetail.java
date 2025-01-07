@@ -32,11 +32,11 @@ public class OrderDetail extends BaseEntity {
   @Schema(description = "座位名")
   private String tpSeatName;
 
-  @Schema(description = "取票类型")
-  private String ticketType;
+  @Schema(description = "取票提示")
+  private String ticketTips;
 
-  @Schema(description = "取票码")
-  private String ticketCode;
+  @Schema(description = "取票码数组")
+  private String ticketCodeJson;
 
   @Schema(description = "总价格")
   private BigDecimal totalPrice;

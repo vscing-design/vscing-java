@@ -13,6 +13,7 @@
         <result column="show_id" property="showId" jdbcType="BIGINT" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+        <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="order_type" property="orderType" jdbcType="TINYINT" />
         <result column="platform" property="platform" jdbcType="TINYINT" />
@@ -141,13 +142,13 @@
         UPDATE <include refid="tableName" />
         SET status = 5, -- 已取消状态
         WHERE status = 1 -- 待支付状态
-        AND DATE_ADD(created_at, INTERVAL 10 MINUTE) > CURRENT_TIMESTAMP;
+        AND DATE_ADD(created_at, INTERVAL 10 MINUTE) &lt; CURRENT_TIMESTAMP;
     </update>
 
     <!-- 查询待出票订单列表 -->
     <select id="getPendingTicketOrders" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
-        WHERE status = 3 AND DATE_ADD(updated_at, INTERVAL 3 MINUTE) > CURRENT_TIMESTAMP;
+        WHERE status = 3 AND DATE_ADD(updated_at, INTERVAL 3 MINUTE) &lt; CURRENT_TIMESTAMP;
     </select>
 
     <!-- 根据 ID 查询 -->
@@ -173,6 +174,12 @@
         WHERE `order`.id = #{id, jdbcType=BIGINT} and `order`.deleted_at IS NULL
     </select>
 
+    <!-- 根据 order_sn 查询订单信息 -->
+    <select id="selectByOrderSn" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE order_sn = #{orderSn, jdbcType=BIGINT} and status = 3 and deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Order">
         INSERT INTO <include refid="tableName" />
@@ -185,6 +192,7 @@
             <if test="showId != null">show_id,</if>
             <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
+            <if test="supplierOrderSn != null">supplier_order_sn,</if>
             <if test="status != null">status,</if>
             <if test="orderType != null">order_type,</if>
             <if test="platform != null">platform,</if>
@@ -209,6 +217,7 @@
             <if test="showId != null">#{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
+            <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">#{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
@@ -236,6 +245,7 @@
             <if test="showId != null">show_id = #{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
+            <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">order_type = #{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">platform = #{platform, jdbcType=TINYINT},</if>
