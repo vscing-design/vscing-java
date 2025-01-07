@@ -4,10 +4,12 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.admin.service.MovieService;
+import com.vscing.admin.service.OrderService;
 import com.vscing.admin.service.ShowService;
 import com.vscing.admin.service.TaskService;
 import com.vscing.common.api.ResultCode;
-import com.vscing.common.utils.HttpClientUtil;
+import com.vscing.common.service.supplier.SupplierService;
+import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
@@ -19,6 +21,7 @@ import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Province;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
+import com.vscing.model.http.HttpOrder;
 import com.vscing.model.mapper.CinemaMapper;
 import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;
@@ -51,6 +54,14 @@ import java.util.Map;
 @Slf4j
 @Service
 public class TaskServiceImpl implements TaskService {
+
+  private static final String ORDER_STATUS_GENERATE_SUCCESS = "GENERATE_SUCCESS";
+
+  @Autowired
+  private SupplierServiceFactory supplierServiceFactory;
+
+  @Autowired
+  private OrderService orderService;
 
   @Autowired
   private MovieService movieService;
@@ -94,17 +105,21 @@ public class TaskServiceImpl implements TaskService {
       // 准备请求参数
       Map<String, String> params = new HashMap<>();
 
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+
       // 发送请求并获取响应
-      String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou.cn/ticket/ticket_api/city/query",
-          params
-      );
+      String responseBody = supplierService.sendRequest("/city/query", params);
 
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();
 
       Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
       List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+
+      if (dataList == null) {
+        log.info("dataList is null");
+        return;
+      }
 
       // 遍历数据
       for (Map<String, Object> data : dataList) {
@@ -184,12 +199,9 @@ public class TaskServiceImpl implements TaskService {
         // 准备请求参数
         Map<String, String> params = new HashMap<>();
         params.put("cityId", String.valueOf(city.getS1CityId()));
-
+        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
         // 发送请求并获取响应
-        String responseBody = HttpClientUtil.postRequest(
-            "https://test.ot.jfshou.cn/ticket/ticket_api/cinema/query",
-            params
-        );
+        String responseBody = supplierService.sendRequest("/cinema/query", params);
 
         log.info("responseBody: {}", responseBody);
 
@@ -272,12 +284,9 @@ public class TaskServiceImpl implements TaskService {
     try {
       // 准备请求参数
       Map<String, String> params = new HashMap<>();
-
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
-      String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou.cn/ticket/ticket_api/film/query",
-          params
-      );
+      String responseBody = supplierService.sendRequest("/film/query", params);
       log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
@@ -412,11 +421,9 @@ public class TaskServiceImpl implements TaskService {
           String startTimeString = endOfDayPrecise.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
   //      params.put("time", startTimeString);
 
+          SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
           // 发送请求并获取响应
-          String responseBody = HttpClientUtil.postRequest(
-              "https://test.ot.jfshou.cn/ticket/ticket_api/show/preferential/query",
-              params
-          );
+          String responseBody = supplierService.sendRequest("/show/preferential/query", params);
 
           // 将 JSON 字符串解析为 JsonNode 对象
           log.info("responseBody: {}", responseBody);
@@ -522,7 +529,7 @@ public class TaskServiceImpl implements TaskService {
     }
   }
 
-  @Async("threadPoolTaskExecutor")
+//  @Async("threadPoolTaskExecutor")
   @Override
   public void syncPendingTicketOrder() {
     try {
@@ -534,12 +541,9 @@ public class TaskServiceImpl implements TaskService {
           // 准备请求参数
           Map<String, String> params = new HashMap<>();
           params.put("tradeNo", orderItem.getOrderSn());
-
+          SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
           // 发送请求并获取响应
-          String responseBody = HttpClientUtil.postRequest(
-              "https://test.ot.jfshou.cn/ticket/ticket_api/order/query",
-              params
-          );
+          String responseBody = supplierService.sendRequest("/order/query", params);
 
           // 将 JSON 字符串解析为 JsonNode 对象
           log.info("responseBody: {}", responseBody);
@@ -554,7 +558,20 @@ public class TaskServiceImpl implements TaskService {
             log.info("code: {}, message: {}", code, message);
             continue;
           }
-
+          Object data = responseMap.get("data");
+          if(data == null){
+            continue;
+          }
+          HttpOrder httpOrder = objectMapper.convertValue(data, HttpOrder.class);
+          if(httpOrder == null || !ORDER_STATUS_GENERATE_SUCCESS.equals(httpOrder.getOrderStatus())){
+            continue;
+          }
+          boolean res = orderService.supplierOrder(httpOrder);
+          if(res) {
+            log.info("同步出票中订单成功", httpOrder);
+          } else {
+            log.info("同步出票中订单失败", httpOrder);
+          }
         }
       }
       log.info("同步出票中订单结束");

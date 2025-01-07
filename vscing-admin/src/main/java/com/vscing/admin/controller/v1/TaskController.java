@@ -73,7 +73,7 @@ public class TaskController {
     @Operation(summary = "订单自动取消、查询测试")
     public CommonResult<Object> order() {
         // 同步待支付订单
-        taskService.syncPendingPaymentOrder();
+//        taskService.syncPendingPaymentOrder();
         // 同步出票中订单
         taskService.syncPendingTicketOrder();
         return CommonResult.success();

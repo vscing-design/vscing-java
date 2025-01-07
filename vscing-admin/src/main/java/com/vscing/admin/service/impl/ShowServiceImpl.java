@@ -6,7 +6,8 @@ import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.ShowService;
 import com.vscing.common.api.ResultCode;
 import com.vscing.common.exception.ServiceException;
-import com.vscing.common.utils.HttpClientUtil;
+import com.vscing.common.service.supplier.SupplierService;
+import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.ShowAllDto;
@@ -49,6 +50,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ShowServiceImpl implements ShowService {
+
+  @Autowired
+  private SupplierServiceFactory supplierServiceFactory;
 
   @Autowired
   private ShowMapper showMapper;
@@ -162,12 +166,9 @@ public class ShowServiceImpl implements ShowService {
       Map<String, String> params = new HashMap<>();
       params.put("showId", show.getTpShowId());
       params.put("addFlag", String.valueOf(showSeat.getAddFlag()));
-
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
-      String responseBody = HttpClientUtil.postRequest(
-          "https://test.ot.jfshou.cn/ticket/ticket_api/seat/query",
-          params
-      );
+      String responseBody = supplierService.sendRequest("/seat/submit", params);
       log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
