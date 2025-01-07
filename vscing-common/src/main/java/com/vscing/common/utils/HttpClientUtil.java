@@ -1,5 +1,6 @@
 package com.vscing.common.utils;
 
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -7,6 +8,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
 
@@ -29,12 +32,22 @@ public class HttpClientUtil {
     params.put("timestamp", String.valueOf(timestamp));
     // 秘钥
     String key = "BA19B011B243479B8A90CEA61A7286AF";
+    // 日志记录：打印请求参数
+    String jsonString1 = JSONUtil.toJsonStr(params);
+    log.info("SignatureGenerator: {}", jsonString1);
     // 生成签名
     String sign = SignatureGenerator.generateSignature(params, key);
     params.put("sign", sign);
 
+    // 判断是否需要URL编码的子段
+    if (params.containsKey("showInfor")) {
+      String encodedShowInfor = URLEncoder.encode(params.get("showInfor"), StandardCharsets.UTF_8.toString());
+      params.put("showInfor", encodedShowInfor);
+    }
+
     // 日志记录：打印请求参数
-    log.info("Request Parameters: {}", params);
+    String jsonString = JSONUtil.toJsonStr(params);
+    log.info("Request Parameters: {}", jsonString);
 
     // 构建 multipart/form-data 请求体
     MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -55,6 +68,9 @@ public class HttpClientUtil {
         throw new IOException("Unexpected code " + response);
       }
       return response.body().string();
+    } catch (Exception e) {
+      log.error("e: {}", e);
+      return "{\"code\":-530,\"message\":\"请求异常\",\"data\":null}";
     }
   }
 
