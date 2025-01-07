@@ -8,4 +8,6 @@ package com.vscing.common.service.applet;
  */
 public interface AppletService {
 
+
+
 }
