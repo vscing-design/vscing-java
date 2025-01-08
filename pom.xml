@@ -52,10 +52,14 @@
         <jackson.version>2.18.2</jackson.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <knife4j-openapi3-jakarta-spring-boot-starter.version>4.5.0</knife4j-openapi3-jakarta-spring-boot-starter.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
         <hutool.version>5.8.9</hutool.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct-plus.version>1.4.4</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
+        <alipay-sdk.version>4.40.30.ALL</alipay-sdk.version>
+        <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
+        <fastjson.version>2.0.53</fastjson.version>
     </properties>
 
     <!--  模块依赖  -->
@@ -151,6 +155,12 @@
             </dependency>
             <!-- Java工具类库 -->
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <!-- Java工具类库 -->
+            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
@@ -191,6 +201,24 @@
 <!--                <artifactId>jakarta.validation-api</artifactId>-->
 <!--                <version>${jakarta.validation.version}</version>-->
 <!--            </dependency>-->
+            <!--  支付宝小程序sdk -->
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-sdk-java</artifactId>
+                <version>${alipay-sdk.version}</version>
+            </dependency>
+            <!-- BouncyCastle Provider for PKCS#7 and CMS support -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bcprov-jdk15on.version}</version> <!-- 使用最新版本或与项目兼容的版本 -->
+            </dependency>
+            <!-- Fastjson for JSON processing -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version> <!-- 使用最新版本或与项目兼容的版本 -->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

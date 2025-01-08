@@ -103,7 +103,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.vscing.admin.VscingApiApplication</mainClass> <!-- 替换为你的主类全限定名 -->
+                    <mainClass>com.vscing.api.VscingApiApplication</mainClass> <!-- 替换为你的主类全限定名 -->
                 </configuration>
                 <executions>
                     <execution>
