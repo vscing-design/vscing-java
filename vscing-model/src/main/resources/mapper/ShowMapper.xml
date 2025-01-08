@@ -87,14 +87,14 @@
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
-            s.deleted_at IS NULL
-            AND s.stop_sell_time >= DATE_FORMAT(CURDATE(), '%Y-%m-%d 00:00:00')
-            <if test="supplierId != null">
-                AND s.supplier_id = #{supplierId}
-            </if>
             <if test="cinemaId != null">
                 AND s.cinema_id = #{cinemaId}
             </if>
+            <if test="supplierId != null">
+                AND s.supplier_id = #{supplierId}
+            </if>
+            AND s.stop_sell_time > NOW()
+            AND s.deleted_at IS NULL
         </where>
     </select>
 

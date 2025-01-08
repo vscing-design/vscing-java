@@ -18,6 +18,9 @@ public class SeatPriceMapVo {
   @Schema(description = "供货价")
   private String supplyPrice;
 
+  @Schema(description = "官方价")
+  private String officialPrice;
+
   @Schema(description = "利润")
   private String profit;
 

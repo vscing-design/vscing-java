@@ -251,6 +251,7 @@ public class ShowServiceImpl implements ShowService {
     // 遍历区域ID，填充最终结果
     List<BigDecimal> salesPrice = new ArrayList<>();
     List<BigDecimal> supplyPrice = new ArrayList<>();
+    List<BigDecimal> officialPrice = new ArrayList<>();
     List<BigDecimal> profit = new ArrayList<>();
     for (String area : seatPrice.getAreaIds()) {
       ShowArea areaPrice = areaPriceMap.get(area);
@@ -269,12 +270,14 @@ public class ShowServiceImpl implements ShowService {
       // 统计
       salesPrice.add(price);
       supplyPrice.add(userPrice);
+      officialPrice.add(showPrice);
       BigDecimal diffPrice = price.subtract(userPrice);
       profit.add(diffPrice);
     }
     // 赋值
     seatPriceMapVo.setSalesPrice(PricingUtil.formatPrices(salesPrice));
     seatPriceMapVo.setSupplyPrice(PricingUtil.formatPrices(supplyPrice));
+    seatPriceMapVo.setOfficialPrice(PricingUtil.formatPrices(officialPrice));
     seatPriceMapVo.setProfit(PricingUtil.formatPrices(profit));
 
     return seatPriceMapVo;

@@ -4,6 +4,7 @@ import com.vscing.model.dto.SeatListDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -53,6 +54,9 @@ public class OrderDetailVo {
 
   @Schema(description = "区县名称")
   private String districtName;
+
+  @Schema(description = "放映开始时间")
+  private LocalDateTime showTime;
 
   @Schema(description = "选中座位")
   private List<SeatListDto> seatList;

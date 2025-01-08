@@ -167,10 +167,12 @@
         cinema.city_id AS cityId,
         cinema.city_name AS cityName,
         cinema.district_id AS districtId,
-        cinema.district_name AS districtName
+        cinema.district_name AS districtName,
+        `show`.show_time AS showTime
         FROM <include refid="tableName" /> `order`
         LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
         LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
         WHERE `order`.id = #{id, jdbcType=BIGINT} and `order`.deleted_at IS NULL
     </select>
 
