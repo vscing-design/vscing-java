@@ -80,6 +80,9 @@ public interface AdminUserService {
    */
   boolean createdRoleList(AdminUserRolesRequest adminUserRoles);
 
-
+  /**
+   * 判断是否超级管理员
+   */
+  boolean isSuperAdmin(Long id);
 
 }

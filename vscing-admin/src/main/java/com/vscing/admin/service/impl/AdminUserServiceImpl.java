@@ -63,7 +63,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Value("${jwt.expiration}")
   private Long expiration;
 
-  @Value("${jwt.superAdminId}")
+  @Value("${app.superAdminId}")
   private Long superAdminId;
 
   @Autowired
@@ -103,7 +103,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     AdminUser entity = adminUserMapper.selectById(id);
     // 直接调用改进后的 Mapper 方法进行转换
     AdminUserDetailVo adminUser = MapstructUtils.convert(entity, AdminUserDetailVo.class);
-    if (adminUser != null && adminUser.getId().equals(superAdminId)) {
+    if (adminUser != null && this.isSuperAdmin(adminUser.getId())) {
       // 用户关联机构
       List<Organization> orgList = organizationMapper.getList(null);
       adminUser.setRelatedOrgList(orgList);
@@ -304,6 +304,11 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     return true;
+  }
+
+  @Override
+  public boolean isSuperAdmin(Long id) {
+    return id != null && id.equals(superAdminId);
   }
 
 }

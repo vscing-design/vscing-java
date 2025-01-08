@@ -213,7 +213,7 @@ public class AdminUserController {
     if(id == null) {
       return CommonResult.validateFailed("参数错误");
     }
-    if(jwtTokenUtil.isSuperAdmin(id)) {
+    if(adminUserService.isSuperAdmin(id)) {
       return CommonResult.failed("超级管理员不可删除！");
     }
     // 操作人ID

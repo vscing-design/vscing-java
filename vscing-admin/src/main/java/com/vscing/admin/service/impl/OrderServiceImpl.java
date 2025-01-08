@@ -13,6 +13,7 @@ import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
@@ -516,8 +517,6 @@ public class OrderServiceImpl implements OrderService {
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public boolean supplierOrder(HttpOrder httpOrder) {
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
     try {
       int rowsAffected = 0;
       // 根据订单号获取订单
@@ -544,9 +543,8 @@ public class OrderServiceImpl implements OrderService {
       List<OrderDetail> updateOrderDetailList = new ArrayList<>();
       for (int i = 0; i < seatInfoArray.length; i++) {
         OrderDetail updateOrderDetail = new OrderDetail();
-        String ticketCodeJson = objectMapper.writeValueAsString(ticketCodeList.get(i).getCode());
         updateOrderDetail.setTicketTips(ticketCodeList.get(i).getMachineInfo());
-        updateOrderDetail.setTicketCodeJson(ticketCodeJson);
+        updateOrderDetail.setTicketCodeJson(JsonUtils.toJsonString(ticketCodeList.get(i).getCode()));
         updateOrderDetail.setOrderId(order.getId());
         updateOrderDetail.setTpSeatName(seatInfoArray[i]);
         updateOrderDetailList.add(updateOrderDetail);
