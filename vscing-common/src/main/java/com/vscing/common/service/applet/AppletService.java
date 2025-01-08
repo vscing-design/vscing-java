@@ -8,6 +8,6 @@ package com.vscing.common.service.applet;
  */
 public interface AppletService {
 
-
+  String getPhoneNumber(String code);
 
 }
