@@ -3,7 +3,6 @@ package com.vscing.admin.service.impl;
 import com.vscing.admin.service.AddressService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.utils.MapstructUtils;
-import com.vscing.common.utils.RedisKeyConstants;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.mapper.CityMapper;
 import com.vscing.model.mapper.DistrictMapper;
@@ -42,7 +41,7 @@ public class AddressServiceImpl implements AddressService {
   @Override
   public List<ProvinceVo> getList() {
 
-    String redisKey = RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + RedisKeyConstants.KEY_SEPARATOR + "addressList";
+    String redisKey = "addressList";
 
     List<ProvinceVo> provinceList;
 

@@ -10,7 +10,6 @@ import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.utils.MapstructUtils;
-import com.vscing.common.utils.RedisKeyConstants;
 import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.dto.AdminUserListDto;
 import com.vscing.model.dto.AdminUserSaveDto;
@@ -62,6 +61,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 
   @Value("${jwt.expiration}")
   private Long expiration;
+
+  @Value("${jwt.cachePrefix}")
+  private String cachePrefix;
 
   @Value("${app.superAdminId}")
   private Long superAdminId;
@@ -162,7 +164,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       adminUser.setLoginAt(LocalDateTime.now());
 
       // 记录到redis
-      redisService.set(RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + adminUser.getId() + RedisKeyConstants.KEY_SEPARATOR + token, adminUser, expiration);
+      redisService.set(cachePrefix + adminUser.getId() + ":" + token, adminUser, expiration);
 
       AdminUserSaveDto adminUserDto = MapstructUtils.convert(adminUser, AdminUserSaveDto.class);
       // 更新表数据
@@ -176,7 +178,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Override
   public boolean logout(AdminUserDetailVo adminUser, String authToken) {
     // 删除缓存
-    String redisKey = RedisKeyConstants.CACHE_KEY_PREFIX_ADMIN + adminUser.getId() + RedisKeyConstants.KEY_SEPARATOR + authToken;
+    String redisKey = cachePrefix + adminUser.getId() + ":" + authToken;
     return redisService.del(redisKey);
   }
 

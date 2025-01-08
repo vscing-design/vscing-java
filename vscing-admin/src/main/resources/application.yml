@@ -43,6 +43,7 @@ jwt:
   tokenHeader: Authorization #JWT存储的请求头
   expiration: 604800 #JWT的超期限时间(60*60*24*1)
   tokenHead: 'Bearer '  #JWT负载中拿到开头
+  cachePrefix: 'Vscing:Admin:'
 #security:
 #  users:
 #    admin:
