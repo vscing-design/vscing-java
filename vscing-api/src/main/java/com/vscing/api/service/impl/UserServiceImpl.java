@@ -5,12 +5,15 @@ import com.vscing.api.service.UserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.service.RedisService;
+import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.entity.User;
 import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
  * @author vscing
  * @date 2025/1/6 11:48
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -35,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private RedisService redisService;
+
+  @Autowired
+  private AppletServiceFactory appletServiceFactory;
 
   @Override
   public VscingUserDetails userInfo(long id) {
@@ -55,8 +62,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public String login(UserLoginDto userLogin, HttpServletRequest request) {
-    String token = null;
-    return token;
+    String phone = null;
+    try {
+      AppletService appletService = appletServiceFactory.getAppletService(userLogin.getPlatform());
+      phone = appletService.getPhoneNumber(userLogin.getCode());
+    } catch (Exception e) {
+      log.error("", e);
+    }
+    return phone;
   }
 
 }
