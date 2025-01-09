@@ -34,6 +34,11 @@ public interface OrderService {
   OrderPriceVo getOrderPrice(OrderListDto data);
 
   /**
+   * 校验座位是否存在订单中
+   */
+  boolean verifyOrderSeat(OrderSaveRequest orderSave);
+
+  /**
    * 手动下单
   */
   boolean createOrder(OrderSaveRequest orderSave, Long by);

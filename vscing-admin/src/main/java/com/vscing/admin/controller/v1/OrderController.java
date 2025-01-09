@@ -84,6 +84,10 @@ public class OrderController {
       by = userInfo.getUserId();
     }
     try {
+      boolean is = orderService.verifyOrderSeat(orderSave);
+      if(is) {
+        return CommonResult.failed("当前选中座位已被选中");
+      }
       boolean res = orderService.createOrder(orderSave, by);
       if(res) {
         return CommonResult.success("下单成功");

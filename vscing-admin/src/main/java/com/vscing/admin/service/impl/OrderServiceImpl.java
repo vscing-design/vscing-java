@@ -171,6 +171,20 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  public boolean verifyOrderSeat(OrderSaveRequest orderSave) {
+    // 获取座位ID
+    List<String> seatIds = orderSave.getSeatList().stream()
+        // 提取seatId
+        .map(SeatListDto::getSeatId)
+        // 过滤掉null
+        .filter(Objects::nonNull)
+        // 过滤掉空字符串
+        .filter(seatId -> !seatId.trim().isEmpty())
+        .collect(Collectors.toList());
+    return orderMapper.checkOrderShowSeat(orderSave.getShowId(), seatIds);
+  }
+
+  @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public boolean createOrder(OrderSaveRequest orderSave, Long by) {
     // 获取场次ID

@@ -39,6 +39,9 @@
     <sql id="tableName">
         vscing_order
     </sql>
+    <sql id="orderDetailTableName">
+        vscing_order_detail
+    </sql>
     <sql id="userTableName">
         vscing_user
     </sql>
@@ -273,5 +276,22 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 检查是否存在已被占用的座位 -->
+    <select id="checkOrderShowSeat" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM <include refid="orderDetailTableName" /> od
+            JOIN <include refid="tableName" /> o ON od.order_id = o.id
+            WHERE
+            AND o.status IN (1, 2, 3, 4)
+            AND o.show_id = #{showId}
+            AND od.tp_seat_id IN
+            <foreach item="seatId" index="index" collection="seatIds"
+                     open="(" separator="," close=")">
+                #{seatId}
+            </foreach>
+        ) as existsOccupied
+    </select>
 
 </mapper>

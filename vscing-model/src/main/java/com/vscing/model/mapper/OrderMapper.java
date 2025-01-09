@@ -36,5 +36,7 @@ public interface OrderMapper {
   int cancelPendingPayments();
 
   List<Order> getPendingTicketOrders();
+
+  boolean checkOrderShowSeat(@Param("showId") Long showId, @Param("seatIds") List<String> seatIds);
   
 }
