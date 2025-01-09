@@ -31,36 +31,19 @@ knife4j:
 #  basic:
 #    enable: true
 #    # Basic认证用户名
-#    username: hgh
+#    username: root
 #    # Basic认证密码
-#    password: a1234567
+#    password: 1234567
 mybatis:
   configuration:
 #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
   mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
-jwt:
-  tokenHeader: Authorization #JWT存储的请求头
-  expiration: 604800 #JWT的超期限时间(60*60*24*1)
-  tokenHead: 'Bearer '  #JWT负载中拿到开头
-  cachePrefix: 'Vscing:Admin:'
 #security:
 #  users:
 #    admin:
 #      password: '{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohZdumEBJV8CciViZknxbce5eh.' # 已经用BCrypt编码过的密码
 #      roles: USER
-secure:
-  ignored:
-    enabled: false  # 安全校验开关，默认开启
-    urls:
-      - /v1/admin/login
-      - /v1/task/address
-      - /v1/task/cinema
-      - /v1/task/movie
-      - /v1/task/show
-      - /css/**
-      - /js/**
-      - /images/**
 # 启用 DEBUG 模式
 debug: false
 # 全局线程池相关配置
