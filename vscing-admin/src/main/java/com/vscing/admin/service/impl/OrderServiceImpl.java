@@ -273,6 +273,7 @@ public class OrderServiceImpl implements OrderService {
       if(userInfo == null) {
         User user = new User();
         user.setId(userId);
+        user.setSource(orderSave.getUserSource());
         user.setUsername(orderSave.getUsername());
         user.setCreatedBy(by);
         user.setPhone(orderSave.getPhone());
