@@ -539,34 +539,20 @@ public class OrderServiceImpl implements OrderService {
       if(order == null) {
         throw new ServiceException("订单数据不存在");
       }
+      // 订单取票码
+      List<HttpTicketCode> ticketCodeList = httpOrder.getTicketCode();
+      if(ticketCodeList == null || ticketCodeList.isEmpty()) {
+        throw new ServiceException("订单取票码不存在");
+      }
       // 改变订单状态
       Order updateOrder = new Order();
       updateOrder.setId(order.getId());
       updateOrder.setStatus(4);
       updateOrder.setSupplierOrderSn(httpOrder.getOrderNo());
+      updateOrder.setTicketCode(JsonUtils.toJsonString(ticketCodeList));
       rowsAffected = orderMapper.update(updateOrder);
       if (rowsAffected <= 0) {
         throw new ServiceException("改变订单状态失败");
-      }
-      // 改变订单详情信息
-      String[] seatInfoArray = httpOrder.getSeatInfos().split(",");
-      List<HttpTicketCode> ticketCodeList = httpOrder.getTicketCode();
-      if(seatInfoArray.length == 0 || ticketCodeList == null || ticketCodeList.isEmpty() || ticketCodeList.size() != seatInfoArray.length) {
-        throw new ServiceException("订单详情数据不存在");
-      }
-      // 更新数据源
-      List<OrderDetail> updateOrderDetailList = new ArrayList<>();
-      for (int i = 0; i < seatInfoArray.length; i++) {
-        OrderDetail updateOrderDetail = new OrderDetail();
-        updateOrderDetail.setTicketTips(ticketCodeList.get(i).getMachineInfo());
-        updateOrderDetail.setTicketCodeJson(JsonUtils.toJsonString(ticketCodeList.get(i).getCode()));
-        updateOrderDetail.setOrderId(order.getId());
-        updateOrderDetail.setTpSeatName(seatInfoArray[i]);
-        updateOrderDetailList.add(updateOrderDetail);
-      }
-      rowsAffected = orderDetailMapper.batchUpdateOrderDetail(updateOrderDetailList);
-      if (rowsAffected <= 0 || rowsAffected != updateOrderDetailList.size()) {
-        throw new ServiceException("改变订单详情数据失败");
       }
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());

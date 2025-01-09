@@ -529,7 +529,7 @@ public class TaskServiceImpl implements TaskService {
     }
   }
 
-//  @Async("threadPoolTaskExecutor")
+  @Async("threadPoolTaskExecutor")
   @Override
   public void syncPendingTicketOrder() {
     try {

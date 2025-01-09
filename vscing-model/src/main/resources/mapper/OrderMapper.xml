@@ -14,6 +14,7 @@
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
         <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
+        <result column="ticket_code" property="ticketCode" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="order_type" property="orderType" jdbcType="TINYINT" />
         <result column="platform" property="platform" jdbcType="TINYINT" />
@@ -198,6 +199,7 @@
             <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
             <if test="supplierOrderSn != null">supplier_order_sn,</if>
+            <if test="ticketCode != null">ticket_code,</if>
             <if test="status != null">status,</if>
             <if test="orderType != null">order_type,</if>
             <if test="platform != null">platform,</if>
@@ -223,6 +225,7 @@
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
+            <if test="ticketCode != null">#{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">#{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
@@ -251,6 +254,7 @@
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>
+            <if test="ticketCode != null">ticket_code = #{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="orderType != null">order_type = #{orderType, jdbcType=TINYINT},</if>
             <if test="platform != null">platform = #{platform, jdbcType=TINYINT},</if>
