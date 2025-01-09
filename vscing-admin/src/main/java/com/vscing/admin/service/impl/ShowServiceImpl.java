@@ -168,7 +168,7 @@ public class ShowServiceImpl implements ShowService {
       params.put("addFlag", String.valueOf(showSeat.getAddFlag()));
       SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
-      String responseBody = supplierService.sendRequest("/seat/submit", params);
+      String responseBody = supplierService.sendRequest("/seat/query", params);
       log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
