@@ -283,8 +283,7 @@
             SELECT 1
             FROM <include refid="orderDetailTableName" /> od
             JOIN <include refid="tableName" /> o ON od.order_id = o.id
-            WHERE
-            AND o.status IN (1, 2, 3, 4)
+            WHERE o.status IN (1, 2, 3, 4)
             AND o.show_id = #{showId}
             AND od.tp_seat_id IN
             <foreach item="seatId" index="index" collection="seatIds"
