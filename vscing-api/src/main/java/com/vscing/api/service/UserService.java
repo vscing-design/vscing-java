@@ -28,4 +28,14 @@ public interface UserService {
   */
   String login(UserLoginDto userLogin, HttpServletRequest request);
 
+  /**
+   * 用户手机号
+  */
+  boolean userPhone(UserLoginDto userLogin, UserDetailVo userData, String authToken);
+
+  /**
+   * 退出登陆
+  */
+  boolean logout(UserDetailVo user, String authToken);
+
 }

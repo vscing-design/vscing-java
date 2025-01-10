@@ -77,7 +77,7 @@ public class AppletServiceImpl implements AppletService {
       JsonNode jsonNode = objectMapper.readTree(response);
       // 检查是否有错误信息
       if (!jsonNode.has("access_token")) {
-        throw new HttpException("WeChat API returned an error: " + jsonNode.toPrettyString());
+        throw new HttpException("getStableAccessToken 缺少access_token: " + jsonNode.toPrettyString());
       }
       // 提取 access_token 和过期时间
       String accessToken = jsonNode.path("access_token").asText();
@@ -86,17 +86,16 @@ public class AppletServiceImpl implements AppletService {
       if (StringUtils.isNotBlank(accessToken) && expiresIn > 0) {
         // 设置到 Redis 并返回 access_token
         redisService.set(getKey(), accessToken, expiresIn);
-        log.info("Stable access token refreshed successfully.");
+        log.info("getStableAccessToken 调用成功");
         return accessToken;
       } else {
-        throw new HttpException("Failed to get stable access_token or invalid expires_in value: " + jsonNode.toPrettyString());
+        throw new HttpException("getStableAccessToken access_token 或 expires_in 值错误: " + jsonNode.toPrettyString());
       }
     } catch (IOException e) {
-      log.error("Error during HTTP request for stable access token.", e);
-      throw new HttpException("Error refreshing stable access token: " + e.getMessage(), e);
+      throw new HttpException("getStableAccessToken 微信API调用异常: " + e.getMessage(), e);
     } catch (Exception e) {
-      log.error("Unexpected error while refreshing stable access token.", e);
-      throw new HttpException("Unexpected error refreshing stable access token: " + e.getMessage(), e);
+      log.error("getStableAccessToken 方法异常", e);
+      throw new HttpException("getStableAccessToken 方法异常: " + e.getMessage(), e);
     }
   }
 
@@ -114,7 +113,7 @@ public class AppletServiceImpl implements AppletService {
       JsonNode jsonNode = objectMapper.readTree(response);
       // 检查是否有错误信息
       if (!jsonNode.has("access_token")) {
-        throw new HttpException("WeChat API returned an error: " + jsonNode.toPrettyString());
+        throw new HttpException("getAccessToken 缺少access_token: " + jsonNode.toPrettyString());
       }
       // 提取 access_token 和过期时间
       String accessToken = jsonNode.path("access_token").asText();
@@ -123,17 +122,16 @@ public class AppletServiceImpl implements AppletService {
       if (StringUtils.isNotBlank(accessToken) && expiresIn > 0) {
         // 设置到 Redis 并返回 access_token
         redisService.set(getKey(), accessToken, expiresIn);
-        log.info("Stable access token refreshed successfully.");
+        log.info("getAccessToken 调用成功");
         return accessToken;
       } else {
-        throw new HttpException("Failed to get stable access_token or invalid expires_in value: " + jsonNode.toPrettyString());
+        throw new HttpException("getAccessToken access_token 或 expires_in 值错误: " + jsonNode.toPrettyString());
       }
     } catch (IOException e) {
-      log.error("Error during HTTP request for stable access token.", e);
-      throw new HttpException("Error refreshing stable access token: " + e.getMessage(), e);
+      throw new HttpException("getAccessToken 微信API调用异常: " + e.getMessage(), e);
     } catch (Exception e) {
-      log.error("Unexpected error while refreshing stable access token.", e);
-      throw new HttpException("Unexpected error refreshing stable access token: " + e.getMessage(), e);
+      log.error("getAccessToken 方法异常", e);
+      throw new HttpException("getAccessToken 方法异常: " + e.getMessage(), e);
     }
   }
 
@@ -148,12 +146,13 @@ public class AppletServiceImpl implements AppletService {
       );
       // 发送 POST 请求并获取响应
       String response = okHttpService.doPostJson(WECHAT_BASH_URL + "/wxa/business/getuserphonenumber?access_token=" + token, JsonUtils.toJsonString(params), null);
+      log.info("微信获取手机号调用结果: " , response);
       // 将响应字符串解析为 JSON 对象
       ObjectMapper objectMapper = JsonUtils.getObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(response);
       // 检查是否有错误信息
       if (jsonNode.has("errcode") && jsonNode.get("errcode").asInt() != 0) {
-        throw new HttpException("WeChat API returned an error: " + jsonNode.toPrettyString());
+        throw new HttpException("微信获取手机号失败: " + jsonNode.toPrettyString());
       }
       // 导航到 phone_info 节点并获取 purePhoneNumber
       JsonNode phoneInfoNode = jsonNode.path("phone_info");
@@ -162,17 +161,45 @@ public class AppletServiceImpl implements AppletService {
         if (purePhoneNumber != null && !purePhoneNumber.isEmpty()) {
           return purePhoneNumber;
         } else {
-          throw new RuntimeException("未找到有效的 purePhoneNumber");
+          throw new RuntimeException("微信获取手机号未找到有效的 purePhoneNumber");
         }
       } else {
-        throw new RuntimeException("未找到 phone_info 节点");
+        throw new RuntimeException("微信获取手机号未找到 phone_info 节点");
       }
     } catch (IOException e) {
-      log.error("Error during HTTP request for stable access token.", e);
-      throw new HttpException("Error refreshing stable access token: " + e.getMessage(), e);
+      throw new HttpException("微信获取手机号API调用异常: " + e.getMessage(), e);
     } catch (Exception e) {
-      log.error("Unexpected error while refreshing stable access token.", e);
-      throw new HttpException("Unexpected error refreshing stable access token: " + e.getMessage(), e);
+      log.error("微信获取手机号方法异常", e);
+      throw new HttpException("微信获取手机号方法异常: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public JsonNode getOpenid(String code) {
+    try {
+      // 组装请求参数
+      Map<String, String> params = Map.of(
+          "appid", appletProperties.getAppId(),
+          "secret", appletProperties.getAppSecret(),
+          "js_code", code,
+          "grant_type", "authorization_code"
+      );
+      // 发送 GET 请求并获取响应
+      String response = okHttpService.doGet(WECHAT_BASH_URL + "/sns/jscode2session", params, null);
+      log.info("微信获取openidAPI调用结果: " , response);
+      // 将响应字符串解析为 JSON 对象
+      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(response);
+      // 检查是否有错误信息
+      if (jsonNode.has("errcode") && jsonNode.get("errcode").asInt() != 0) {
+        throw new HttpException("微信获取openid失败: " + jsonNode.toPrettyString());
+      }
+      return jsonNode;
+    } catch (IOException e) {
+      throw new HttpException("微信获取openidAPI调用异常: " + e.getMessage(), e);
+    } catch (Exception e) {
+      log.error("微信获取openid方法异常", e);
+      throw new HttpException("微信获取openid方法异常: " + e.getMessage(), e);
     }
   }
 

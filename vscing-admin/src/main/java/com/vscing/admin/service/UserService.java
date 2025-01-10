@@ -23,10 +23,6 @@ public interface UserService {
      */
     long created(User user);
 
-    /**
-     * 编辑
-     */
-    long updated(User data);
 
     /**
      * 删除

@@ -5,11 +5,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.parser.Feature;
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipaySystemOauthTokenRequest;
+import com.alipay.api.response.AlipaySystemOauthTokenResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.service.OkHttpService;
 import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -151,6 +159,36 @@ public class AppletServiceImpl implements AppletService {
     } catch (Exception e) {
       log.error("Unexpected error while refreshing stable access token.", e);
       throw new HttpException("Unexpected error refreshing stable access token: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public JsonNode getOpenid(String code) {
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();
+      // 设置授权码
+      request.setCode(code);
+      // 设置授权方式
+      request.setGrantType("authorization_code");
+      // 发起请求
+      AlipaySystemOauthTokenResponse response = alipayClient.execute(request);
+      log.info("支付宝获取openid调用结果: " , response);
+      if (response.isSuccess()) {
+        // 将响应字符串解析为 JSON 对象
+        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(response.getBody());
+        return jsonNode;
+      } else {
+        // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝获取openid失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      log.error("支付宝获取openid方法异常", e);
+      throw new HttpException("支付宝获取openid方法异常: " + e.getMessage(), e);
     }
   }
 

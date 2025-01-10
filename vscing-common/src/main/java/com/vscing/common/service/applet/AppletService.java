@@ -1,5 +1,7 @@
 package com.vscing.common.service.applet;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * AppletService
  * 小程序封装
@@ -8,6 +10,14 @@ package com.vscing.common.service.applet;
  */
 public interface AppletService {
 
+  /**
+   * 获取openid
+  */
+  JsonNode getOpenid(String code);
+
+  /**
+   * 获取手机号
+  */
   String getPhoneNumber(String code);
 
 }

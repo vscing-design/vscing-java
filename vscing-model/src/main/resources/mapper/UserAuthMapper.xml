@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.UserAuthMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.UserAuth">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="platform" property="platform" jdbcType="TINYINT" />
+        <result column="uuid" property="uuid" jdbcType="VARCHAR" />
+        <result column="openid" property="openid" jdbcType="VARCHAR" />
+        <result column="last_ip" property="lastIp" jdbcType="VARCHAR" />
+        <result column="login_at" property="loginAt" jdbcType="TIMESTAMP" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_user_auth
+    </sql>
+    <sql id="userTableName">
+        vscing_user
+    </sql>
+
+    <!-- 根据 openid、uuid 查询用户id -->
+    <select id="selectUserIdByOpenidAndUuid" resultMap="BaseResultMap">
+        SELECT id, user_id FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="platform != null">
+                AND platform = #{platform}
+            </if>
+            <if test="openid != null">
+                AND openid = #{openid}
+            </if>
+            <if test="uuid != null">
+                AND uuid = #{uuid}
+            </if>
+        </where>
+    </select>
+
+    <!-- 更新用户登陆信息 -->
+    <update id="updateLoginInfoById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="lastIp != null">
+                last_ip = #{lastIp},
+            </if>
+            <if test="loginAt != null">
+                login_at = #{loginAt},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.UserAuth">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="platform != null">platform,</if>
+            <if test="uuid != null">uuid,</if>
+            <if test="openid != null">openid,</if>
+            <if test="lastIp != null">last_ip,</if>
+            <if test="loginAt != null">login_at,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
+            <if test="uuid != null">#{uuid, jdbcType=VARCHAR},</if>
+            <if test="openid != null">#{openid, jdbcType=VARCHAR},</if>
+            <if test="lastIp != null">#{lastIp, jdbcType=VARCHAR},</if>
+            <if test="loginAt != null">#{loginAt, jdbcType=TIMESTAMP},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新关联用户ID -->
+    <update id="updateUserId" parameterType="map">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="newUserId != null">
+                user_id = #{newUserId}
+            </if>
+        </set>
+        WHERE user_id = #{oldUserId} AND deleted_at IS NULL
+    </update>
+
+</mapper>

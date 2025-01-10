@@ -25,12 +25,22 @@ public class User extends BaseEntity {
     @Schema(description = "用户密码")
     private String password;
 
+    @Schema(description = "昵称")
+    private String nickname;
+
+    @Schema(description = "用户头像")
+    private String avatar;
+
     @Schema(description = "用户手机号")
     private String phone;
 
     @Schema(description = "用户星级")
     private Integer star;
 
-    @Schema(description = "openid")
-    private String openid;
+    @Schema(description = "用户状态  1正常 2禁用")
+    private Integer status;
+
+    @Schema(description = "备注")
+    private String notes;
+
 }

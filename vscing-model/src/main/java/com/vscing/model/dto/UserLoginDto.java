@@ -18,7 +18,7 @@ public class UserLoginDto {
   private String platform;
 
   @NotNull(message = "code不能为空")
-  @Schema(description = "凭证code")
+  @Schema(description = "login的code")
   private String code;
 
 }

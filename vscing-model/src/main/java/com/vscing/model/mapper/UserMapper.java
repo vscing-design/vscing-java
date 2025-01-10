@@ -23,7 +23,7 @@ public interface UserMapper {
 
     int insert(User record);
 
-    int update(User record);
+    int updatePhone(User record);
 
     int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 

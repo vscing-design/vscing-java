@@ -4,10 +4,8 @@ import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.UserService;
 import com.vscing.common.service.RedisService;
-import com.vscing.model.dto.SupplierListDto;
 import com.vscing.model.dto.UserListDto;
 import com.vscing.model.entity.User;
-import com.vscing.model.mapper.SupplierMapper;
 import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.vo.UserListVo;
 import lombok.extern.slf4j.Slf4j;
@@ -41,11 +39,6 @@ public class UserServiceImpl implements UserService {
     public long created(User user) {
         user.setId(IdUtil.getSnowflakeNextId());
         return userMapper.insert(user);
-    }
-
-    @Override
-    public long updated(User user) {
-        return userMapper.update(user);
     }
 
     @Override
