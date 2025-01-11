@@ -83,7 +83,7 @@ public class OrderVo {
     private String hallName;
 
     @Schema(description = "订单号")
-    private String orderSn
+    private String orderSn;
 
     @Schema(description = "三方订单号")
     private String supplierOrderSn;

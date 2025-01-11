@@ -1,6 +1,7 @@
 package com.vscing.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.po.impl.AdminUserDetailsImpl;
@@ -42,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,21 +123,33 @@ public class AdminUserServiceImpl implements AdminUserService {
     } else if (adminUser != null) {
       // 用户关联机构
       List<Organization> orgList = organizationMapper.getOrganizationsByUserId(adminUser.getId());
+      orgList = CollectionUtil.isEmpty(orgList) ? Collections.emptyList()
+          : orgList;
       adminUser.setRelatedOrgList(orgList);
       // 用户关联角色
       List<Role> roleList = roleMapper.getRolesByAdminUserId(adminUser.getId());
+      roleList = CollectionUtil.isEmpty(roleList) ? Collections.emptyList()
+          : roleList;
       adminUser.setRelatedRoleList(roleList);
       // 用户关联菜单（基于角色ID）
       if (!roleList.isEmpty()) {
         List<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toList());
-        List<Menu> menuList = menuMapper.getMenusByRoleIds(roleIds);
-        adminUser.setRelatedMenuList(menuList);
+        if (roleIds != null) {
+          List<Menu> menuList = menuMapper.getMenusByRoleIds(roleIds);
+          menuList = CollectionUtil.isEmpty(menuList) ? Collections.emptyList()
+              : menuList;
+          adminUser.setRelatedMenuList(menuList);
+        }
       }
       // 用户关联菜单（基于角色ID）
       if (!roleList.isEmpty()) {
         List<Long> roleIds = roleList.stream().map(Role::getId).collect(Collectors.toList());
-        List<Permission> permissionList = permissionMapper.getPermissionsByRoleIds(roleIds);
-        adminUser.setRelatedPermissionList(permissionList);
+        if (roleIds != null) {
+          List<Permission> permissionList = permissionMapper.getPermissionsByRoleIds(roleIds);
+          permissionList = CollectionUtil.isEmpty(permissionList) ? Collections.emptyList()
+              : permissionList;
+          adminUser.setRelatedPermissionList(permissionList);
+        }
       }
     }
 

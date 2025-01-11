@@ -28,7 +28,7 @@ public interface MenuMapper {
 
   List<Menu> getMenusByRoleId(long id);
 
-  List<Menu> getMenusByRoleIds(List<Long> ids);
+  List<Menu> getMenusByRoleIds(List<Long> roleIds);
 
   int deleteMenusByRoleId(long id);
 

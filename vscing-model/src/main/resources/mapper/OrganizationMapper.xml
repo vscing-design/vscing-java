@@ -96,11 +96,11 @@
     </update>
 
     <!-- 根据 用户ID 查询关联信息 -->
-    <select id="getOrganizationsByUserId" parameterType="long" resultMap="BaseResultMap">
+    <select id="getOrganizationsByUserId" parameterType="Long" resultMap="BaseResultMap">
         SELECT o.*
         FROM <include refid="tableName" /> o
         INNER JOIN <include refid="adminUserOrganizationTableName" /> uo ON o.id = uo.organization_id
-        WHERE ur.admin_user_id = #{id, jdbcType=BIGINT}
+        WHERE uo.admin_user_id = #{id, jdbcType=BIGINT}
     </select>
 
     <!-- 根据 用户ID列表 查询关联信息 -->

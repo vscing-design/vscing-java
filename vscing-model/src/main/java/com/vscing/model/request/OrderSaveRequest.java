@@ -21,7 +21,7 @@ public class OrderSaveRequest {
   @Schema(description = "用户来源 1 微信小程序 2 支付宝小程序 3 淘宝 4 咸鱼 5 拼多多 6 微信")
   private Integer userSource;
 
-  @NotNull(message = "用户信息不能为空")
+//  @NotNull(message = "用户信息不能为空")
   @Schema(description = "用户信息")
   private String username;
 

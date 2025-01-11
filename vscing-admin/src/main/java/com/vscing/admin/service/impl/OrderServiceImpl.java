@@ -274,7 +274,12 @@ public class OrderServiceImpl implements OrderService {
         User user = new User();
         user.setId(userId);
         user.setSource(orderSave.getUserSource());
-        user.setUsername(orderSave.getUsername());
+        String username = orderSave.getUsername();
+        if (username == null || username.trim().isEmpty()) {
+          // 如果用户名为空或仅包含空白字符，则生成随机昵称
+          username = "HY_" + RandomUtil.randomString(8);
+        }
+        user.setUsername(username);
         user.setCreatedBy(by);
         user.setPhone(orderSave.getPhone());
         rowsAffected = userMapper.insert(user);
@@ -438,6 +443,8 @@ public class OrderServiceImpl implements OrderService {
           .collect(Collectors.joining(","));
       order.setSeatInfo(seatInfoStr);
       order.setUpdatedBy(by);
+      // 调座
+      order.setIsAdjusted(1);
       // 开始创建
       rowsAffected = orderMapper.update(order);
       if (rowsAffected <= 0) {

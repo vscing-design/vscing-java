@@ -28,7 +28,7 @@ public interface PermissionMapper {
 
   List<Permission> getPermissionsByRoleId(long id);
 
-  List<Permission> getPermissionsByRoleIds(List<Long> ids);
+  List<Permission> getPermissionsByRoleIds(List<Long> roleIds);
 
   int deletePermissionsByRoleId(long id);
 
