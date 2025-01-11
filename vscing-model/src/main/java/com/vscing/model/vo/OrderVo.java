@@ -83,7 +83,17 @@ public class OrderVo {
     private String hallName;
 
     @Schema(description = "订单号")
-    private String orderSn;
+    private String orderSn
+
+    @Schema(description = "三方订单号")
+    private String supplierOrderSn;
+
+    @Schema(description = "取票码JSON数组，每组code数组的value以｜分隔组成二维码。需生成取票二维码的话，请按以下方式生成：\n" +
+        "①序列号|取票码|验证码  \n" +
+        "②取票码|验证码\n" +
+        "③取票码\n" +
+        "④验证码\n")
+    private String ticketCode;
 
     @Schema(description = "订单状态 1 待付款 2 待出票 3 出票中 4 已出票 5 已取消 6 退款中 7 退款完成")
     private Integer status;
