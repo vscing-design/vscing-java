@@ -62,6 +62,15 @@
             <if test="cinemaId != null">
                 AND s.cinema_id = #{cinemaId}
             </if>
+            <if test="provinceId != null">
+                AND c.province_id = #{provinceId}
+            </if>
+            <if test="cityId != null">
+                AND c.city_id = #{cityId}
+            </if>
+            <if test="districtId != null">
+                AND c.district_id = #{districtId}
+            </if>
             <if test="cinemaName != null">
                 AND c.name LIKE CONCAT('%', #{cinemaName}, '%')
             </if>
