@@ -29,7 +29,16 @@
         vscing_district
     </sql>
 
-    <!-- 查询用户列表 -->
+    <!-- 查询全部列表 -->
+    <select id="getAllList" resultMap="BaseResultMap">
+        SELECT id, city_id, `name`, first_letter FROM <include refid="tableName" />
+        <where>
+            s1_city_id IS NOT NULL
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 查询列表 -->
     <select id="getList" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
         <where>

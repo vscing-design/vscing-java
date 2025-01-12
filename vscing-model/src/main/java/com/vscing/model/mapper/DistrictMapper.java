@@ -30,6 +30,8 @@ public interface DistrictMapper {
   @Update("UPDATE vscing_district SET s1_region_id = #{regionId} WHERE id = #{id}")
   void updateRegion(@Param("id") Long id, @Param("regionId") Long regionId);
 
+  List<District> getAllList();
+
   List<District> getList(@Param("record") AddressListDto record);
 
   District selectById(long id);

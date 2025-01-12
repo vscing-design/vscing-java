@@ -24,6 +24,8 @@ public interface CityMapper {
   @Update("UPDATE vscing_city SET s1_city_id = #{cityId} WHERE id = #{id}")
   void updateCityId(@Param("id") Long id, @Param("cityId") Long cityId);
 
+  List<City> getAllList();
+
   List<City> getList(@Param("record") AddressListDto record);
 
   City selectById(long id);
