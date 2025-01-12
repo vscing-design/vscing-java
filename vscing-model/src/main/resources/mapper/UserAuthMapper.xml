@@ -63,6 +63,7 @@
         INSERT INTO <include refid="tableName" />
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
             <if test="platform != null">platform,</if>
             <if test="uuid != null">uuid,</if>
             <if test="openid != null">openid,</if>
@@ -73,6 +74,7 @@
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
             <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
             <if test="uuid != null">#{uuid, jdbcType=VARCHAR},</if>
             <if test="openid != null">#{openid, jdbcType=VARCHAR},</if>

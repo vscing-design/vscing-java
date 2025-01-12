@@ -134,9 +134,9 @@ public class UserServiceImpl implements UserService {
 
   @Transactional(rollbackFor = Exception.class)
   public Long createUserAndAuth(Integer platform, String openid, String uuid, String loginIp) {
+    Long userId = IdUtil.getSnowflakeNextId();
     try {
       User user = new User();
-      Long userId = IdUtil.getSnowflakeNextId();
       user.setId(userId);
       user.setSource(platform);
       user.setUsername("HY_" + RandomUtil.randomString(8));
@@ -169,24 +169,26 @@ public class UserServiceImpl implements UserService {
     try {
       AppletService appletService = appletServiceFactory.getAppletService(userLogin.getPlatform());
       String phone = appletService.getPhoneNumber(userLogin.getCode());
-      User userData = userMapper.selectByPhone(phone);
+      User newUserData = userMapper.selectByPhone(phone);
       // 如果手机号用户存在并且是当前用户，不做任何操作，返回成功
-      if(userData != null && userData.getId().equals(oldUserData.getId())) {
+      if(newUserData != null && newUserData.getId().equals(oldUserData.getId())) {
         return true;
       }
       // 如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id
-      if(userData != null && !userData.getId().equals(oldUserData.getId())) {
-        boolean res = this.changeUser(userData.getId(), oldUserData.getId());
+      if(newUserData != null && !newUserData.getId().equals(oldUserData.getId())) {
+        boolean res = this.changeUser(newUserData.getId(), oldUserData.getId());
         if(res) {
           this.logout(oldUserData, authToken);
         }
         return res;
       }
       // 如果手机号用户不存在
-      if(userData == null) {
-        userData.setPhone(phone);
-        userData.setUpdatedBy(userData.getId());
-        int rowsAffected = userMapper.updatePhone(userData);
+      if(newUserData == null) {
+        User updateUser = new User();
+        updateUser.setId(oldUserData.getId());
+        updateUser.setPhone(phone);
+        updateUser.setUpdatedBy(oldUserData.getId());
+        int rowsAffected = userMapper.updatePhone(updateUser);
         if (rowsAffected <= 0) {
           throw new ServiceException("用户授权手机号失败");
         } else {

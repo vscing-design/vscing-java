@@ -96,7 +96,6 @@ public class TaskServiceImpl implements TaskService {
   @Autowired
   private ShowMapper showMapper;
 
-
   @Async("threadPoolTaskExecutor")
   @Override
   public void syncAddress() {

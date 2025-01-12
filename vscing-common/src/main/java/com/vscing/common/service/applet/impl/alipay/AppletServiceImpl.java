@@ -174,7 +174,7 @@ public class AppletServiceImpl implements AppletService {
       // 设置授权方式
       request.setGrantType("authorization_code");
       // 发起请求
-      AlipaySystemOauthTokenResponse response = alipayClient.execute(request);
+      AlipaySystemOauthTokenResponse response = alipayClient.certificateExecute(request);
       log.info("支付宝获取openid调用结果: " , response);
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象
