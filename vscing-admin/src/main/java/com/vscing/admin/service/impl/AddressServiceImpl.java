@@ -1,7 +1,9 @@
 package com.vscing.admin.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.vscing.admin.service.AddressService;
 import com.vscing.common.service.RedisService;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.mapper.CityMapper;
@@ -26,6 +28,8 @@ import java.util.Optional;
 @Service
 public class AddressServiceImpl implements AddressService {
 
+  private static final String REDIS_KEY = "addressList";
+
   @Autowired
   private ProvinceMapper provinceMapper;
 
@@ -45,9 +49,10 @@ public class AddressServiceImpl implements AddressService {
 
     List<ProvinceVo> provinceList;
 
-    // redisService.hasKey(redisKey)
-    if(false) {
-      provinceList = (List<ProvinceVo>) redisService.get(redisKey);
+    if(redisService.hasKey(redisKey)) {
+      // 使用自定义工具类
+      String redisValue = (String) redisService.get(redisKey);
+      provinceList = JsonUtils.parseObject(redisValue, new TypeReference<List<ProvinceVo>>() {});
     } else {
       provinceList = Optional.ofNullable(provinceMapper.getList(new AddressListDto()))
           .orElse(Collections.emptyList())
@@ -79,7 +84,8 @@ public class AddressServiceImpl implements AddressService {
             .toList());
       }
 
-//      redisService.set(redisKey, provinceList);
+      // 以字符串形式存入
+      redisService.set(redisKey, JsonUtils.toJsonString(provinceList));
     }
 
     return provinceList;
