@@ -33,6 +33,7 @@ import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,9 @@ import java.util.Map;
 public class TaskServiceImpl implements TaskService {
 
   private static final String ORDER_STATUS_GENERATE_SUCCESS = "GENERATE_SUCCESS";
+
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
@@ -95,6 +99,48 @@ public class TaskServiceImpl implements TaskService {
 
   @Autowired
   private ShowMapper showMapper;
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncTable() {
+    // 日期
+    String dateSuffix = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+    // 新增扩展表
+    String showTableName = "vscing_show_" + dateSuffix;
+    String showAreaTableName = "vscing_show_area_" + dateSuffix;
+
+    String createShowTableSQL = String.format(
+        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show",
+        showTableName
+    );
+    String createShowAreaTableSQL = String.format(
+        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show_area",
+        showAreaTableName
+    );
+
+    jdbcTemplate.execute(createShowTableSQL);
+    jdbcTemplate.execute(createShowAreaTableSQL);
+
+    // 迁移数据
+    String migrateShowSQL = String.format(
+        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+        showTableName
+    );
+    jdbcTemplate.update(migrateShowSQL);
+
+    String migrateShowAreaSQL = String.format(
+        "INSERT INTO %s SELECT * FROM vscing_show_area WHERE show_id IN " +
+            "(SELECT id FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY))",
+        showAreaTableName
+    );
+    jdbcTemplate.update(migrateShowAreaSQL);
+
+    // 删除已迁移的数据，确保事务一致性
+    jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
+        "(SELECT id FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY))");
+    jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
+  }
 
   @Async("threadPoolTaskExecutor")
   @Override
@@ -578,5 +624,7 @@ public class TaskServiceImpl implements TaskService {
       log.error("同步出票中订单失败", e);
     }
   }
+
+
 
 }

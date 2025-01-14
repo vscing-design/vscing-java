@@ -4,6 +4,7 @@ import com.vscing.admin.service.TaskService;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 */
 @Component
 public class ScheduledTasks {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private TaskService taskService;
@@ -32,11 +36,12 @@ public class ScheduledTasks {
         taskService.syncShow();
     }
 
-    @Scheduled(cron = "0 0 3 * * ?") // 每天凌晨3点执行场次清空
+    @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点执行场次清空
     public void truncateTableTask() {
         System.out.println("执行定时任务 每天凌晨3点执行场次清空：" + LocalDateTime.now());
 //        showMapper.truncateTable();
 //        showAreaMapper.truncateTable();
+        taskService.syncTable();
     }
 
     @Scheduled(cron = "0 0 22 ? * 5") // 每周5晚上10点同步影院

@@ -41,6 +41,13 @@ public class TaskController {
         return CommonResult.success(result);
     }
 
+    @GetMapping("/showTable")
+    @Operation(summary = "拆分数据库测试")
+    public CommonResult<Object> showTable() {
+        taskService.syncTable();
+        return CommonResult.success();
+    }
+
     @GetMapping("/address")
     @Operation(summary = "同步地址库测试")
     public CommonResult<Object> address() {

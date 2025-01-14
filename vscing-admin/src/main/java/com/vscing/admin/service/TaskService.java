@@ -8,6 +8,8 @@ package com.vscing.admin.service;
  */
 public interface TaskService {
 
+  void syncTable();
+
   void syncAddress();
 
   void syncCinema();
