@@ -29,8 +29,7 @@ import com.vscing.model.vo.AdminUserDetailVo;
 import com.vscing.model.vo.AdminUserListVo;
 import com.vscing.model.vo.AdminUserOrganizationVo;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -55,11 +54,9 @@ import java.util.stream.Collectors;
  * @author vscing
  * @date 2024/12/14 21:08
  */
-
+@Slf4j
 @Service
 public class AdminUserServiceImpl implements AdminUserService {
-
-  private static final Logger logger = LoggerFactory.getLogger(AdminUserServiceImpl.class);
 
   @Value("${jwt.expiration}")
   private Long expiration;
@@ -184,7 +181,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       // 更新表数据
       adminUserMapper.update(adminUserDto);
     } catch (AuthenticationException e) {
-      logger.warn("登录异常:{}", e.getMessage());
+      log.warn("登录异常:{}", e.getMessage());
     }
     return token;
   }
