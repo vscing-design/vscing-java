@@ -146,10 +146,8 @@
 
     <!-- 定时更新待支付订单状态 -->
     <update id="cancelPendingPayments">
-        UPDATE <include refid="tableName" />
-        SET status = 5, -- 已取消状态
-        WHERE status = 1 -- 待支付状态
-        AND DATE_ADD(created_at, INTERVAL 10 MINUTE) &lt; CURRENT_TIMESTAMP;
+        UPDATE <include refid="tableName" /> SET status = 5
+        WHERE status = 1 AND DATE_ADD(created_at, INTERVAL 10 MINUTE) &lt; CURRENT_TIMESTAMP;
     </update>
 
     <!-- 查询待出票订单列表 -->
