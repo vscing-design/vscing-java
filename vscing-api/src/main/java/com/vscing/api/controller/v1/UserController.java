@@ -91,7 +91,7 @@ public class UserController {
     // 授权手机号
     String phone = userService.userPhone(userLogin, userData, authToken);
     if (phone != null && !phone.isEmpty()) {
-      return CommonResult.success("授权成功");
+      return CommonResult.success("授权成功", phone);
     } else {
       return CommonResult.failed("授权失败");
     }
