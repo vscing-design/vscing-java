@@ -1,5 +1,6 @@
 package com.vscing.auth.component;
 
+import com.vscing.auth.config.SecurityProperties;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.service.VscingUserDetailsService;
 import com.vscing.auth.util.JwtTokenUtil;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * JwtValidationFilter
@@ -45,12 +47,17 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
   @Autowired
   private RedisService redisService;
 
+  @Autowired
+  private SecurityProperties securityProperties;
+
   @Override
   protected void doFilterInternal(HttpServletRequest request,
                                   HttpServletResponse response,
                                   FilterChain chain) throws ServletException, IOException {
+    List<String> unprotectedUrls = securityProperties.getUrls();
     String authHeader = request.getHeader(this.tokenHeader);
-    if (authHeader != null && authHeader.startsWith(this.tokenHead)) {
+    // 如果请求路径在白名单中，则直接放行。其它请求路径需要校验。
+    if (!unprotectedUrls.contains(request.getRequestURI()) && authHeader != null && authHeader.startsWith(this.tokenHead)) {
       String authToken = authHeader.substring(this.tokenHead.length());
       Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
       log.info("checking userId:{}", userId);
