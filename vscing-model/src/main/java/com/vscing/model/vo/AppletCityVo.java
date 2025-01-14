@@ -24,4 +24,13 @@ public class AppletCityVo {
   @Schema(description = "名称首字母")
   private String firstLetter;
 
+  @Schema(description = "城市热度值")
+  private Integer hot;
+
+  @Schema(description = "城市经度")
+  private Double lng;
+
+  @Schema(description = "城市维度")
+  private Double lat;
+
 }

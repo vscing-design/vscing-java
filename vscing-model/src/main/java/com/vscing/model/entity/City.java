@@ -48,4 +48,7 @@ public class City extends BaseEntity {
   @Schema(description = "城市维度")
   private Double lat;
 
+  @Schema(description = "城市热度值")
+  private Integer hot;
+
 }
