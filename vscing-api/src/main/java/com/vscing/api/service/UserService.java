@@ -31,7 +31,7 @@ public interface UserService {
   /**
    * 用户手机号
   */
-  boolean userPhone(UserLoginDto userLogin, UserDetailVo userData, String authToken);
+  String userPhone(UserLoginDto userLogin, UserDetailVo userData, String authToken);
 
   /**
    * 退出登陆

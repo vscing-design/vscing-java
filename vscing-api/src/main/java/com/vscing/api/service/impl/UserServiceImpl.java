@@ -165,25 +165,22 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean userPhone(UserLoginDto userLogin, UserDetailVo oldUserData, String authToken) {
+  public String userPhone(UserLoginDto userLogin, UserDetailVo oldUserData, String authToken) {
     try {
       AppletService appletService = appletServiceFactory.getAppletService(userLogin.getPlatform());
       String phone = appletService.getPhoneNumber(userLogin.getCode());
       User newUserData = userMapper.selectByPhone(phone);
-      // 如果手机号用户存在并且是当前用户，不做任何操作，返回成功
-      if(newUserData != null && newUserData.getId().equals(oldUserData.getId())) {
-        return true;
-      }
-      // 如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id
-      if(newUserData != null && !newUserData.getId().equals(oldUserData.getId())) {
+
+      if (newUserData != null && !newUserData.getId().equals(oldUserData.getId())) {
+        // 如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id
         boolean res = this.changeUser(newUserData.getId(), oldUserData.getId());
         if(res) {
           this.logout(oldUserData, authToken);
+        } else {
+          throw new ServiceException("如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id 失败");
         }
-        return res;
-      }
-      // 如果手机号用户不存在
-      if(newUserData == null) {
+      } else if (newUserData == null) {
+        // 如果手机号用户不存在
         User updateUser = new User();
         updateUser.setId(oldUserData.getId());
         updateUser.setPhone(phone);
@@ -191,14 +188,13 @@ public class UserServiceImpl implements UserService {
         int rowsAffected = userMapper.updatePhone(updateUser);
         if (rowsAffected <= 0) {
           throw new ServiceException("用户授权手机号失败");
-        } else {
-          return true;
         }
       }
+      return phone;
     } catch (Exception e) {
       log.error("用户授权手机号异常：", e);
+      return null;
     }
-    return false;
   }
 
   @Transactional(rollbackFor = Exception.class)

@@ -89,8 +89,8 @@ public class UserController {
     }
     String authToken = authHeader.substring(this.tokenHead.length());
     // 授权手机号
-    boolean res = userService.userPhone(userLogin, userData, authToken);
-    if (res) {
+    String phone = userService.userPhone(userLogin, userData, authToken);
+    if (phone != null && !phone.isEmpty()) {
       return CommonResult.success("授权成功");
     } else {
       return CommonResult.failed("授权失败");
@@ -117,6 +117,19 @@ public class UserController {
     } else {
       return CommonResult.failed("登出失败");
     }
+  }
+
+  @PostMapping("/self")
+  @Operation(summary = "用户详细信息")
+  public CommonResult<UserDetailVo> phone(@AuthenticationPrincipal UserDetails userInfo) {
+    if(userInfo == null) {
+      return CommonResult.failed("上下文异常");
+    }
+    UserDetailVo userData = userInfo.getUser();
+    if (userData == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    return CommonResult.success(userData);
   }
 
 }
