@@ -83,6 +83,9 @@
             <if test="endDate != null">
                 AND `order`.created_at <![CDATA[ <= ]]> #{endDate, jdbcType=TIMESTAMP}
             </if>
+            <if test="phone != null and phone != ''">
+                AND `order`.phone = #{phone}
+            </if>
             <if test="cinemaName != null and cinemaName.trim().length() > 0">
                 AND cinema.name LIKE CONCAT('%', #{cinemaName}, '%')
             </if>

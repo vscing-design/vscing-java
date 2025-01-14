@@ -22,6 +22,9 @@ public class OrderVo {
     @Schema(description = "用户名称")
     private String username;
 
+    @Schema(description = "下单手机号")
+    private String phone;
+
     @Schema(description = "供应商ID")
     private Long supplierId;
 
