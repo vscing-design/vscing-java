@@ -6,8 +6,10 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.RoleListDto;
 import com.vscing.model.entity.Menu;
+import com.vscing.model.entity.Permission;
 import com.vscing.model.entity.Role;
 import com.vscing.model.request.RoleMenusRequest;
+import com.vscing.model.request.RolePermissionsRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +63,34 @@ public class RoleController {
     }
     try {
       boolean res = roleService.createdMenuList(roleMenus);
+      if (res) {
+        return CommonResult.success("新增成功");
+      }
+      return CommonResult.failed("新增失败");
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @GetMapping("/permissions/{id}")
+  @Operation(summary = "关联按钮列表")
+  public CommonResult<CommonPage<Permission>> permissionsList(@PathVariable("id") Long id) {
+    List<Permission> list = roleService.getPermissionList(id);
+    return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @PostMapping("/permissions")
+  @Operation(summary = "新增关联按钮")
+  public CommonResult<Object> addPermissions(@Validated @RequestBody RolePermissionsRequest rolePermissions,
+                                  BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    try {
+      boolean res = roleService.createdPermissionList(rolePermissions);
       if (res) {
         return CommonResult.success("新增成功");
       }
