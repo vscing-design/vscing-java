@@ -32,6 +32,8 @@ public interface ShowAreaMapper {
 
   List<ShowArea> selectByShowIdAreas(@Param("showId") Long showId, @Param("areas") List<String> areas);
 
+  ShowArea getMinPriceByShowIds(@Param("showIds") String showIds);
+
   void truncateTable();
 
 }

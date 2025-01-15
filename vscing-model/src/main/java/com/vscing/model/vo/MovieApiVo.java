@@ -3,6 +3,7 @@ package com.vscing.model.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -17,8 +18,8 @@ public class MovieApiVo {
   @Schema(description = "主键ID")
   private Long id;
 
-  @Schema(description = "场次ID")
-  private Long showId;
+  @Schema(description = "场次ID组合")
+  private String showIds;
 
   @Schema(description = "影片类型")
   private String movieType;
@@ -46,5 +47,8 @@ public class MovieApiVo {
 
   @Schema(description = "影片主演")
   private String cast;
+
+  @Schema(description = "最小出售价格")
+  private BigDecimal minPrice;
 
 }

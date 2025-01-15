@@ -40,7 +40,7 @@ public class MovieController {
   }
 
   @GetMapping
-  @Operation(summary = "列表")
+  @Operation(summary = "首页影片列表")
   public CommonResult<CommonPage<MovieApiVo>> lists(@ParameterObject MovieApiListDto queryParam) {
     List<MovieApiVo> list = movieService.getList(queryParam);
     return CommonResult.success(CommonPage.restPage(list));

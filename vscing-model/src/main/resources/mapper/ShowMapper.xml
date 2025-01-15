@@ -110,8 +110,8 @@
     <!-- 根据cinemaId查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
         SELECT
-        s.id as show_id,
-        m.id as movie_id,
+        GROUP_CONCAT(DISTINCT s.id ORDER BY s.id SEPARATOR ',') as show_ids,
+        m.id,
         m.name,
         m.movie_type,
         m.poster_url,
@@ -144,6 +144,7 @@
             AND s.stop_sell_time >= NOW()
             AND s.deleted_at IS NULL
         </where>
+        GROUP BY m.id
     </select>
 
     <!-- 根据 ID 查询 -->

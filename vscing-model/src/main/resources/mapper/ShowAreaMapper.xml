@@ -22,7 +22,7 @@
     <sql id="tableName">
         vscing_show_area
     </sql>
-    <sql id="movieTableName">
+    <sql id="showTableName">
         vscing_show
     </sql>
 
@@ -131,5 +131,16 @@
     <delete id="truncateTable">
         TRUNCATE TABLE <include refid="tableName" />
     </delete>
+
+    <!-- 根据场次ID字符串查最小价格数据 -->
+    <select id="getMinPriceByShowIds" resultMap="BaseResultMap">
+        SELECT s.*
+        FROM <include refid="tableName" /> sa
+        JOIN <include refid="showTableName" /> s ON sa.show_id = s.id
+        WHERE FIND_IN_SET(s.id, #{showIds})
+        AND s.stop_sell_time > NOW()
+        ORDER BY s.stop_sell_time ASC, sa.show_price ASC
+        LIMIT 1
+    </select>
 
 </mapper>
