@@ -1,0 +1,74 @@
+# 服务端口
+server:
+  port: 5300
+spring:
+  profiles:
+    active: '@spring.profiles.active@'
+  application:
+    name: vscing
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher # 或者 "path_pattern_parser"
+logging:
+  level:
+    root: WARN
+    org.springframework.web: DEBUG
+    com.vscing.admin: INFO
+    org.springdoc: DEBUG
+    com.github.xiaoymin: DEBUG
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+#knife4j相关配置 可以不用改
+knife4j:
+  enable: true    #开启knife4j，无需添加@EnableKnife4j注解
+  setting:
+    language: zh_cn   #中文
+    swagger-model-name: 实体类   #重命名SwaggerModel名称,默认
+  #开启Swagger的Basic认证功能,默认是false
+#  basic:
+#    enable: true
+#    # Basic认证用户名
+#    username: hgh
+#    # Basic认证密码
+#    password: a1234567
+mybatis:
+  configuration:
+    #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+    mapUnderscoreToCamelCase: true
+  mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  expiration: 21600 #JWT的超期限时间(60*60*6*1)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
+  cachePrefix: 'Vscing:Api:'
+secure:
+  ignored:
+    enabled: false  # 安全校验开关，默认开启
+    urls:
+      - /v1/user/login
+      - /css/**
+      - /js/**
+      - /images/**
+# 启用 DEBUG 模式
+debug: false
+# 全局线程池相关配置
+# 如使用JDK21请直接使用虚拟线程 不要开启此配置
+thread-pool:
+  # 是否开启线程池
+  enabled: false
+  # 队列最大长度
+  queueCapacity: 128
+  # 线程池维护线程所允许的空闲时间
+  keepAliveSeconds: 300
+ok:
+ http:
+  connect-timeout: 60
+  read-timeout: 60
+  write-timeout: 60
+  # 连接池中整体的空闲连接的最大数量
+  max-idle-connections: 200
+  # 连接空闲时间最多为 300 秒
+  keep-alive-duration: 300
