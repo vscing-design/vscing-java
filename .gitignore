@@ -25,6 +25,8 @@ replay_pid*
 
 # 自定义
 .idea
+certs
+sql
 mvvm
 mvvm.cmd
 
@@ -41,4 +43,5 @@ target/
 application.yml
 application-dev.yml
 application-prod.yml
+
 
