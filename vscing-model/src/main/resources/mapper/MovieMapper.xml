@@ -35,7 +35,29 @@
         vscing_movie
     </sql>
 
-    <!-- 查询用户列表 -->
+    <!-- 查询小程序端电影列表 -->
+    <select id="getApiList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="name != null">
+                AND name LIKE CONCAT(#{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询小程序端电影前10海报列表 -->
+    <select id="selectBanners" resultType="com.vscing.model.vo.MovieBannersVo">
+        SELECT id, `name`, poster_url FROM <include refid="tableName" />
+        <where>
+            poster_url IS NOT NULL
+            AND deleted_at IS NULL
+        </where>
+        ORDER BY publish_date DESC, grade DESC
+        LIMIT 10
+    </select>
+
+    <!-- 查询管理端电影列表 -->
     <select id="getList" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
         <where>
