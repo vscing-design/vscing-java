@@ -53,16 +53,16 @@ public class ScheduledTasks {
         taskService.syncCinema();
     }
 
-    @Scheduled(cron = "0 0/5 * * * ?") // 每5分钟同步一下取消待支付订单
-    public void pendingPaymentTask() {
-        System.out.println("执行定时任务 每5分钟同步一下取消待支付订单：" + LocalDateTime.now());
-        taskService.syncPendingPaymentOrder();
-    }
+//    @Scheduled(cron = "0 0/5 * * * ?") // 每5分钟同步一下取消待支付订单
+//    public void pendingPaymentTask() {
+//        System.out.println("执行定时任务 每5分钟同步一下取消待支付订单：" + LocalDateTime.now());
+//        taskService.syncPendingPaymentOrder();
+//    }
 
-    @Scheduled(cron = "0 0/3 * * * ?") // 每3分钟同步一下出票信息
-    public void pendingTicketTask() {
-        System.out.println("执行定时任务 每3分钟同步一下出票信息：" + LocalDateTime.now());
-        taskService.syncPendingTicketOrder();
-    }
+//    @Scheduled(cron = "0 0/3 * * * ?") // 每3分钟同步一下出票信息
+//    public void pendingTicketTask() {
+//        System.out.println("执行定时任务 每3分钟同步一下出票信息：" + LocalDateTime.now());
+//        taskService.syncPendingTicketOrder();
+//    }
 
 }
