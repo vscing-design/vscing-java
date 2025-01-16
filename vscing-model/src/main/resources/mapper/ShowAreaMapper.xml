@@ -132,15 +132,49 @@
         TRUNCATE TABLE <include refid="tableName" />
     </delete>
 
-    <!-- 根据场次ID字符串查最小价格数据 -->
-    <select id="getMinPriceByShowIds" resultMap="BaseResultMap">
-        SELECT s.*
+    <!-- 根据电影ID字符串查最小价格数据 -->
+    <select id="getMinPriceByMovieIds" resultType="com.vscing.model.vo.MinPriceVo">
+        SELECT
+            sa.id,
+            sa.show_id as showId,
+            sa.area,
+            sa.show_price as showPrice,
+            sa.user_price as userPrice,
+            s.stop_sell_time as stopSellTime,
+            s.movie_id as movieId,
+            s.cinema_id as cinemaId
         FROM <include refid="tableName" /> sa
         JOIN <include refid="showTableName" /> s ON sa.show_id = s.id
-        WHERE FIND_IN_SET(s.id, #{showIds})
+        WHERE s.movie_id IN
+        <foreach item="movieId" collection="list" open="(" separator="," close=")">
+            #{movieId, jdbcType=BIGINT}
+        </foreach>
         AND s.stop_sell_time > NOW()
+        AND sa.deleted_at IS NULL
         ORDER BY s.stop_sell_time ASC, sa.show_price ASC
-        LIMIT 1
+        GROUP BY s.movie_id
+    </select>
+
+    <!-- 根据影院ID字符串查最小价格数据 -->
+    <select id="getMinPriceByCinemaIds" resultType="com.vscing.model.vo.MinPriceVo">
+        SELECT
+            sa.id,
+            sa.show_id as showId,
+            sa.area,
+            sa.show_price as showPrice,
+            sa.user_price as userPrice,
+            s.stop_sell_time as stopSellTime,
+            s.movie_id as movieId,
+            s.cinema_id as cinemaId
+        FROM <include refid="tableName" /> sa
+        JOIN <include refid="showTableName" /> s ON sa.show_id = s.id
+        WHERE s.cinema_id IN
+        <foreach item="cinemaId" collection="list" open="(" separator="," close=")">
+            #{cinemaId, jdbcType=BIGINT}
+        </foreach>
+        AND s.stop_sell_time > NOW()
+        AND sa.deleted_at IS NULL
+        ORDER BY s.stop_sell_time ASC, sa.show_price ASC
     </select>
 
 </mapper>

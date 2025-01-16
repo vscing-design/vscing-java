@@ -110,7 +110,6 @@
     <!-- 根据cinemaId查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
         SELECT
-        GROUP_CONCAT(DISTINCT s.id ORDER BY s.id SEPARATOR ',') as show_ids,
         m.id,
         m.name,
         m.movie_type,
@@ -120,13 +119,15 @@
         m.version_type,
         m.language,
         m.director,
-        m.cast
+        m.cast,
+        m.publish_status,
+        m.grade
         FROM
-        <include refid="tableName" /> s
+        <include refid="movieTableName" /> m
+        LEFT JOIN
+        <include refid="tableName" /> s ON s.movie_id = m.id
         LEFT JOIN
         <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
-        LEFT JOIN
-        <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
             <!-- 左匹配 -->
             <if test="name != null and name != ''">

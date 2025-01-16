@@ -13,6 +13,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -41,8 +42,10 @@ public class MovieController {
 
   @GetMapping
   @Operation(summary = "首页影片列表")
-  public CommonResult<CommonPage<MovieApiVo>> lists(@ParameterObject MovieApiListDto queryParam) {
-    List<MovieApiVo> list = movieService.getList(queryParam);
+  public CommonResult<CommonPage<MovieApiVo>> lists(@ParameterObject MovieApiListDto queryParam,
+                                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                    @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+    List<MovieApiVo> list = movieService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }
 

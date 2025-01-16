@@ -22,6 +22,6 @@ public interface MovieService {
   /**
    * 列表
    */
-  List<MovieApiVo> getList(MovieApiListDto data);
+  List<MovieApiVo> getList(MovieApiListDto data, Integer pageSize, Integer pageNum);
 
 }

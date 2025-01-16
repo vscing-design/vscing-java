@@ -48,6 +48,12 @@ public class MovieApiVo {
   @Schema(description = "影片主演")
   private String cast;
 
+  @Schema(description = "评分")
+  private String grade;
+
+  @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
+  private String publishStatus;
+
   @Schema(description = "最小出售价格")
   private BigDecimal minPrice;
 

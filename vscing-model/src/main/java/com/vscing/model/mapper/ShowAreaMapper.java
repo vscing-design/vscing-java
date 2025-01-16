@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MovieShowAreaListDto;
 import com.vscing.model.entity.ShowArea;
+import com.vscing.model.vo.MinPriceVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,7 +33,9 @@ public interface ShowAreaMapper {
 
   List<ShowArea> selectByShowIdAreas(@Param("showId") Long showId, @Param("areas") List<String> areas);
 
-  ShowArea getMinPriceByShowIds(@Param("showIds") String showIds);
+  List<MinPriceVo> getMinPriceByMovieIds(@Param("list") List<Long> movieIds);
+
+  List<MinPriceVo> getMinPriceByCinemaIds(@Param("list") List<Long> cinemaIds);
 
   void truncateTable();
 
