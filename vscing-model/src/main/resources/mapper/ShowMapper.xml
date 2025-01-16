@@ -107,7 +107,7 @@
         </where>
     </select>
 
-    <!-- 根据cinemaId查询全部列表 -->
+    <!-- 根据MovieApiListDto查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
         SELECT
         m.id,
@@ -146,6 +146,43 @@
             AND s.deleted_at IS NULL
         </where>
         GROUP BY m.id
+    </select>
+
+    <!-- 根据CinemaApiListDto查询全部列表 -->
+    <select id="selectByCinemaApiList" resultType="com.vscing.model.vo.CinemaApiVo">
+        SELECT
+        c.id,
+        c.name,
+        c.province_name as provinceName,
+        c.city_name as cityName,
+        c.district_name as districtName,
+        c.address,
+        c.lng,
+        c.lat,
+        (
+            6371 * acos(
+            cos(radians(#{lat, jdbcType=DECIMAL})) *
+            cos(radians(c.lat)) *
+            cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +
+            sin(radians(#{lat, jdbcType=DECIMAL})) *
+            sin(radians(c.lat))
+        )
+        ) AS distance
+        FROM <include refid="cinemaTableName" /> c
+        <where>
+            <!-- 动态条件 -->
+            <if test="keyword != null and keyword != ''">
+                AND (c.name LIKE CONCAT('%', #{keyword}, '%')
+                OR c.address LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="cityId != null">
+                AND c.city_id = #{cityId}
+            </if>
+            <if test="districtId != null">
+                AND c.district_id = #{districtId}
+            </if>
+        </where>
+        ORDER BY distance ASC
     </select>
 
     <!-- 根据 ID 查询 -->
