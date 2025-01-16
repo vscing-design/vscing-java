@@ -29,18 +29,21 @@ public class ScheduledTasks {
     @Autowired
     private ShowAreaMapper showAreaMapper;
 
-    @Scheduled(cron = "0 0 8,9 * * ?") // 每天早上8点和9点执行同步影片和同步场次
-    public void movieShowTask() {
-        System.out.println("执行定时任务 每天早上8点和9点执行同步影片和同步场次：" + LocalDateTime.now());
+    @Scheduled(cron = "0 0 5 * * ?") // 每天早上5点执行同步影片
+    public void movieTask() {
+        System.out.println("执行定时任务 每天早上5点执行同步影片：" + LocalDateTime.now());
         taskService.syncMovie();
+    }
+
+    @Scheduled(cron = "0 0 6 * * ?") // 每天早上6点执行同步场次
+    public void movieShowTask() {
+        System.out.println("执行定时任务 每天早上6点执行同步场次：" + LocalDateTime.now());
         taskService.syncShow();
     }
 
     @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点执行场次清空
     public void truncateTableTask() {
-        System.out.println("执行定时任务 每天凌晨3点执行场次清空：" + LocalDateTime.now());
-//        showMapper.truncateTable();
-//        showAreaMapper.truncateTable();
+        System.out.println("执行定时任务 每天凌晨1点执行场次清空：" + LocalDateTime.now());
         taskService.syncTable();
     }
 

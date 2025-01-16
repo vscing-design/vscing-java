@@ -448,6 +448,23 @@ public class TaskServiceImpl implements TaskService {
     }
   }
 
+  @Override
+  public String getSyncShow(Integer id) {
+    String responseBody = "";
+    try {
+      // 准备请求参数
+      Map<String, String> params = new HashMap<>();
+      params.put("cinemaId", String.valueOf(id));
+
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+      // 发送请求并获取响应
+      responseBody = supplierService.sendRequest("/show/preferential/query", params);
+    } catch (Exception e) {
+      log.error("同步异常: {}", e);
+    }
+    return responseBody;
+  }
+
   @Async("threadPoolTaskExecutor")
   @Override
   public void syncShow() {
@@ -460,11 +477,6 @@ public class TaskServiceImpl implements TaskService {
           // 准备请求参数
           Map<String, String> params = new HashMap<>();
           params.put("cinemaId", String.valueOf(cinema.getTpCinemaId()));
-          // 获取当天的 LocalDate 对象
-          LocalDateTime endOfDayPrecise = LocalDate.now().atTime(23, 59, 59);
-          // 格式化为字符串
-          String startTimeString = endOfDayPrecise.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-  //      params.put("time", startTimeString);
 
           SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
           // 发送请求并获取响应
@@ -551,7 +563,6 @@ public class TaskServiceImpl implements TaskService {
 
               } catch (Exception e) {
                 log.error("同步场次失败", e);
-                continue;
               }
             }
           }

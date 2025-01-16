@@ -22,4 +22,6 @@ public interface TaskService {
 
   void syncPendingTicketOrder();
 
+  String getSyncShow(Integer id);
+
 }

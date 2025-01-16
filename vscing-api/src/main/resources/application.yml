@@ -41,7 +41,7 @@ mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
 jwt:
   tokenHeader: Authorization #JWT存储的请求头
-  expiration: 21600 #JWT的超期限时间(60*60*6*1)
+  expiration: 300 #JWT的超期限时间(60*60*6*1 21600)
   tokenHead: 'Bearer '  #JWT负载中拿到开头
   cachePrefix: 'Vscing:Api:'
 secure:

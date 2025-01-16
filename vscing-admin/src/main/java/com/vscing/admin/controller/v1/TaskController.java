@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -74,6 +75,15 @@ public class TaskController {
     public CommonResult<Object> show() {
         taskService.syncShow();
         return CommonResult.success();
+    }
+
+    @GetMapping("/show/{id}")
+    @Operation(summary = "同步影院影片场次测试")
+    public CommonResult<Object> getSyncShow(@PathVariable Integer id) {
+        if(id == null) {
+            return CommonResult.validateFailed("参数错误");
+        }
+        return CommonResult.success(taskService.getSyncShow(id));
     }
 
     @GetMapping("/order")
