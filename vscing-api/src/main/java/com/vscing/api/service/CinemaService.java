@@ -1,5 +1,6 @@
 package com.vscing.api.service;
 
+import com.vscing.model.dto.CinemaApiDetailsDto;
 import com.vscing.model.dto.CinemaApiDistrictDto;
 import com.vscing.model.dto.CinemaApiListDto;
 import com.vscing.model.vo.CinemaApiDetailsVo;
@@ -29,6 +30,6 @@ public interface CinemaService {
   /**
    * 详情
    */
-  CinemaApiDetailsVo getDetails(Long id, Double lat, Double lng);
+  CinemaApiDetailsVo getDetails(CinemaApiDetailsDto data);
 
 }

@@ -72,7 +72,7 @@
     <select id="selectByIdWithDistance" parameterType="map" resultType="com.vscing.model.vo.CinemaApiDetailsVo">
         SELECT
             id,
-            name,
+            `name`,
             province_name as provinceName,
             city_name as cityName,
             district_name as districtName,

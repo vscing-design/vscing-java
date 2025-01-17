@@ -3,6 +3,7 @@ package com.vscing.api.controller.v1;
 import com.vscing.api.service.CinemaService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
+import com.vscing.model.dto.CinemaApiDetailsDto;
 import com.vscing.model.dto.CinemaApiDistrictDto;
 import com.vscing.model.dto.CinemaApiListDto;
 import com.vscing.model.vo.CinemaApiDetailsVo;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,15 +62,16 @@ public class CinemaController {
     return CommonResult.success(CommonPage.restPage(list));
   }
 
-  @GetMapping("/{id}")
+  @PostMapping("/details")
   @Operation(summary = "影院详情")
-  public CommonResult<CinemaApiDetailsVo> details(@PathVariable("id") Long id,
-                                                  @RequestParam(value = "lat", defaultValue = "0") Double lat,
-                                                  @RequestParam(value = "lng", defaultValue = "0") Double lng) {
-    if (id == null || lat == null || lng == null) {
-      return CommonResult.validateFailed("参数错误");
+  public CommonResult<CinemaApiDetailsVo> details(@Validated @RequestBody CinemaApiDetailsDto data,
+                                                  BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
     }
-    CinemaApiDetailsVo details = cinemaService.getDetails(id, lat, lng);
+    CinemaApiDetailsVo details = cinemaService.getDetails(data);
     if (details == null) {
       return CommonResult.failed("信息不存在");
     }

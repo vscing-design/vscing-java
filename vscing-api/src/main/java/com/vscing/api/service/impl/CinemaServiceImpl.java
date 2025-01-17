@@ -2,6 +2,7 @@ package com.vscing.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.CinemaService;
+import com.vscing.model.dto.CinemaApiDetailsDto;
 import com.vscing.model.dto.CinemaApiDistrictDto;
 import com.vscing.model.dto.CinemaApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
@@ -72,16 +73,31 @@ public class CinemaServiceImpl implements CinemaService {
   }
 
   @Override
-  public CinemaApiDetailsVo getDetails(Long id, Double lat, Double lng) {
+  public CinemaApiDetailsVo getDetails(CinemaApiDetailsDto data) {
     // 查询影院信息
-    CinemaApiDetailsVo cinemaApiDetailsVo = cinemaMapper.selectByIdWithDistance(id, lat, lng);
+    CinemaApiDetailsVo cinemaApiDetailsVo = cinemaMapper.selectByIdWithDistance(data);
+    if (cinemaApiDetailsVo == null) {
+      return null;
+    }
     // 根据影院id，查询出所有影片场次列表
-    List<CinemaApiDetailsShowVo> cinemaApiDetailsShowVoList = showMapper.selectByCinemaId(id);
+    List<CinemaApiDetailsShowVo> cinemaApiDetailsShowVoList = showMapper.selectByCinemaId(data.getId());
+    if (cinemaApiDetailsShowVoList == null || cinemaApiDetailsShowVoList.isEmpty()) {
+      cinemaApiDetailsVo.setShowList(Collections.emptyList());
+      return cinemaApiDetailsVo;
+    }
     // 根据场次id，查询场次区域价格列表
     List<Long> showIds = cinemaApiDetailsShowVoList.stream()
         .map(CinemaApiDetailsShowVo::getShowId)
         .collect(Collectors.toList());
+    if (showIds.isEmpty()) {
+      cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);
+      return cinemaApiDetailsVo;
+    }
     List<ShowArea> showAreaList = showAreaMapper.selectByShowIds(showIds);
+    if (showAreaList == null || showAreaList.isEmpty()) {
+      cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);
+      return cinemaApiDetailsVo;
+    }
     // 使用 Stream API 创建映射，将每个 showId 映射到其最低价格对应的 ShowArea 对象
     Map<Long, ShowArea> ShowAreaMinPrice = showAreaList.stream()
         .collect(Collectors.toMap(

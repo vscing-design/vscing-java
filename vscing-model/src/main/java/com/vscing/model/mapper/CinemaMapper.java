@@ -1,5 +1,6 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.CinemaApiDetailsDto;
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
 import com.vscing.model.vo.CinemaApiDetailsVo;
@@ -21,7 +22,7 @@ public interface CinemaMapper {
 
   Cinema selectById(long id);
 
-  CinemaApiDetailsVo selectByIdWithDistance(long id, double lat, double lng);
+  CinemaApiDetailsVo selectByIdWithDistance(CinemaApiDetailsDto record);
 
   int insert(Cinema record);
 

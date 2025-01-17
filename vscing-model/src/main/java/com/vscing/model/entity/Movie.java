@@ -1,6 +1,9 @@
 package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
+import com.vscing.model.vo.MovieApiDetailsVo;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +18,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@AutoMappers({
+    @AutoMapper(target = MovieApiDetailsVo.class),
+})
 public class Movie extends BaseEntity {
 
   @Schema(description = "主键ID")
