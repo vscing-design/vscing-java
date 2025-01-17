@@ -2,14 +2,18 @@ package com.vscing.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.MovieService;
+import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
+import com.vscing.model.entity.Movie;
+import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.entity.PricingRule;
 import com.vscing.model.mapper.MovieMapper;
+import com.vscing.model.mapper.MovieProducerMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
-import com.vscing.model.vo.MinPriceVo;
+import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
 import com.vscing.model.vo.MovieBannersVo;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,9 @@ public class MovieServiceImpl implements MovieService {
   private MovieMapper movieMapper;
 
   @Autowired
+  private MovieProducerMapper movieProducerMapper;
+
+  @Autowired
   private ShowMapper showMapper;
 
   @Autowired
@@ -41,10 +48,13 @@ public class MovieServiceImpl implements MovieService {
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
 
+  @Override
   public List<MovieBannersVo> getBanners() {
+    // 获取轮播图
     return movieMapper.selectBanners();
   }
 
+  @Override
   public List<MovieApiVo> getList(MovieApiListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     List<MovieApiVo> movieApiVoList = showMapper.selectByMovieApiList(data);
@@ -74,6 +84,26 @@ public class MovieServiceImpl implements MovieService {
 //    }
 
     return movieApiVoList;
+  }
+
+  @Override
+  public MovieApiDetailsVo getDetails(Long id) {
+    // 获取影片的详情
+    Movie movie = movieMapper.selectById(id);
+    MovieApiDetailsVo movieApiDetailsVo = MapstructUtils.convert(movie, MovieApiDetailsVo.class);
+    // 根据影片ID获取导演、演员列表
+    List<MovieProducer> movieProducerList = movieProducerMapper.selectByMovieId(id);
+    // 赋值
+    if (movieApiDetailsVo != null) {
+      movieApiDetailsVo.setMovieProducerList(movieProducerList);
+    }
+    return movieApiDetailsVo;
+  }
+
+  @Override
+  public List<MovieProducer> getMovieProducerList(Long id) {
+    // 根据影片ID获取导演、演员列表
+    return movieProducerMapper.selectByMovieId(id);
   }
 
 }

@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
+import com.vscing.model.vo.CinemaApiDetailsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,6 +20,8 @@ public interface CinemaMapper {
   List<Cinema> getList(CinemaListDto record);
 
   Cinema selectById(long id);
+
+  CinemaApiDetailsVo selectByIdWithDistance(long id, double lat, double lng);
 
   int insert(Cinema record);
 

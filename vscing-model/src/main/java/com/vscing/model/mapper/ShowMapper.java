@@ -5,6 +5,7 @@ import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.ShowAllDto;
 import com.vscing.model.dto.ShowListDto;
 import com.vscing.model.entity.Show;
+import com.vscing.model.vo.CinemaApiDetailsShowVo;
 import com.vscing.model.vo.CinemaApiVo;
 import com.vscing.model.vo.MovieApiVo;
 import com.vscing.model.vo.ShowListVo;
@@ -26,7 +27,9 @@ public interface ShowMapper {
 
   List<MovieApiVo> selectByMovieApiList(MovieApiListDto record);
 
-  List<ShowListVo> getListByCinemaId(ShowAllDto record);
+  List<ShowListVo> getListByCinemaIdAndSupplierId(ShowAllDto record);
+
+  List<CinemaApiDetailsShowVo> selectByCinemaId(@Param("cinemaId") long cinemaId);
 
   List<ShowListVo> getList(ShowListDto record);
 

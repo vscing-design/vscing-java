@@ -49,6 +49,13 @@
         </where>
     </select>
 
+    <!-- 根据 CityId 查询列表 -->
+    <select id="selectByCityId" parameterType="com.vscing.model.dto.CinemaApiDistrictDto" resultType="com.vscing.model.vo.CinemaApiDistrictVo">
+        SELECT id, name, lng, lat
+        FROM <include refid="tableName" />
+        WHERE city_id = #{cityId, jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 根据 ID 查询 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL

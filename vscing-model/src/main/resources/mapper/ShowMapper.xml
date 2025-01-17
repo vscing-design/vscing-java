@@ -80,8 +80,8 @@
         </where>
     </select>
 
-    <!-- 根据cinemaId查询全部列表 -->
-    <select id="getListByCinemaId" resultType="com.vscing.model.vo.ShowListVo">
+    <!-- 根据cinemaId、supplierId查询全部列表 -->
+    <select id="getListByCinemaIdAndSupplierId" resultType="com.vscing.model.vo.ShowListVo">
         SELECT
             s.supplier_id,
             s.cinema_id,
@@ -103,6 +103,41 @@
                 AND s.supplier_id = #{supplierId}
             </if>
             AND s.stop_sell_time > NOW()
+            AND s.deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 根据cinemaId查询全部场次列表 -->
+    <select id="selectByCinemaId" parameterType="long" resultType="com.vscing.model.vo.CinemaApiDetailsShowVo">
+        SELECT
+            s.supplier_id as supplierId,
+            s.movie_id as movieId,
+            s.id as showId,
+            s.hall_name as hallName,
+            s.show_time as showTime,
+            s.duration,
+            s.show_version_type as showVersionType,
+            s.stop_sell_time as stopSellTime,
+            m.name as movieName,
+            m.publish_date as publishDate,
+            m.director,
+            m.cast,
+            m.intro,
+            m.version_type as versionType,
+            m.language,
+            m.movie_type as movieType,
+            m.poster_url as posterUrl,
+            m.plot_url as plotUrl,
+            m.grade,
+            m.like,
+            m.publish_status as publishStatus
+        FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
+        <where>
+            <if test="cinemaId != null">
+                AND s.cinema_id = #{cinemaId}
+            </if>
+            <!--            AND s.stop_sell_time > NOW()-->
             AND s.deleted_at IS NULL
         </where>
     </select>

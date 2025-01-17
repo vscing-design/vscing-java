@@ -118,7 +118,7 @@ public class ShowServiceImpl implements ShowService {
 
   @Override
   public List<MovieTreeVo> getAll(ShowAllDto data) {
-    List<ShowListVo> list = showMapper.getListByCinemaId(data);
+    List<ShowListVo> list = showMapper.getListByCinemaIdAndSupplierId(data);
     // 设置影片列表
     List<MovieTreeVo> movieList = new ArrayList<>();
     // 构建 showId 到 ShowTreeVo 的映射

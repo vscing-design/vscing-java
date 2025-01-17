@@ -28,7 +28,7 @@
         vscing_movie
     </sql>
 
-    <!-- 查询用户列表 -->
+    <!-- 查询列表 -->
     <select id="getList" resultMap="BaseResultMap">
         SELECT mp.*, m.name as movieName FROM <include refid="tableName" /> mp
         LEFT JOIN <include refid="movieTableName" /> m ON mp.movie_id = m.id
@@ -43,6 +43,17 @@
             <if test="movieName != null">
                 AND m.name LIKE CONCAT('%', #{movieName}, '%')
             </if>
+        </where>
+    </select>
+
+    <!-- 根据movieId查询列表 -->
+    <select id="selectByMovieId" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            <if test="movieId != null">
+                AND movie_id = #{movieId, jdbcType=BIGINT}
+            </if>
+            AND deleted_at IS NULL
         </where>
     </select>
 

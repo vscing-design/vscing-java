@@ -1,6 +1,8 @@
 package com.vscing.api.service;
 
 import com.vscing.model.dto.MovieApiListDto;
+import com.vscing.model.entity.MovieProducer;
+import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
 import com.vscing.model.vo.MovieBannersVo;
 
@@ -23,5 +25,15 @@ public interface MovieService {
    * 列表
    */
   List<MovieApiVo> getList(MovieApiListDto data, Integer pageSize, Integer pageNum);
+
+  /**
+   * 电影详情
+   */
+  MovieApiDetailsVo getDetails(Long id);
+
+  /**
+   * 电影演员、导演表
+  */
+  List<MovieProducer> getMovieProducerList(Long id);
 
 }

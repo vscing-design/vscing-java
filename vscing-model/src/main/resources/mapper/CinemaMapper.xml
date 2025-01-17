@@ -68,6 +68,32 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据ID查询详情并计算距离 -->
+    <select id="selectByIdWithDistance" parameterType="map" resultType="com.vscing.model.vo.CinemaApiDetailsVo">
+        SELECT
+            id,
+            name,
+            province_name as provinceName,
+            city_name as cityName,
+            district_name as districtName,
+            address,
+            lat,
+            lng,
+            phone,
+            status,
+            (
+                6371 * acos(
+                    cos(radians(#{lat, jdbcType=DECIMAL})) *
+                    cos(radians(lat)) *
+                    cos(radians(lng) - radians(#{lng, jdbcType=DECIMAL})) +
+                    sin(radians(#{lat, jdbcType=DECIMAL})) *
+                    sin(radians(lat))
+                )
+            ) AS distance
+        FROM <include refid="tableName" />
+        WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Cinema">
         INSERT INTO <include refid="tableName" />

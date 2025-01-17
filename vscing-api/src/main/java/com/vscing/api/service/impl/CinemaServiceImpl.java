@@ -2,17 +2,30 @@ package com.vscing.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.CinemaService;
+import com.vscing.model.dto.CinemaApiDistrictDto;
 import com.vscing.model.dto.CinemaApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.entity.PricingRule;
+import com.vscing.model.entity.ShowArea;
+import com.vscing.model.mapper.CinemaMapper;
+import com.vscing.model.mapper.DistrictMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.utils.PricingUtil;
+import com.vscing.model.vo.CinemaApiDetailsShowVo;
+import com.vscing.model.vo.CinemaApiDetailsVo;
+import com.vscing.model.vo.CinemaApiDistrictVo;
 import com.vscing.model.vo.CinemaApiVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * CinemaServiceImpl
@@ -24,6 +37,12 @@ import java.util.List;
 public class CinemaServiceImpl implements CinemaService {
 
   @Autowired
+  private CinemaMapper cinemaMapper;
+
+  @Autowired
+  private DistrictMapper districtMapper;
+
+  @Autowired
   private ShowMapper showMapper;
 
   @Autowired
@@ -32,6 +51,16 @@ public class CinemaServiceImpl implements CinemaService {
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
 
+  @Override
+  public List<CinemaApiDistrictVo> getDistrictList(CinemaApiDistrictDto data) {
+    // 如果是区县级，就返回空list
+    if(data.getDistrictId() != null) {
+      return Collections.emptyList();
+    }
+    return districtMapper.selectByCityId(data);
+  }
+
+  @Override
   public List<CinemaApiVo> getList(CinemaApiListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     List<CinemaApiVo> cinemaApiVoList = showMapper.selectByCinemaApiList(data);
@@ -40,6 +69,44 @@ public class CinemaServiceImpl implements CinemaService {
     List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
 
     return cinemaApiVoList;
+  }
+
+  @Override
+  public CinemaApiDetailsVo getDetails(Long id, Double lat, Double lng) {
+    // 查询影院信息
+    CinemaApiDetailsVo cinemaApiDetailsVo = cinemaMapper.selectByIdWithDistance(id, lat, lng);
+    // 根据影院id，查询出所有影片场次列表
+    List<CinemaApiDetailsShowVo> cinemaApiDetailsShowVoList = showMapper.selectByCinemaId(id);
+    // 根据场次id，查询场次区域价格列表
+    List<Long> showIds = cinemaApiDetailsShowVoList.stream()
+        .map(CinemaApiDetailsShowVo::getShowId)
+        .collect(Collectors.toList());
+    List<ShowArea> showAreaList = showAreaMapper.selectByShowIds(showIds);
+    // 使用 Stream API 创建映射，将每个 showId 映射到其最低价格对应的 ShowArea 对象
+    Map<Long, ShowArea> ShowAreaMinPrice = showAreaList.stream()
+        .collect(Collectors.toMap(
+            ShowArea::getShowId,
+            Function.identity(),
+            (existing, replacement) -> existing.getShowPrice().compareTo(replacement.getShowPrice()) <= 0 ? existing : replacement
+        ));
+    // 获取结算规则列表
+    List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
+    // 循环影片场次列表，并计算出最低价格和最高价格
+    cinemaApiDetailsShowVoList.forEach(cinemaApiDetailsShowVo -> {
+      ShowArea showArea = ShowAreaMinPrice.get(cinemaApiDetailsShowVo.getShowId());
+      // 实际销售价格
+      BigDecimal price = PricingUtil.calculateActualPrice(showArea.getShowPrice(), showArea.getUserPrice(), pricingRules);
+      // 官方价格
+      cinemaApiDetailsShowVo.setMaxPrice(showArea.getShowPrice());
+      // 实际售价
+      cinemaApiDetailsShowVo.setMinPrice(price);
+      // 优惠金额
+      cinemaApiDetailsShowVo.setDiscount(showArea.getShowPrice().subtract(price));
+    });
+    // 赋值
+    cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);
+
+    return cinemaApiDetailsVo;
   }
 
 }

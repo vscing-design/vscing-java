@@ -18,6 +18,8 @@ public interface MovieProducerMapper {
 
   List<MovieProducer> getList(MovieProducerListDto record);
 
+  List<MovieProducer> selectByMovieId(long movieId);
+
   MovieProducer selectById(long id);
 
   int insert(MovieProducer record);
