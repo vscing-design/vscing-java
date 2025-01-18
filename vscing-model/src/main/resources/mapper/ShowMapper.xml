@@ -38,6 +38,9 @@
     <sql id="movieTableName">
         vscing_movie
     </sql>
+    <sql id="showAreaTableName">
+        vscing_show_area
+    </sql>
 
     <!-- 查询列表 -->
     <select id="getList" resultType="com.vscing.model.vo.ShowListVo">
@@ -145,42 +148,50 @@
     <!-- 根据MovieApiListDto查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
         SELECT
-        m.id,
-        m.name,
-        m.movie_type,
-        m.poster_url,
-        m.like,
-        m.publish_date,
-        m.version_type,
-        m.language,
-        m.director,
-        m.cast,
-        m.publish_status,
-        m.grade
-        FROM
-        <include refid="movieTableName" /> m
-        LEFT JOIN
-        <include refid="tableName" /> s ON s.movie_id = m.id
-        LEFT JOIN
-        <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+            m.id,
+            m.name,
+            m.movie_type,
+            m.poster_url,
+            m.like,
+            m.publish_date,
+            m.version_type,
+            m.language,
+            m.director,
+            m.cast,
+            m.publish_status,
+            m.grade,
+            subq.min_show_price as minShowPrice,
+            subq.min_user_price as minUserPrice
+        FROM <include refid="movieTableName" /> m
+        INNER JOIN (
+            SELECT
+                s.movie_id,
+                MIN(sa.user_price) as min_user_price,
+                MIN(sa.show_price) as min_show_price
+            FROM <include refid="tableName" /> s
+            INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+            INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
+            <where>
+                <if test="cityId != null">
+                    AND c.city_id = #{cityId}
+                </if>
+                <if test="districtId != null">
+                    AND c.district_id = #{districtId}
+                </if>
+                AND s.stop_sell_time >= NOW()
+            </where>
+            GROUP BY s.movie_id
+            ORDER BY s.stop_sell_time ASC
+        ) subq ON m.id = subq.movie_id
         <where>
-            <!-- 左匹配 -->
             <if test="name != null and name != ''">
                 AND m.name LIKE CONCAT(#{name}, '%')
-            </if>
-            <if test="cityId != null">
-                AND c.city_id = #{cityId}
-            </if>
-            <if test="districtId != null">
-                AND c.district_id = #{districtId}
             </if>
             <if test="publishStatus != null and publishStatus != ''">
                 AND m.publish_status = #{publishStatus}
             </if>
-            AND s.stop_sell_time >= NOW()
-            AND s.deleted_at IS NULL
         </where>
-        GROUP BY m.id
+        ORDER BY m.publish_date DESC
     </select>
 
     <!-- 根据CinemaApiListDto查询全部列表 -->
@@ -202,8 +213,24 @@
             sin(radians(#{lat, jdbcType=DECIMAL})) *
             sin(radians(c.lat))
         )
-        ) AS distance
+        ) AS distance,
+        subq.min_show_price as maxPrice,
+        subq.min_user_price as minPrice
         FROM <include refid="cinemaTableName" /> c
+        INNER JOIN (
+            SELECT
+                s.cinema_id,
+                MIN(sa.user_price) as min_user_price,
+                MIN(sa.show_price) as min_show_price
+            FROM <include refid="tableName" /> s
+            INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+            INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
+            <where>
+                AND s.stop_sell_time >= NOW()
+            </where>
+            GROUP BY s.cinema_id
+            ORDER BY s.stop_sell_time ASC
+        ) subq ON c.id = subq.cinema_id
         <where>
             <!-- 动态条件 -->
             <if test="keyword != null and keyword != ''">
@@ -217,7 +244,77 @@
                 AND c.district_id = #{districtId}
             </if>
         </where>
-        ORDER BY distance ASC
+        <choose>
+            <when test="orderBy == 1">
+                ORDER BY distance ASC
+            </when>
+            <when test="orderBy == 2">
+                ORDER BY subq.min_show_price ASC
+            </when>
+        </choose>
+    </select>
+
+    <!-- 根据MovieApiCinemaDto查询全部列表 -->
+    <select id="selectByMovieApiCinema" resultType="com.vscing.model.vo.CinemaApiVo">
+        SELECT
+        c.id,
+        c.name,
+        c.province_name as provinceName,
+        c.city_name as cityName,
+        c.district_name as districtName,
+        c.address,
+        c.lng,
+        c.lat,
+        (
+        6371 * acos(
+        cos(radians(#{lat, jdbcType=DECIMAL})) *
+        cos(radians(c.lat)) *
+        cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +
+        sin(radians(#{lat, jdbcType=DECIMAL})) *
+        sin(radians(c.lat))
+        )
+        ) AS distance,
+        subq.min_show_price as maxPrice,
+        subq.min_user_price as minPrice
+        FROM <include refid="cinemaTableName" /> c
+        INNER JOIN (
+        SELECT
+        s.cinema_id,
+        MIN(sa.user_price) as min_user_price,
+        MIN(sa.show_price) as min_show_price
+        FROM <include refid="tableName" /> s
+        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+        INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
+        <where>
+            <if test="movieId != null">
+                AND s.movie_id = #{movieId}
+            </if>
+            AND s.stop_sell_time >= NOW()
+        </where>
+        GROUP BY s.cinema_id
+        ORDER BY s.stop_sell_time ASC
+        ) subq ON c.id = subq.cinema_id
+        <where>
+            <!-- 动态条件 -->
+            <if test="keyword != null and keyword != ''">
+                AND (c.name LIKE CONCAT('%', #{keyword}, '%')
+                OR c.address LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="cityId != null">
+                AND c.city_id = #{cityId}
+            </if>
+            <if test="districtId != null">
+                AND c.district_id = #{districtId}
+            </if>
+        </where>
+        <choose>
+            <when test="orderBy == 1">
+                ORDER BY distance ASC
+            </when>
+            <when test="orderBy == 2">
+                ORDER BY subq.min_show_price ASC
+            </when>
+        </choose>
     </select>
 
     <!-- 根据 ID 查询 -->

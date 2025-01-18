@@ -1,6 +1,7 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.CinemaApiListDto;
+import com.vscing.model.dto.MovieApiCinemaDto;
 import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.ShowAllDto;
 import com.vscing.model.dto.ShowListDto;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 @Mapper
 public interface ShowMapper {
+
+  List<CinemaApiVo> selectByMovieApiCinema(MovieApiCinemaDto record);
 
   List<CinemaApiVo> selectByCinemaApiList(CinemaApiListDto record);
 

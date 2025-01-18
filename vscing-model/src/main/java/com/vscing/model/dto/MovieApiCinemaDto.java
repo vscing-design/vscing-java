@@ -4,13 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * CinemaApiListDto
+ * MovieApiCinemaDto
  *
  * @author vscing
- * @date 2025/1/16 23:17
+ * @date 2025/1/18 19:43
  */
 @Data
-public class CinemaApiListDto {
+public class MovieApiCinemaDto {
+
+  @Schema(description = "影片ID")
+  private Long movieId;
 
   @Schema(description = "影院名称或地址")
   private String keyword;

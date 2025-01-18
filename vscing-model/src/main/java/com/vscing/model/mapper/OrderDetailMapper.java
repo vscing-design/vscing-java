@@ -20,6 +20,8 @@ public interface OrderDetailMapper {
 
   List<SeatListDto> selectByOrderId(@Param("orderId") Long orderId);
 
+  List<SeatListDto> selectByShowId(Long showId);
+
   int softDeleteByOrderId(@Param("orderId") long orderId, @Param("deleterId") long deleterId);
 
   int batchUpdateOrderDetail(List<OrderDetail> updateOrderDetailList);

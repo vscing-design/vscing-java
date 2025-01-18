@@ -1,53 +1,31 @@
-package com.vscing.model.entity;
+package com.vscing.model.vo;
 
-import com.vscing.model.domain.BaseEntity;
-import com.vscing.model.vo.MovieApiCinemaVo;
-import com.vscing.model.vo.MovieApiDetailsVo;
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * Movie
+ * MovieApiCinemaVo
  *
  * @author vscing
- * @date 2024/12/26 22:34
+ * @date 2025/1/18 19:45
  */
-@Getter
-@Setter
-@AutoMappers({
-    @AutoMapper(target = MovieApiDetailsVo.class),
-    @AutoMapper(target = MovieApiCinemaVo.class),
-})
-public class Movie extends BaseEntity {
+@Data
+public class MovieApiCinemaVo {
 
   @Schema(description = "主键ID")
   private Long id;
 
-  @Schema(description = "三方ID")
-  private Long tpMovieId;
-
   @Schema(description = "影片名称")
   private String name;
-
-  @Schema(description = "供应商ID")
-  private Long supplierId;
 
   @Schema(description = "影片时长（分钟）")
   private Integer duration;
 
   @Schema(description = "上映日期")
   private LocalDateTime publishDate;
-
-  @Schema(description = "影片导演")
-  private String director;
-
-  @Schema(description = "影片主演")
-  private String cast;
 
   @Schema(description = "影片简介")
   private String intro;
@@ -75,5 +53,8 @@ public class Movie extends BaseEntity {
 
   @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
   private String publishStatus;
+
+  @Schema(description = "影院列表")
+  private List<CinemaApiVo> cinemaList;
 
 }

@@ -69,6 +69,14 @@ public class CinemaServiceImpl implements CinemaService {
     // 获取结算规则列表
     List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
 
+    // 循环计算实际售价
+    cinemaApiVoList.forEach(cinemaApiVo -> {
+      // 实际销售价格
+      BigDecimal price = PricingUtil.calculateActualPrice(cinemaApiVo.getMaxPrice(), cinemaApiVo.getMinPrice(), pricingRules);
+      // 实际售价
+      cinemaApiVo.setMinPrice(price);
+    });
+
     return cinemaApiVoList;
   }
 

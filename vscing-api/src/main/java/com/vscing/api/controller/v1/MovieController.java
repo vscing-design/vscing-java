@@ -3,8 +3,10 @@ package com.vscing.api.controller.v1;
 import com.vscing.api.service.MovieService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
+import com.vscing.model.dto.MovieApiCinemaDto;
 import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.entity.MovieProducer;
+import com.vscing.model.vo.MovieApiCinemaVo;
 import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
 import com.vscing.model.vo.MovieBannersVo;
@@ -13,8 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,6 +82,22 @@ public class MovieController {
       return CommonResult.failed("信息不存在");
     }
     return CommonResult.success(movieProducerList);
+  }
+
+  @PostMapping("/cinema")
+  @Operation(summary = "影片详情以及影院列表")
+  public CommonResult<MovieApiCinemaVo> cinema(@Validated @RequestBody MovieApiCinemaDto data,
+                                               BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    MovieApiCinemaVo details = movieService.getMovieCinemaList(data);
+    if (details == null) {
+      return CommonResult.failed("信息不存在");
+    }
+    return CommonResult.success(details);
   }
 
 }

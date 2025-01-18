@@ -27,6 +27,9 @@
     <sql id="tableName">
         vscing_order_detail
     </sql>
+    <sql id="orderTableName">
+        vscing_order
+    </sql>
 
     <!-- 查询订单座位列表 -->
     <select id="selectByOrderId" parameterType="long" resultType="com.vscing.model.dto.SeatListDto">
@@ -91,5 +94,14 @@
         </foreach>
         COMMIT;
     </update>
+
+    <!-- 搜索已被占用的座位 -->
+    <select id="selectByShowId" parameterType="long" resultType="com.vscing.model.dto.SeatListDto">
+        SELECT od.*
+        FROM <include refid="tableName" /> od
+        JOIN <include refid="orderTableName" /> o ON od.order_id = o.id
+        WHERE o.status IN (1, 2, 3, 4)
+        AND o.show_id = #{showId}
+    </select>
 
 </mapper>

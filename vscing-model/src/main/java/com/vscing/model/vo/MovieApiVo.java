@@ -18,9 +18,6 @@ public class MovieApiVo {
   @Schema(description = "主键ID")
   private Long id;
 
-  @Schema(description = "场次ID组合")
-  private String showIds;
-
   @Schema(description = "影片类型")
   private String movieType;
 
@@ -53,6 +50,12 @@ public class MovieApiVo {
 
   @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
   private String publishStatus;
+
+  @Schema(description = "最小场次价格（元）")
+  private BigDecimal minShowPrice;
+
+  @Schema(description = "最小影片结算价（元）")
+  private BigDecimal minUserPrice;
 
   @Schema(description = "最小出售价格")
   private BigDecimal minPrice;
