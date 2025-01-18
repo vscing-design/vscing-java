@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * CinemaApiVo
@@ -19,6 +20,9 @@ public class CinemaApiVo {
 
   @Schema(description = "影院名称")
   private String name;
+
+  @Schema(description = "放映开始时间")
+  private LocalDateTime showTime;
 
   @Schema(description = "省份名称")
   private String provinceName;
