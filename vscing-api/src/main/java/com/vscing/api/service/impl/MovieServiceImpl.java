@@ -85,10 +85,8 @@ public class MovieServiceImpl implements MovieService {
     Movie movie = movieMapper.selectById(id);
     MovieApiDetailsVo movieApiDetailsVo = MapstructUtils.convert(movie, MovieApiDetailsVo.class);
     // 根据影片ID获取导演、演员列表
-    List<MovieProducer> movieProducerList = movieProducerMapper.selectByMovieId(id);
-    // 赋值
     if (movieApiDetailsVo != null) {
-      movieApiDetailsVo.setMovieProducerList(movieProducerList);
+      movieApiDetailsVo.setMovieProducerList(movieProducerMapper.selectByMovieId(id));
     }
     return movieApiDetailsVo;
   }
@@ -105,7 +103,9 @@ public class MovieServiceImpl implements MovieService {
     Movie movie = movieMapper.selectById(data.getMovieId());
     MovieApiCinemaVo movieApiCinemaVo = MapstructUtils.convert(movie, MovieApiCinemaVo.class);
     // 获取影院列表
-    movieApiCinemaVo.setCinemaList(showMapper.selectByMovieApiCinema(data));
+    if (movieApiCinemaVo != null) {
+      movieApiCinemaVo.setCinemaList(showMapper.selectByMovieApiCinema(data));
+    }
     return movieApiCinemaVo;
   }
 

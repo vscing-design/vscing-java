@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AutoMappers({
-    @AutoMapper(target = MovieApiDetailsVo.class),
     @AutoMapper(target = MovieApiCinemaVo.class),
+    @AutoMapper(target = MovieApiDetailsVo.class),
 })
 public class Movie extends BaseEntity {
 
