@@ -54,6 +54,12 @@ public class MovieApiCinemaVo {
   @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
   private String publishStatus;
 
+  @Schema(description = "影片导演")
+  private String director;
+
+  @Schema(description = "影片主演")
+  private String cast;
+
   @Schema(description = "影院列表")
   private List<CinemaApiVo> cinemaList;
 
