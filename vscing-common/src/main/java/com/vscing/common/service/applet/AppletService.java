@@ -2,6 +2,8 @@ package com.vscing.common.service.applet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
 /**
  * AppletService
  * 小程序封装
@@ -19,5 +21,10 @@ public interface AppletService {
    * 获取手机号
   */
   String getPhoneNumber(String code);
+  
+  /** 
+   * 获取小程序支付参数
+  */
+  String getPayment(Map<String, Object> paymentData);
 
 }

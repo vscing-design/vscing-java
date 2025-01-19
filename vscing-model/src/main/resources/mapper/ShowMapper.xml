@@ -324,6 +324,25 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 ID 查询 -->
+    <select id="selectByOrderDetails" parameterType="long" resultType="com.vscing.model.vo.OrderApiDetailsVo">
+        SELECT
+            s.id as showId,
+            s.hall_name as hallName,
+            s.show_time as showTime,
+            s.stop_sell_time as stopSellTime,
+            s.show_version_type as showVersionType,
+            s.show_price as showPrice,
+            s.user_price as userPrice,
+            c.name as cinemaName,
+            m.name as movieName,
+            m.poster_url as posterUrl
+        FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+        LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
+        WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Show">
         INSERT INTO <include refid="tableName" />

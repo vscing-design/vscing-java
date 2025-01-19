@@ -246,7 +246,9 @@ public class OrderServiceImpl implements OrderService {
       BigDecimal price = PricingUtil.calculateActualPrice(showPrice, userPrice, pricingRules);
       // 订单总价
       totalPrice = totalPrice.add(price);
+      // 订单官方价
       officialPrice = officialPrice.add(showPrice);
+      // 订单结算价
       settlementPrice = settlementPrice.add(userPrice);
       // 座位
       seatInfo.add(seatList.getSeatName());

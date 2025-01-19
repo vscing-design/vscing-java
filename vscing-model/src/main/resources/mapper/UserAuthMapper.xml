@@ -44,6 +44,20 @@
         </where>
     </select>
 
+    <!-- 根据 openid、userId 查询用户openid -->
+    <select id="findOpenid" resultMap="BaseResultMap">
+        SELECT openid FROM <include refid="tableName" />
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="platform != null">
+                AND platform = #{platform}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
     <!-- 更新用户登陆信息 -->
     <update id="updateLoginInfoById" parameterType="map">
         UPDATE <include refid="tableName" />

@@ -1,4 +1,4 @@
-package com.vscing.common.service.payment.impl;
+package com.vscing.common.service.payment.impl.wechat;
 
 import com.vscing.common.service.payment.PaymentService;
 import org.springframework.stereotype.Service;

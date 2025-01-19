@@ -39,19 +39,6 @@ mybatis:
     #    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
     mapUnderscoreToCamelCase: true
   mapper-locations: classpath*:mapper/*.xml,classpath*:com/vscing/model/mapper/*.xml
-jwt:
-  tokenHeader: Authorization #JWT存储的请求头
-  expiration: 300 #JWT的超期限时间(60*60*6*1 21600)
-  tokenHead: 'Bearer '  #JWT负载中拿到开头
-  cachePrefix: 'Vscing:Api:'
-secure:
-  ignored:
-    enabled: false  # 安全校验开关，默认开启
-    urls:
-      - /v1/user/login
-      - /css/**
-      - /js/**
-      - /images/**
 # 启用 DEBUG 模式
 debug: false
 # 全局线程池相关配置

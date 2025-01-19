@@ -9,10 +9,13 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.diagnosis.DiagnosisUtils;
+import com.alipay.api.domain.AlipayTradeCreateModel;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
+import com.alipay.api.request.AlipayTradeCreateRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
+import com.alipay.api.response.AlipayTradeCreateResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.service.OkHttpService;
@@ -171,6 +174,62 @@ public class AppletServiceImpl implements AppletService {
     } catch (Exception e) {
       log.error("支付宝获取openid方法异常", e);
       throw new HttpException("支付宝获取openid方法异常: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public String getPayment(Map<String, Object> paymentData) {
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipayTradeCreateRequest request = new AlipayTradeCreateRequest();
+      // 设置异步通知接口
+      request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/alipayCreate");
+      // 业务请求参数
+      AlipayTradeCreateModel model = new AlipayTradeCreateModel();
+      // 设置商户订单号
+      model.setOutTradeNo((String) paymentData.get("outTradeNo"));
+      // 设置订单总金额
+//      model.setTotalAmount((String) paymentData.get("totalAmount"));
+      model.setTotalAmount("0.01");
+      // 设置订单标题
+      model.setSubject("嗨呀电影票订单" + paymentData.get("outTradeNo"));
+      // 设置产品码
+      model.setProductCode("JSAPI_PAY");
+      // 设置小程序支付中
+      model.setOpAppId(appletProperties.getAppId());
+      // 设置买家支付宝用户唯一标识
+      model.setBuyerOpenId((String) paymentData.get("openid"));
+      // 设置订单相对超时时间
+      model.setTimeoutExpress("10m");
+      // 调用接口
+      AlipayTradeCreateResponse response = alipayClient.execute(request);
+      log.info("支付宝下单调用结果: " , response);
+      if (response.isSuccess()) {
+        // 将响应字符串解析为 JSON 对象
+        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(response.getBody());
+        jsonNode = jsonNode.path("alipay_trade_create_response");
+        if (!jsonNode.isMissingNode()) {
+          // 获取 tradeNo
+          String tradeNo = jsonNode.path("trade_no").asText(null);
+          if (tradeNo != null && !tradeNo.isEmpty()) {
+            return tradeNo;
+          } else {
+            throw new RuntimeException("支付宝下单未获取到有效的 trade_no");
+          }
+        } else {
+          throw new RuntimeException("支付宝下单未获取到有效的 alipay_trade_create_response");
+        }
+      } else {
+        // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝下单接口失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      log.error("支付宝下单方法异常", e);
+      throw new HttpException("支付宝下单方法异常: " + e.getMessage(), e);
     }
   }
 

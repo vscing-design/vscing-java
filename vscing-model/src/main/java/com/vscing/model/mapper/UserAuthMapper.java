@@ -27,4 +27,6 @@ public interface UserAuthMapper {
 
   int insert(UserAuth record);
 
+  UserAuth findOpenid(@Param("userId") Long userId, @Param("platform") Integer platform);
+
 }

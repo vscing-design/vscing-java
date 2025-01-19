@@ -203,4 +203,9 @@ public class AppletServiceImpl implements AppletService {
     }
   }
 
+  @Override
+  public String getPayment(Map<String, Object> paymentData) {
+    return "";
+  }
+
 }

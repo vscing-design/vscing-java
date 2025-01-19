@@ -1,7 +1,11 @@
 package com.vscing.api.service;
 
+import com.vscing.model.dto.OrderApiCreatedDto;
+import com.vscing.model.dto.OrderApiDetailsDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.request.ShowSeatRequest;
+import com.vscing.model.vo.OrderApiDetailsVo;
+import com.vscing.model.vo.OrderApiPaymentVo;
 import com.vscing.model.vo.SeatMapVo;
 
 import java.util.List;
@@ -24,6 +28,19 @@ public interface OrderService {
   */
   SeatMapVo getSeat(ShowSeatRequest showSeat);
 
+  /**
+   * 校验座位是否存在订单中
+   */
+  boolean verifyOrderSeat(OrderApiDetailsDto orderApiDetails);
 
+  /**
+   * 下单确认页详情
+   */
+  OrderApiDetailsVo getDetails(OrderApiDetailsDto orderApiDetails);
+
+  /**
+   * 下单返回小程序参数
+  */
+  OrderApiPaymentVo create(Long userId, OrderApiCreatedDto orderApiCreatedDto);
 
 }
