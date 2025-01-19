@@ -340,7 +340,7 @@
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
-        WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+        WHERE s.id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
     <!-- 插入信息 -->
