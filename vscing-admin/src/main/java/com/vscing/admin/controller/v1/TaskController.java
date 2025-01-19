@@ -56,10 +56,17 @@ public class TaskController {
         return CommonResult.success();
     }
 
-    @GetMapping("/cinema")
-    @Operation(summary = "同步影院测试")
-    public CommonResult<Object> cinema() {
-        taskService.syncCinema();
+    @GetMapping("/cityCinema")
+    @Operation(summary = "同步城市影院测试")
+    public CommonResult<Object> cityCinema() {
+        taskService.syncCityCinema();
+        return CommonResult.success();
+    }
+
+    @GetMapping("/districtCinema")
+    @Operation(summary = "同步区县影院测试")
+    public CommonResult<Object> districtCinema() {
+        taskService.syncDistrictCinema();
         return CommonResult.success();
     }
 

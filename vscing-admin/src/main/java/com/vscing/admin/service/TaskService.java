@@ -12,7 +12,9 @@ public interface TaskService {
 
   void syncAddress();
 
-  void syncCinema();
+  void syncCityCinema();
+
+  void syncDistrictCinema();
 
   void syncMovie();
 

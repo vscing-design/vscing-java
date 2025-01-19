@@ -80,7 +80,7 @@ public class TaskServiceImpl implements TaskService {
   private CityMapper cityMapper;
 
   @Autowired
-  private DistrictMapper areaMapper;
+  private DistrictMapper districtMapper;
 
   @Autowired
   private CinemaMapper cinemaMapper;
@@ -186,11 +186,11 @@ public class TaskServiceImpl implements TaskService {
           } else {
             log.info("area");
             // 如果 city 表中找不到，尝试在 area 表中查找 cityCode
-            District area = areaMapper.findByCode(cityCode);
+            District area = districtMapper.findByCode(cityCode);
             if (area != null) {
               log.info("areaCity");
               // 如果找到，则更新 area 表中的 cityId
-              areaMapper.updateCity(area.getId(), cityId);
+              districtMapper.updateCity(area.getId(), cityId);
             }
           }
         } catch (Exception e) {
@@ -207,10 +207,10 @@ public class TaskServiceImpl implements TaskService {
               Long regionId = objectMapper.convertValue(region.get("regionId"), Long.class);
               log.info("regionName: {}, regionId: {}", regionName, regionId);
               if(regionName != null && regionId != null){
-                District areaByRegionName = areaMapper.findByName(regionName, cityId);
+                District areaByRegionName = districtMapper.findByName(regionName, cityId);
                 if (areaByRegionName != null) {
                   log.info("areaRegion", areaByRegionName.getId());
-                  areaMapper.updateRegion(areaByRegionName.getId(), regionId);
+                  districtMapper.updateRegion(areaByRegionName.getId(), regionId);
                 }
               }
             } catch (Exception e) {
@@ -230,7 +230,7 @@ public class TaskServiceImpl implements TaskService {
 
   @Async("threadPoolTaskExecutor")
   @Override
-  public void syncCinema() {
+  public void syncCityCinema() {
     // 获取城市
     List<City> cityList = cityMapper.getList(new AddressListDto());
     for(City city : cityList){
@@ -298,12 +298,104 @@ public class TaskServiceImpl implements TaskService {
                 cinema.setPhone(cinemaPhone);
               }
               if(regionName != null){
-                District district = areaMapper.findByName(regionName, city.getId());
+                District district = districtMapper.findByName(regionName, city.getId());
                 if(district != null){
                   cinema.setDistrictId(district.getId());
                   cinema.setDistrictName(district.getName());
                 }
               }
+              int res = cinemaMapper.insert(cinema);
+              log.info("res: {}", res);
+            }
+          } catch (Exception e) {
+            log.error("影院同步错误原因", e);
+          }
+        }
+
+        log.info(city.getName() + "同步地址结束");
+
+      } catch (Exception e) {
+        log.error(city.getName() + "同步影院失败", e);
+      }
+    }
+
+    log.info("全部影院同步结束");
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncDistrictCinema() {
+    List<District> districtList = districtMapper.getTaskList();
+    for(District district : districtList){
+      City city = cityMapper.selectById(district.getCityId());
+      if(city == null){
+        continue;
+      }
+      Province province = provinceMapper.selectById(city.getProvinceId());
+      if(province == null){
+        continue;
+      }
+      log.info("districtName: {}", district.getName());
+
+      try {
+        // 准备请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put("cityId", String.valueOf(district.getS1CityId()));
+        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+        // 发送请求并获取响应
+        String responseBody = supplierService.sendRequest("/cinema/query", params);
+
+        log.info("responseBody: {}", responseBody);
+
+        // 将 JSON 字符串解析为 JsonNode 对象
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+        Integer code = (Integer) responseMap.getOrDefault("code", 0);
+        String message = (String) responseMap.getOrDefault("message", "未知错误");
+        if(code != ResultCode.SUCCESS.getCode()) {
+          log.info("code: {}, message: {}", code, message);
+          continue;
+        }
+
+        List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+
+        for (Map<String, Object> data : dataList) {
+          log.info("开始处理数据");
+          try {
+            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
+            String cinemaName = (String) data.get("cinemaName");
+            String cinemaAddress = (String) data.get("cinemaAddress");
+            Double longitude = (Double) data.get("longitude");
+            Double latitude = (Double) data.get("latitude");
+            // 可能没有
+            String cinemaPhone = (String) data.get("cinemaPhone");
+            String regionName = (String) data.get("regionName");
+
+            log.info("cinemaId: {}, cinemaName: {}, cinemaAddress: {}, longitude: {}, latitude: {}, cinemaPhone: {}, regionName: {}",
+                cinemaId, cinemaName, cinemaAddress, longitude, latitude, cinemaPhone, regionName);
+
+            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
+
+              Cinema cinema = new Cinema();
+              cinema.setId(IdUtil.getSnowflakeNextId());
+              cinema.setSupplierId(1869799230973227008L);
+              cinema.setTpCinemaId(cinemaId);
+              cinema.setName(cinemaName);
+              cinema.setAddress(cinemaAddress);
+              cinema.setLng(longitude);
+              cinema.setLat(latitude);
+
+              cinema.setProvinceId(province.getId());
+              cinema.setProvinceName(province.getName());
+              cinema.setCityId(city.getId());
+              cinema.setCityName(city.getName());
+              cinema.setCreatedBy(0L);
+              if(cinemaPhone != null){
+                cinema.setPhone(cinemaPhone);
+              }
+              cinema.setDistrictId(district.getId());
+              cinema.setDistrictName(district.getName());
               int res = cinemaMapper.insert(cinema);
               log.info("res: {}", res);
             }

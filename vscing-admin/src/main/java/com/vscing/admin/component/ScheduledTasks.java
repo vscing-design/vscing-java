@@ -47,10 +47,16 @@ public class ScheduledTasks {
         taskService.syncTable();
     }
 
-    @Scheduled(cron = "0 0 22 ? * 5") // 每周5晚上10点同步影院
-    public void cinemaTask() {
-        System.out.println("执行定时任务 每周5晚上10点同步影院：" + LocalDateTime.now());
-        taskService.syncCinema();
+    @Scheduled(cron = "0 0 23 ? * 5") // 每周5晚上11点同步城市影院
+    public void cityCinemaTask() {
+        System.out.println("执行定时任务 每周5晚上11点同步城市影院：" + LocalDateTime.now());
+        taskService.syncCityCinema();
+    }
+
+    @Scheduled(cron = "0 0 21 ? * 5") // 每周5晚上9点同步区县影院
+    public void districtCinema() {
+        System.out.println("执行定时任务 每周5晚上9点同步区县影院：" + LocalDateTime.now());
+        taskService.syncDistrictCinema();
     }
 
 //    @Scheduled(cron = "0 0/5 * * * ?") // 每5分钟同步一下取消待支付订单

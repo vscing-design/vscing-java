@@ -20,6 +20,9 @@ import java.util.List;
 @Mapper
 public interface DistrictMapper {
 
+  @Select("SELECT * FROM vscing_district WHERE s1_city_id IS NOT NULL")
+  List<District> getTaskList();
+
   @Select("SELECT * FROM vscing_district WHERE id = #{code}")
   District findByCode(@Param("code") String code);
 
