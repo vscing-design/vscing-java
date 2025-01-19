@@ -138,4 +138,67 @@ public class OrderController {
     return CommonResult.success(orderSave);
   }
 
+  @PostMapping("/delete/{id}")
+  @Operation(summary = "删除订单")
+  public CommonResult<Object> delete(@PathVariable("id") Long id,
+                                     @AuthenticationPrincipal UserDetails userInfo) {
+    try {
+      boolean res = orderService.deleteOrder(userInfo.getUserId(), id);
+      if (res) {
+        return CommonResult.success("删除成功");
+      } else {
+        return CommonResult.failed("删除失败");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/cancel/{id}")
+  @Operation(summary = "取消订单")
+  public CommonResult<Object> cancel(@PathVariable("id") Long id,
+                                     @AuthenticationPrincipal UserDetails userInfo) {
+    try {
+      boolean res = orderService.cancelOrder(userInfo.getUserId(), id);
+      if (res) {
+        return CommonResult.success("取消成功");
+      } else {
+        return CommonResult.failed("取消失败");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/payment/{id}")
+  @Operation(summary = "去支付")
+  public CommonResult<OrderApiPaymentVo> payment(@PathVariable("id") Long id,
+                                     @AuthenticationPrincipal UserDetails userInfo) {
+    try {
+      return CommonResult.success(orderService.paymentOrder(userInfo.getUserId(), id));
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/ticket/{id}")
+  @Operation(summary = "去出票")
+  public CommonResult<Object> ticket(@PathVariable("id") Long id,
+                                     @AuthenticationPrincipal UserDetails userInfo) {
+    try {
+      boolean res = orderService.ticketOrder(userInfo.getUserId(), id);
+      if (res) {
+        return CommonResult.success("取票接口返回成功");
+      } else {
+        return CommonResult.failed("取票接口返回失败");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
 }

@@ -3,6 +3,7 @@ package com.vscing.api.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.OrderService;
@@ -12,11 +13,13 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
 import com.vscing.model.dto.OrderApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
+import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.OrderDetail;
 import com.vscing.model.entity.PricingRule;
@@ -46,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +65,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
+
+  private static final List<Integer> SUCCESS_CODES = Arrays.asList(200, -530, 9999, 9008, 9011);
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
@@ -442,6 +448,111 @@ public class OrderServiceImpl implements OrderService {
       orderApiDetailsVo.setOrderDetailList(orderDetailList);
     }
     return orderApiDetailsVo;
+  }
+
+  @Override
+  public boolean deleteOrder(Long userId, Long id) {
+    // 删除订单
+    int rowsAffected = orderMapper.softDeleteById(id, 0L);
+    if (rowsAffected <= 0) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public boolean cancelOrder(Long userId, Long id) {
+    Order orderInfo = orderMapper.selectById(id);
+    // 判断订单状态
+    if (orderInfo == null || orderInfo.getStatus() >= 5) {
+      return false;
+    }
+    // 修改订单状态
+    Order order = new Order();
+    order.setId(id);
+    order.setStatus(5);
+    int rowsAffected = orderMapper.update(order);
+    if (rowsAffected <= 0) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public OrderApiPaymentVo paymentOrder(Long userId, Long id) {
+    Order orderInfo = orderMapper.selectById(id);
+
+    return null;
+  }
+
+  @Override
+  public boolean ticketOrder(Long id, Long by) {
+
+    try {
+      // 订单详情
+      Order order = orderMapper.selectById(id);
+      if(order == null || order.getStatus() != 2) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 场次详情
+      Show show = showMapper.selectById(order.getShowId());
+      if(show == null) {
+        throw new ServiceException("场次数据不存在");
+      }
+      // 获取订单详情
+      List<SeatListDto> seatList = orderDetailMapper.selectByOrderId(id);
+      if(seatList == null || seatList.isEmpty()) {
+        throw new ServiceException("订单详情数据不存在");
+      }
+      List<ShowInforDto> showInfor = MapstructUtils.convert(seatList, ShowInforDto.class);
+      // 判断是否需要先改变订单状态
+      Order updateOrder = new Order();
+      updateOrder.setId(order.getId());
+      if(order.getStatus() != 3) {
+        // 改变订单状态
+        updateOrder.setStatus(3);
+        updateOrder.setUpdatedBy(by);
+        int res = orderMapper.update(updateOrder);
+        if (res <= 0) {
+          throw new ServiceException("改变订单状态失败");
+        }
+      }
+      // 将 List 转换为 JSON 字符串
+      String showInforStr = JSONUtil.toJsonStr(showInfor);
+      // 准备请求参数
+      Map<String, String> params = new HashMap<>();
+      params.put("showId", show.getTpShowId());
+      params.put("showInfor", showInforStr);
+      params.put("notifyUrl", "https://sys-api.hiyaflix.cn/v1/notify/order");
+      params.put("takePhoneNumber", order.getPhone());
+      params.put("tradeNo", order.getOrderSn());
+      params.put("supportChangeSeat", "1");
+      params.put("addFlag", "1");
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+      // 发送请求并获取响应
+      String responseBody = supplierService.sendRequest("/order/preferential/submit", params);
+
+      log.info("responseBody: {}", responseBody);
+
+      // 将 JSON 字符串解析为 JsonNode 对象
+      ObjectMapper objectMapper = new ObjectMapper();
+      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+      Integer code = (Integer) responseMap.getOrDefault("code", 0);
+      String message = (String) responseMap.getOrDefault("message", "未知错误");
+      // 保存三方接口的返回结果
+      updateOrder.setResponseBody(responseBody);
+      // 调用保存
+      orderMapper.update(updateOrder);
+      // 调用三方成功
+      if(SUCCESS_CODES.contains(code)) {
+        log.error("调用三方下单写入数据：", order.getOrderSn());
+        return true;
+      }
+      throw new ServiceException(message);
+    } catch (Exception e) {
+      log.error("调用三方下单异常：{}", e);
+    }
+    return false;
   }
 
 }

@@ -56,4 +56,24 @@ public interface OrderService {
    */
   OrderApiDetailsVo getDetails(Long userId, Long id);
 
+  /**
+   * 删除订单
+   */
+  boolean deleteOrder(Long userId, Long id);
+
+  /**
+   * 取消订单
+   */
+  boolean cancelOrder(Long userId, Long id);
+
+  /**
+   * 去支付
+   */
+  OrderApiPaymentVo paymentOrder(Long userId, Long id);
+
+  /**
+   * 去出票
+   */
+  boolean ticketOrder(Long userId, Long id);
+
 }
