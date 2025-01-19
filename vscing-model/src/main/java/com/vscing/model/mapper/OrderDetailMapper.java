@@ -18,6 +18,8 @@ public interface OrderDetailMapper {
 
   int batchInsert(@Param("list") List<OrderDetail> list);
 
+  List<OrderDetail> selectByApiOrderId(@Param("orderId") Long orderId);
+
   List<SeatListDto> selectByOrderId(@Param("orderId") Long orderId);
 
   List<SeatListDto> selectByShowId(Long showId);

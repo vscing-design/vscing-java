@@ -13,6 +13,7 @@
         <result column="show_id" property="showId" jdbcType="BIGINT" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+        <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
         <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
         <result column="ticket_code" property="ticketCode" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
@@ -22,6 +23,7 @@
         <result column="settle_status" property="settleStatus" jdbcType="TINYINT" />
         <result column="purchase_quantity" property="purchaseQuantity" jdbcType="INTEGER" />
         <result column="seat_info" property="seatInfo" jdbcType="VARCHAR" />
+        <result column="seat_adjusted" property="seatAdjusted" jdbcType="TINYINT" />
         <result column="is_adjusted" property="isAdjusted" jdbcType="TINYINT" />
         <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
         <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
@@ -113,7 +115,7 @@
         <include refid="commonWhereClause" />
     </select>
 
-    <!-- 查询用户列表 -->
+    <!-- 查询列表 -->
     <select id="getList" resultType="com.vscing.model.vo.OrderVo">
         SELECT
         `order`.*,
@@ -142,6 +144,81 @@
         LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
         <include refid="commonWhereClause" />
         ORDER BY `order`.created_at DESC
+    </select>
+
+    <!-- 查询小程序我的订单列表 -->
+    <select id="getApiList" resultType="com.vscing.model.vo.OrderApiListVo">
+        SELECT
+        `order`.id,
+        `order`.purchase_quantity AS purchaseQuantity,
+        `order`.total_price as totalPrice,
+        `order`.created_at as createdAt,
+        cinema.name AS cinemaName,
+        movie.name AS movieName,
+        movie.poster_url AS posterUrl,
+        `show`.hall_name AS hallName,
+        `show`.show_time AS showTime
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
+        <where>
+        <if test="userId != null">
+            AND `user`.id = #{userId}
+        </if>
+        <if test="status != null and status != ''">
+            <foreach collection="status.split(',')" item="item" open="AND `order`.status IN (" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND `order`.deleted_at IS NULL
+        </where>
+        ORDER BY `order`.created_at DESC
+    </select>
+
+    <!-- 查询小程序我的订单详情 -->
+    <select id="getApiDetails" parameterType="map" resultType="com.vscing.model.vo.OrderApiDetailsVo">
+        SELECT
+        `order`.id,
+        `order`.order_sn AS orderSn,
+        `order`.phone,
+        `order`.status,
+        `order`.purchase_quantity AS purchaseQuantity,
+        `order`.seat_info AS seatInfo,
+        `order`.ticket_code AS ticketCode,
+        `order`.total_price AS totalPrice,
+        `order`.official_price AS officialPrice,
+        `order`.created_at AS createdAt,
+        cinema.name AS cinemaName,
+        cinema.province_name AS provinceName,
+        cinema.city_name AS cityName,
+        cinema.district_name AS districtName,
+        cinema.address,
+        cinema.lng,
+        cinema.lat,
+        cinema.phone AS cinemaPhone,
+        movie.name AS movieName,
+        movie.poster_url AS posterUrl,
+        `show`.hall_name AS hallName,
+        `show`.show_time AS showTime,
+        `show`.show_version_type AS showVersionType,
+        `show`.stop_sell_time AS stopSellTime
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
+        <where>
+            <if test="id != null">
+                AND `order`.id = #{id}
+            </if>
+            <if test="userId != null">
+                AND `order`.user_id = #{userId}
+            </if>
+            AND `order`.deleted_at IS NULL
+        </where>
+        LIMIT 1
     </select>
 
     <!-- 定时更新待支付订单状态 -->
@@ -199,6 +276,7 @@
             <if test="showId != null">show_id,</if>
             <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
+            <if test="tradeNo != null">trade_no,</if>
             <if test="supplierOrderSn != null">supplier_order_sn,</if>
             <if test="ticketCode != null">ticket_code,</if>
             <if test="status != null">status,</if>
@@ -208,6 +286,7 @@
             <if test="settleStatus != null">settle_status,</if>
             <if test="purchaseQuantity != null">purchase_quantity,</if>
             <if test="seatInfo != null">seat_info,</if>
+            <if test="seatAdjusted != null">seat_adjusted,</if>
             <if test="isAdjusted != null">is_adjusted,</if>
             <if test="totalPrice != null">total_price,</if>
             <if test="officialPrice != null">official_price,</if>
@@ -225,6 +304,7 @@
             <if test="showId != null">#{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
+            <if test="tradeNo != null">#{tradeNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="ticketCode != null">#{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
@@ -234,6 +314,7 @@
             <if test="settleStatus != null">#{settleStatus, jdbcType=TINYINT},</if>
             <if test="purchaseQuantity != null">#{purchaseQuantity, jdbcType=INTEGER},</if>
             <if test="seatInfo != null">#{seatInfo, jdbcType=VARCHAR},</if>
+            <if test="seatAdjusted != null">#{seatAdjusted, jdbcType=TINYINT},</if>
             <if test="isAdjusted != null">#{isAdjusted, jdbcType=TINYINT},</if>
             <if test="totalPrice != null">#{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
@@ -254,6 +335,7 @@
             <if test="showId != null">show_id = #{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
+            <if test="tradeNo != null">trade_no = #{tradeNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="ticketCode != null">ticket_code = #{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
@@ -263,6 +345,7 @@
             <if test="settleStatus != null">settle_status = #{settleStatus, jdbcType=TINYINT},</if>
             <if test="purchaseQuantity != null">purchase_quantity = #{purchaseQuantity, jdbcType=INTEGER},</if>
             <if test="seatInfo != null">seat_info = #{seatInfo, jdbcType=VARCHAR},</if>
+            <if test="seatAdjusted != null">seat_adjusted = #{seatAdjusted, jdbcType=TINYINT},</if>
             <if test="isAdjusted != null">is_adjusted = #{isAdjusted, jdbcType=TINYINT},</if>
             <if test="totalPrice != null">total_price = #{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">official_price = #{officialPrice, jdbcType=DECIMAL},</if>

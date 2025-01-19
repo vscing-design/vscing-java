@@ -325,7 +325,7 @@
     </select>
 
     <!-- 根据 ID 查询 -->
-    <select id="selectByOrderDetails" parameterType="long" resultType="com.vscing.model.vo.OrderApiDetailsVo">
+    <select id="selectByOrderDetails" parameterType="long" resultType="com.vscing.model.vo.OrderApiConfirmDetailsVo">
         SELECT
             s.id as showId,
             s.hall_name as hallName,

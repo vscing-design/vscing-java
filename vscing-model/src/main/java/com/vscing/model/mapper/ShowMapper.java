@@ -9,7 +9,7 @@ import com.vscing.model.entity.Show;
 import com.vscing.model.vo.CinemaApiDetailsShowVo;
 import com.vscing.model.vo.CinemaApiVo;
 import com.vscing.model.vo.MovieApiVo;
-import com.vscing.model.vo.OrderApiDetailsVo;
+import com.vscing.model.vo.OrderApiConfirmDetailsVo;
 import com.vscing.model.vo.ShowListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -39,7 +39,7 @@ public interface ShowMapper {
 
   Show selectById(long id);
 
-  OrderApiDetailsVo selectByOrderDetails(long id);
+  OrderApiConfirmDetailsVo selectByOrderDetails(long id);
 
   int insert(Show record);
 

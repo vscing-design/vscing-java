@@ -2,6 +2,8 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.entity.Order;
+import com.vscing.model.vo.OrderApiDetailsVo;
+import com.vscing.model.vo.OrderApiListVo;
 import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
@@ -16,6 +18,10 @@ import java.util.List;
 */
 @Mapper
 public interface OrderMapper {
+
+  List<OrderApiListVo> getApiList(@Param("userId") long userId, @Param("status") String status);
+
+  OrderApiDetailsVo getApiDetails(@Param("userId") long userId, @Param("id") long id);
 
   List<OrderVo> getList(OrderListDto record);
 

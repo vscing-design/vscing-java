@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.OrderService;
 import com.vscing.common.api.ResultCode;
 import com.vscing.common.exception.ServiceException;
@@ -11,8 +12,9 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
-import com.vscing.model.dto.OrderApiDetailsDto;
+import com.vscing.model.dto.OrderApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.entity.Order;
@@ -29,7 +31,9 @@ import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.utils.PricingUtil;
+import com.vscing.model.vo.OrderApiConfirmDetailsVo;
 import com.vscing.model.vo.OrderApiDetailsVo;
+import com.vscing.model.vo.OrderApiListVo;
 import com.vscing.model.vo.OrderApiPaymentVo;
 import com.vscing.model.vo.OrderApiSeatListVo;
 import com.vscing.model.vo.SeatMapVo;
@@ -169,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public boolean verifyOrderSeat(OrderApiDetailsDto orderApiDetails) {
+  public boolean verifyOrderSeat(OrderApiConfirmDetailsDto orderApiDetails) {
     // 获取座位ID
     List<String> seatIds = orderApiDetails.getSeatList().stream()
         // 提取seatId
@@ -183,11 +187,11 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderApiDetailsVo getDetails(OrderApiDetailsDto orderApiDetails) {
+  public OrderApiConfirmDetailsVo getConfirmDetails(OrderApiConfirmDetailsDto orderApiDetails) {
     // 获取结算规则列表
     List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
     // 获取场次全局价格
-    OrderApiDetailsVo details = showMapper.selectByOrderDetails(orderApiDetails.getShowId());
+    OrderApiConfirmDetailsVo details = showMapper.selectByOrderDetails(orderApiDetails.getShowId());
     // 获取区域ID
     List<String> areas = orderApiDetails.getSeatList().stream()
         // 提取areaId
@@ -419,6 +423,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     return orderApiPaymentVo;
+  }
+
+  @Override
+  public List<OrderApiListVo> getList(Long userId, OrderApiListDto queryParam, Integer pageSize, Integer pageNum) {
+    PageHelper.startPage(pageNum, pageSize);
+    return orderMapper.getApiList(userId, queryParam.getStatus());
+  }
+
+  @Override
+  public OrderApiDetailsVo getDetails(Long userId, Long id) {
+    OrderApiDetailsVo orderApiDetailsVo = orderMapper.getApiDetails(userId, id);
+    if(orderApiDetailsVo != null) {
+      // 计算优惠
+      orderApiDetailsVo.setDiscount(orderApiDetailsVo.getOfficialPrice().subtract(orderApiDetailsVo.getTotalPrice()));
+      // 座位列表
+      List<OrderDetail> orderDetailList = orderDetailMapper.selectByApiOrderId(id);
+      orderApiDetailsVo.setOrderDetailList(orderDetailList);
+    }
+    return orderApiDetailsVo;
   }
 
 }

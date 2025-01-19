@@ -1,7 +1,5 @@
 package com.vscing.model.dto;
 
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -16,9 +14,6 @@ import java.util.List;
  * @date 2025/1/19 12:11
  */
 @Data
-@AutoMappers({
-    @AutoMapper(target = OrderApiDetailsDto.class),
-})
 public class OrderApiCreatedDto {
 
   @NotNull(message = "场次ID不能为空")

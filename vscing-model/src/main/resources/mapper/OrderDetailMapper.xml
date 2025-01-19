@@ -43,6 +43,15 @@
         </where>
     </select>
 
+    <!-- 查询订单座位列表 -->
+    <select id="selectByApiOrderId" parameterType="long" resultMap="BaseResultMap">
+        SELECT *
+        FROM <include refid="tableName" />
+        <where>
+            order_id = #{orderId, jdbcType=BIGINT} and deleted_at IS NULL
+        </where>
+    </select>
+
     <!-- 批量插入信息 -->
     <insert id="batchInsert" parameterType="java.util.List">
         INSERT INTO <include refid="tableName" />
