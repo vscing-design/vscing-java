@@ -3,38 +3,100 @@ package com.vscing.mq.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * RabbitMQConfig
+ *
+ * @author vscing
+ * @date 2025/1/21 00:21
+ */
 @Slf4j
 @Configuration
 public class RabbitMQConfig {
 
-    //队列 起名：TestDirectQueue
-    @Bean
-    public Queue TestDirectQueue() {
-        // durable:是否持久化,默认是false,持久化队列：会被存储在磁盘上，当消息代理重启时仍然存在，暂存队列：当前连接有效
-        // exclusive:默认也是false，只能被当前创建的连接使用，而且当连接关闭后队列即被删除。此参考优先级高于durable
-        // autoDelete:是否自动删除，当没有生产者或者消费者使用此队列，该队列会自动删除。
-        //   return new Queue("TestDirectQueue",true,true,false);
+    // 延迟交换机名称
+    public static final String DELAYED_EXCHANGE_NAME = "delayed_exchange";
 
-        //一般设置一下队列的持久化就好,其余两个就是默认false
-        return new Queue("TestDirectQueue",true);
+    // 同步场次码相关配置
+    public static final String SYNC_CODE_QUEUE = "sync_code_queue";
+    public static final String SYNC_CODE_ROUTING_KEY = "sync_code_routing_key";
+
+    // 取消订单相关配置
+    public static final String CANCEL_ORDER_QUEUE = "cancel_order_queue";
+    public static final String CANCEL_ORDER_ROUTING_KEY = "cancel_order_routing_key";
+
+    // 死信交换机和队列配置
+    public static final String DLX_EXCHANGE_NAME = "dlx_exchange";
+    public static final String DLX_QUEUE_NAME = "dlx_queue";
+    public static final String DLX_ROUTING_KEY = "dlx_routing_key";
+
+    /**
+     * 创建延迟交换机。
+     */
+    @Bean
+    public CustomExchange delayedExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange(DELAYED_EXCHANGE_NAME, "x-delayed-message", true, false, args);
     }
 
-    //Direct交换机 起名：TestDirectExchange
+    /**
+     * 创建同步场次码队列，并绑定到延迟交换机。
+     */
     @Bean
-    DirectExchange TestDirectExchange() {
-        //  return new DirectExchange("TestDirectExchange",true,true);
-        return new DirectExchange("TestDirectExchange",true,false);
+    public Queue syncCodeQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME); // 指定死信交换机
+        args.put("x-dead-letter-routing-key", DLX_ROUTING_KEY); // 指定死信路由键
+        return QueueBuilder.durable(SYNC_CODE_QUEUE).withArguments(args).build();
     }
 
-    //绑定  将队列和交换机绑定, 并设置用于匹配键：TestDirectRouting
     @Bean
-    Binding bindingDirect() {
-        return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with("TestDirectRouting");
+    public Binding bindingSyncCodeQueueToDelayedExchange(Queue syncCodeQueue) {
+        return BindingBuilder.bind(syncCodeQueue).to(delayedExchange()).with(SYNC_CODE_ROUTING_KEY).noargs();
     }
 
+    /**
+     * 创建取消订单队列，并绑定到延迟交换机。
+     */
+    @Bean
+    public Queue cancelOrderQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", DLX_EXCHANGE_NAME); // 指定死信交换机
+        args.put("x-dead-letter-routing-key", DLX_ROUTING_KEY); // 指定死信路由键
+        return QueueBuilder.durable(CANCEL_ORDER_QUEUE).withArguments(args).build();
+    }
+
+    @Bean
+    public Binding bindingCancelOrderQueueToDelayedExchange(Queue cancelOrderQueue) {
+        return BindingBuilder.bind(cancelOrderQueue).to(delayedExchange()).with(CANCEL_ORDER_ROUTING_KEY).noargs();
+    }
+
+    /**
+     * 创建死信交换机和队列。
+     */
+    @Bean
+    public DirectExchange dlxExchange() {
+        return new DirectExchange(DLX_EXCHANGE_NAME);
+    }
+
+    @Bean
+    public Queue dlxQueue() {
+        return QueueBuilder.durable(DLX_QUEUE_NAME).build();
+    }
+
+    @Bean
+    public Binding bindingDlxQueueToDlxExchange(Queue dlxQueue, DirectExchange dlxExchange) {
+        return BindingBuilder.bind(dlxQueue).to(dlxExchange).with(DLX_ROUTING_KEY);
+    }
 }
+
