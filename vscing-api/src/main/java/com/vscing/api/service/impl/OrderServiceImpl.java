@@ -413,22 +413,21 @@ public class OrderServiceImpl implements OrderService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
+      // 下发支付参数
+      OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
+      // 处理微信参数
+      if(AppletServiceFactory.WECHAT.equals(orderApiCreatedDto.getPlatform())) {
 
+      }
+      // 处理支付宝参数
+      if(AppletServiceFactory.ALIPAY.equals(orderApiCreatedDto.getPlatform())) {
+        orderApiPaymentVo.setTradeNo(paymentStr);
+      }
+      return orderApiPaymentVo;
     } catch (Exception e) {
       log.error("下单异常：", e);
-      return null;
+      throw new ServiceException(e.getMessage());
     }
-    OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-    // 处理微信参数
-    if(AppletServiceFactory.WECHAT.equals(orderApiCreatedDto.getPlatform())) {
-
-    }
-    // 处理支付宝参数
-    if(AppletServiceFactory.ALIPAY.equals(orderApiCreatedDto.getPlatform())) {
-      orderApiPaymentVo.setTradeNo(paymentStr);
-    }
-
-    return orderApiPaymentVo;
   }
 
   @Override
