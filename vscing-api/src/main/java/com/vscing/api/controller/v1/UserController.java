@@ -44,6 +44,20 @@ public class UserController {
   @Autowired
   private UserService userService;
 
+  @PostMapping("/testLogin")
+  @Operation(summary = "测试小程序用户登录")
+  public CommonResult<Object> testLogin() {
+    String token = userService.testLogin();
+    if (token == null || token.isBlank()) {
+      return CommonResult.failed("登陆失败");
+    } else {
+      Map<String, String> tokenMap = new HashMap<>(2);
+      tokenMap.put("token", token);
+      tokenMap.put("tokenHead", tokenHead);
+      return CommonResult.success("登陆成功", tokenMap);
+    }
+  }
+
   @PostMapping("/login")
   @Operation(summary = "小程序用户登录")
   public CommonResult<Object> login(@Validated @RequestBody UserLoginDto userLogin,

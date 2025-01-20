@@ -24,6 +24,11 @@ public interface UserService {
   UserDetailVo self(long id);
 
   /**
+   * 测试小程序用户登录
+   */
+  String testLogin();
+
+  /**
    * 小程序用户登陆
   */
   String login(UserLoginDto userLogin, HttpServletRequest request);

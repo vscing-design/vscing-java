@@ -79,6 +79,24 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public String testLogin() {
+    String token = null;
+    try {
+      // 根据用户信息生成token
+      UserDetailVo userData = this.self(1878629185372782592L);
+      VscingUserDetails userDetails = new UserDetailsImpl(userData);
+      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+      token = jwtTokenUtil.generateToken(userDetails.getUserId());
+      // 记录到redis
+      redisService.set(cachePrefix + userDetails.getUserId() + ":" + token, userData, expiration);
+    } catch (Exception e) {
+      log.error("login登陆异常：", e);
+    }
+    return token;
+  }
+
+  @Override
   public String login(UserLoginDto userLogin, HttpServletRequest request) {
     String token = null;
     try {
