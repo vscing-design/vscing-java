@@ -68,6 +68,11 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 cinemaId 查询 -->
+    <select id="selectByTpCinemaId" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE tp_cinema_id = #{tpCinemaId, jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 根据ID查询详情并计算距离 -->
     <select id="selectByIdWithDistance" parameterType="map" resultType="com.vscing.model.vo.CinemaApiDetailsVo">
         SELECT

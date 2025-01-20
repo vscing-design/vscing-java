@@ -39,6 +39,8 @@ public interface ShowMapper {
 
   Show selectById(long id);
 
+  Show selectByTpShowId(String tpShowId);
+
   OrderApiConfirmDetailsVo selectByOrderDetails(long id);
 
   int insert(Show record);

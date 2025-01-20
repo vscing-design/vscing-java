@@ -324,6 +324,11 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 tpShowId 查询 -->
+    <select id="selectByTpShowId" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE tp_show_id = #{tpShowId,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 根据 ID 查询 -->
     <select id="selectByOrderDetails" parameterType="long" resultType="com.vscing.model.vo.OrderApiConfirmDetailsVo">
         SELECT

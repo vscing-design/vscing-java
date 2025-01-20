@@ -31,6 +31,8 @@ public interface MovieMapper {
 
   Movie selectById(long id);
 
+  Movie selectByTpMovieId(long tpMovieId);
+
   int insert(Movie record);
 
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);

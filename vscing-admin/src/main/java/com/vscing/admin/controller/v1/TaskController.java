@@ -103,6 +103,11 @@ public class TaskController {
         return CommonResult.success();
     }
 
-
+    @GetMapping("/test")
+    @Operation(summary = "测试异常")
+    public CommonResult<Object> syncTest() {
+        taskService.syncTest();
+        return CommonResult.success();
+    }
 
 }

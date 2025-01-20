@@ -22,6 +22,8 @@ public interface CinemaMapper {
 
   Cinema selectById(long id);
 
+  Cinema selectByTpCinemaId(long tpCinemaId);
+
   CinemaApiDetailsVo selectByIdWithDistance(CinemaApiDetailsDto record);
 
   int insert(Cinema record);

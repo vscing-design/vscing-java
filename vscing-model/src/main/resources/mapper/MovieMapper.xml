@@ -73,6 +73,11 @@
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
+    <!-- 根据 tpMovieId 查询 -->
+    <select id="selectByTpMovieId" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE tp_movie_id = #{tpMovieId, jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Movie">
         INSERT INTO <include refid="tableName" />
