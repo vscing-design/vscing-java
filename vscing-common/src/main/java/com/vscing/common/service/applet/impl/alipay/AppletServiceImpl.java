@@ -203,8 +203,10 @@ public class AppletServiceImpl implements AppletService {
       model.setBuyerOpenId((String) paymentData.get("openid"));
       // 设置订单相对超时时间
       model.setTimeoutExpress("10m");
+      // 请求参数的集合
+      request.setBizModel(model);
       // 调用接口
-      AlipayTradeCreateResponse response = alipayClient.execute(request);
+      AlipayTradeCreateResponse response = alipayClient.certificateExecute(request);
       log.info("支付宝下单调用结果: " , response);
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象

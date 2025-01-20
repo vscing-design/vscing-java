@@ -52,6 +52,34 @@
         </where>
     </select>
 
+    <!-- 小程序批量插入信息 -->
+    <insert id="apiBatchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].orderId != null">order_id,</if>
+            <if test="list[0].tpAreaId != null">tp_area_id,</if>
+            <if test="list[0].tpSeatId != null">tp_seat_id,</if>
+            <if test="list[0].tpSeatName != null">tp_seat_name,</if>
+            <if test="list[0].totalPrice != null">total_price,</if>
+            <if test="list[0].officialPrice != null">official_price,</if>
+            <if test="list[0].settlementPrice != null">settlement_price</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.orderId != null">#{item.orderId, jdbcType=BIGINT},</if>
+                <if test="item.tpAreaId != null">#{item.tpAreaId, jdbcType=VARCHAR},</if>
+                <if test="item.tpSeatId != null">#{item.tpSeatId,jdbcType=VARCHAR},</if>
+                <if test="item.tpSeatName != null">#{item.tpSeatName,jdbcType=VARCHAR},</if>
+                <if test="item.totalPrice != null">#{item.totalPrice, jdbcType=DECIMAL},</if>
+                <if test="item.officialPrice != null">#{item.officialPrice, jdbcType=DECIMAL},</if>
+                <if test="item.settlementPrice != null">#{item.settlementPrice, jdbcType=DECIMAL}</if>
+            </trim>
+        </foreach>
+    </insert>
+
     <!-- 批量插入信息 -->
     <insert id="batchInsert" parameterType="java.util.List">
         INSERT INTO <include refid="tableName" />

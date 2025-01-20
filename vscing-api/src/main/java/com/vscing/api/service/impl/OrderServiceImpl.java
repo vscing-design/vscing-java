@@ -408,7 +408,7 @@ public class OrderServiceImpl implements OrderService {
       }
       // 创建订单详情数据
       if(!orderDetailList.isEmpty()) {
-        rowsAffected = orderDetailMapper.batchInsert(orderDetailList);
+        rowsAffected = orderDetailMapper.apiBatchInsert(orderDetailList);
         if (rowsAffected != orderDetailList.size()) {
           throw new ServiceException("创建订单详情数据失败");
         }
