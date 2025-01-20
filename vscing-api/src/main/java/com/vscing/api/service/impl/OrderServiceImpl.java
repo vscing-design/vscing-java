@@ -480,8 +480,17 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderApiPaymentVo paymentOrder(Long userId, Long id) {
     Order orderInfo = orderMapper.selectById(id);
+    // 下发支付参数
+    OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
+    // 处理微信参数
+    if(AppletServiceFactory.WECHAT.equals(orderInfo.getPlatform())) {
 
-    return null;
+    }
+    // 处理支付宝参数
+    if(AppletServiceFactory.ALIPAY.equals(orderInfo.getPlatform())) {
+      orderApiPaymentVo.setTradeNo(orderInfo.getTradeNo());
+    }
+    return orderApiPaymentVo;
   }
 
   @Override
