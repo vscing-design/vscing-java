@@ -170,13 +170,15 @@
             <if test="userId != null">
                 AND `user`.id = #{userId}
             </if>
+            <if test="platform != null">
+                AND `order`.platform = #{platform}
+            </if>
             <if test="status != null and status != ''">
                 <foreach collection="status.split(',')" item="item" open="AND `order`.status IN (" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
             AND `order`.order_type = 1
-            AND `order`.platform = 2
             AND `order`.deleted_at IS NULL
         </where>
         ORDER BY `order`.created_at DESC
@@ -360,6 +362,13 @@
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 更新支付宝订单信息 -->
+    <update id="updateAlipayOrder" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET status = 2, payment_status = 1
+        WHERE order_sn = #{orderSn, jdbcType=VARCHAR} AND trade_no = #{tradeNo, jdbcType=VARCHAR}
     </update>
 
     <!-- 根据 ID 软删除 -->

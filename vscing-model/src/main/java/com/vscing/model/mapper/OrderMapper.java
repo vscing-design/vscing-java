@@ -19,7 +19,7 @@ import java.util.List;
 @Mapper
 public interface OrderMapper {
 
-  List<OrderApiListVo> getApiList(@Param("userId") long userId, @Param("status") String status);
+  List<OrderApiListVo> getApiList(@Param("userId") long userId, @Param("status") String status, @Param("platform") Integer platform);
 
   OrderApiDetailsVo getApiDetails(@Param("userId") long userId, @Param("id") long id);
 
@@ -36,6 +36,8 @@ public interface OrderMapper {
   int insert(Order record);
 
   int update(Order record);
+
+  int updateAlipayOrder(@Param("orderSn") String orderSn, @Param("tradeNo") String tradeNo);
 
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 

@@ -2,6 +2,8 @@ package com.vscing.api.controller.v1;
 
 import com.vscing.api.service.TestService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.service.RedisService;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.config.RabbitMQConfig;
@@ -38,6 +40,9 @@ public class TestController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private RedisService redisService;
+
     public void sendDelayedMessage(String routingKey, Object message, int delayMilliseconds) {
         rabbitTemplate.convertAndSend(DELAYED_EXCHANGE_NAME, routingKey, message, msg -> {
             msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
@@ -51,13 +56,14 @@ public class TestController {
     public CommonResult<Object> test() {
         Map<String, Object> message = new HashMap<>(2);
         // 2分钟
+        redisService.set("retryCount", 0);
         message.put("id", 1);
         message.put("key", "123");
-        sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, message, 2 * 60 * 1000);
+        sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, JsonUtils.toJsonString(message), 10 *1000);
         // 10分钟
         message.put("id", 2);
         message.put("key", "456");
-        sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, message, 10 * 60 * 1000);
+        // sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, JsonUtils.toJsonString(message), 10 * 60 * 1000);
         return CommonResult.success("ok");
     }
 

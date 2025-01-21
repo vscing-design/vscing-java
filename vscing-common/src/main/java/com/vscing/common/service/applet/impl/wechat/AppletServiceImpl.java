@@ -208,4 +208,9 @@ public class AppletServiceImpl implements AppletService {
     return "";
   }
 
+  @Override
+  public boolean queryOrder(Map<String, String> queryData) {
+    return false;
+  }
+
 }

@@ -27,4 +27,9 @@ public interface AppletService {
   */
   String getPayment(Map<String, Object> paymentData);
 
+  /**
+   * 查询小程序订单是否支付成功
+   */
+  boolean queryOrder(Map<String, String> queryData);
+
 }

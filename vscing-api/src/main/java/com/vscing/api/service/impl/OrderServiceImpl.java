@@ -433,7 +433,16 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public List<OrderApiListVo> getList(Long userId, OrderApiListDto queryParam, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
-    return orderMapper.getApiList(userId, queryParam.getStatus());
+    Integer platform = 0;
+    // 处理微信参数
+    if(AppletServiceFactory.WECHAT.equals(queryParam.getPlatform())) {
+      platform = 1;
+    }
+    // 处理支付宝参数
+    if(AppletServiceFactory.ALIPAY.equals(queryParam.getPlatform())) {
+      platform = 2;
+    }
+    return orderMapper.getApiList(userId, queryParam.getStatus(), platform);
   }
 
   @Override

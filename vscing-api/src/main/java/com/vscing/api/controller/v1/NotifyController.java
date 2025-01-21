@@ -1,9 +1,11 @@
 package com.vscing.api.controller.v1;
 
+import com.vscing.api.service.NotifyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +26,13 @@ import java.util.Map;
 @Tag(name = "异步通知接口", description = "异步通知接口")
 public class NotifyController {
 
+  @Autowired
+  private NotifyService notifyService;
+
   @PostMapping("/alipayCreate")
   @Operation(summary = "支付宝下单异步通知")
   public String alipayCreate(HttpServletRequest request) {
-    Map<String,String> params = new HashMap<String,String>();
+    Map<String, String> params = new HashMap<String,String>();
     Map requestParams = request.getParameterMap();
     for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
       String name = (String) iter.next();
@@ -42,8 +47,12 @@ public class NotifyController {
       params.put(name, valueStr);
     }
     log.error("支付宝异步通知: {}", params);
-    // 查询订单接口，获取订单状态
-    return "success";
+    boolean res = notifyService.queryAlipayOrder(params);
+    if (res) {
+      // 查询订单接口，获取订单状态
+      return "success";
+    }
+    return "fail";
   }
 
 }
