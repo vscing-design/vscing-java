@@ -167,15 +167,17 @@
         LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
         LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
         <where>
-        <if test="userId != null">
-            AND `user`.id = #{userId}
-        </if>
-        <if test="status != null and status != ''">
-            <foreach collection="status.split(',')" item="item" open="AND `order`.status IN (" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        AND `order`.deleted_at IS NULL
+            <if test="userId != null">
+                AND `user`.id = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                <foreach collection="status.split(',')" item="item" open="AND `order`.status IN (" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            AND `order`.order_type = 1
+            AND `order`.platform = 2
+            AND `order`.deleted_at IS NULL
         </where>
         ORDER BY `order`.created_at DESC
     </select>
