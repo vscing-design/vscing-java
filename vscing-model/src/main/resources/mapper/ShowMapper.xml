@@ -274,11 +274,9 @@
                 sin(radians(c.lat))
                 )
             ) AS distance,
-            s.show_time as showTime,
             subq.min_show_price as maxPrice,
             subq.min_user_price as minPrice
-        FROM <include refid="tableName" /> s
-        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+        FROM <include refid="cinemaTableName" /> c
         INNER JOIN (
             SELECT
             s.cinema_id,

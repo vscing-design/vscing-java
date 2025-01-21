@@ -134,9 +134,12 @@
 
     <!-- 搜索已被占用的座位 -->
     <select id="selectByShowId" parameterType="long" resultType="com.vscing.model.dto.SeatListDto">
-        SELECT od.*
+        SELECT
+            od.tp_area_id as areaId,
+            od.tp_seat_id as seatId,
+            od.tp_seat_name as seatName
         FROM <include refid="tableName" /> od
-        JOIN <include refid="orderTableName" /> o ON od.order_id = o.id
+        INNER JOIN <include refid="orderTableName" /> o ON od.order_id = o.id
         WHERE o.status IN (1, 2, 3, 4)
         AND o.show_id = #{showId}
     </select>

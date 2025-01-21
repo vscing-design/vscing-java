@@ -18,6 +18,9 @@ public class OrderApiListVo {
   @Schema(description = "订单id")
   private Long id;
 
+  @Schema(description = "订单状态 1 待付款 2 待出票 3 出票中 4 已出票 5 已取消 6 退款中 7 退款完成")
+  private Integer status;
+
   @Schema(description = "影院名称")
   private String cinemaName;
 
@@ -39,7 +42,10 @@ public class OrderApiListVo {
   @Schema(description = "放映开始时间")
   private LocalDateTime showTime;
 
-  @Schema(description = "创建时间")
+  @Schema(description = "更新日期")
   private LocalDateTime createdAt;
+
+  @Schema(description = "创建时间")
+  private LocalDateTime updatedAt;
 
 }

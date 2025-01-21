@@ -86,6 +86,9 @@ public class OrderApiDetailsVo {
   @Schema(description = "放映开始时间")
   private LocalDateTime showTime;
 
+  @Schema(description = "放映时长（分钟）")
+  private Integer duration;
+
   @Schema(description = "场次类型")
   private String showVersionType;
 

@@ -150,9 +150,11 @@
     <select id="getApiList" resultType="com.vscing.model.vo.OrderApiListVo">
         SELECT
         `order`.id,
+        `order`.status,
         `order`.purchase_quantity AS purchaseQuantity,
         `order`.total_price as totalPrice,
         `order`.created_at as createdAt,
+        `order`.updated_at as updatedAt,
         cinema.name AS cinemaName,
         movie.name AS movieName,
         movie.poster_url AS posterUrl,
@@ -202,6 +204,7 @@
         movie.name AS movieName,
         movie.poster_url AS posterUrl,
         `show`.hall_name AS hallName,
+        `show`.duration,
         `show`.show_time AS showTime,
         `show`.show_version_type AS showVersionType,
         `show`.stop_sell_time AS stopSellTime
