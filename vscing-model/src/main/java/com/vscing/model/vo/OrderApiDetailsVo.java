@@ -101,4 +101,7 @@ public class OrderApiDetailsVo {
   @Schema(description = "座位列表")
   private List<OrderDetail> orderDetailList;
 
+  @Schema(description = "评分")
+  private Integer score;
+
 }
