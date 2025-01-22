@@ -39,6 +39,8 @@ import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
+import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,6 +90,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
+
+  @Autowired
+  private RabbitMQService rabbitMQService;
 
   /**
    * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
@@ -335,6 +340,8 @@ public class OrderServiceImpl implements OrderService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
+      // 发送mq消息
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
     }
@@ -525,6 +532,8 @@ public class OrderServiceImpl implements OrderService {
       updateOrder.setResponseBody(responseBody);
       // 调用保存
       orderMapper.update(updateOrder);
+      // 发送mq异步处理
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
       // 调用三方成功
       if(SUCCESS_CODES.contains(code)) {
         log.error("调用三方下单写入数据：", order.getOrderSn());

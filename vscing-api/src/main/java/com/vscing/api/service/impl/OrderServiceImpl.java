@@ -13,10 +13,12 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
 import com.vscing.model.dto.OrderApiListDto;
+import com.vscing.model.dto.OrderApiScoreDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
@@ -26,6 +28,8 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.UserAuth;
+import com.vscing.model.http.HttpOrder;
+import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
@@ -41,6 +45,8 @@ import com.vscing.model.vo.OrderApiPaymentVo;
 import com.vscing.model.vo.OrderApiSeatListVo;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.model.vo.SeatVo;
+import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,6 +97,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
+
+  @Autowired
+  private RabbitMQService rabbitMQService;
 
   /**
    * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
@@ -412,7 +421,8 @@ public class OrderServiceImpl implements OrderService {
         if (rowsAffected != orderDetailList.size()) {
           throw new ServiceException("创建订单详情数据失败");
         }
-      }
+      }// 发送mq消息
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
       // 处理微信参数
@@ -560,6 +570,8 @@ public class OrderServiceImpl implements OrderService {
       updateOrder.setResponseBody(responseBody);
       // 调用保存
       orderMapper.update(updateOrder);
+      // 发送mq异步处理
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
       // 调用三方成功
       if(SUCCESS_CODES.contains(code)) {
         log.error("调用三方下单写入数据：", order.getOrderSn());
@@ -570,6 +582,59 @@ public class OrderServiceImpl implements OrderService {
       log.error("调用三方下单异常：{}", e);
     }
     return false;
+  }
+
+  @Override
+  public boolean scoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto) {
+
+    try {
+      // 订单详情
+      Order order = orderMapper.selectById(orderApiScoreDto.getId());
+      if(order == null) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 增加分数
+      int rowsAffected = orderMapper.insertScore(userId, orderApiScoreDto.getId(), orderApiScoreDto.getScore());
+      if (rowsAffected <= 0) {
+        throw new ServiceException("评分失败");
+      }
+      return true;
+    } catch (Exception e) {
+      log.error("评分：{}", e);
+    }
+    return false;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+  public boolean supplierOrder(HttpOrder httpOrder) {
+
+    try {
+      int rowsAffected = 0;
+      // 根据订单号获取订单
+      Order order = orderMapper.selectByOrderSn(httpOrder.getTradeNo());
+      if(order == null) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 订单取票码
+      List<HttpTicketCode> ticketCodeList = httpOrder.getTicketCode();
+      if(ticketCodeList == null || ticketCodeList.isEmpty()) {
+        throw new ServiceException("订单取票码不存在");
+      }
+      // 改变订单状态
+      Order updateOrder = new Order();
+      updateOrder.setId(order.getId());
+      updateOrder.setStatus(4);
+      updateOrder.setSupplierOrderSn(httpOrder.getOrderNo());
+      updateOrder.setTicketCode(JsonUtils.toJsonString(ticketCodeList));
+      rowsAffected = orderMapper.update(updateOrder);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("改变订单状态失败");
+      }
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
+    return true;
   }
 
 }

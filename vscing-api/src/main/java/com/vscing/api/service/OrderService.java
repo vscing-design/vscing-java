@@ -3,7 +3,9 @@ package com.vscing.api.service;
 import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
 import com.vscing.model.dto.OrderApiListDto;
+import com.vscing.model.dto.OrderApiScoreDto;
 import com.vscing.model.dto.SeatListDto;
+import com.vscing.model.http.HttpOrder;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.OrderApiConfirmDetailsVo;
 import com.vscing.model.vo.OrderApiDetailsVo;
@@ -75,5 +77,16 @@ public interface OrderService {
    * 去出票
    */
   boolean ticketOrder(Long userId, Long id);
+
+  /**
+   * 评价
+   */
+  boolean scoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto);
+
+  /**
+   * 同步三方订单列表
+   */
+  boolean supplierOrder(HttpOrder httpOrder);
+
 
 }

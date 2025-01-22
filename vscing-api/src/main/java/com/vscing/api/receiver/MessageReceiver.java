@@ -1,9 +1,16 @@
 package com.vscing.api.receiver;
 
-import com.rabbitmq.client.Channel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vscing.api.service.OrderService;
+import com.vscing.common.api.ResultCode;
 import com.vscing.common.service.RedisService;
-import com.vscing.common.utils.JsonUtils;
+import com.vscing.common.service.supplier.SupplierService;
+import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.model.entity.Order;
+import com.vscing.model.http.HttpOrder;
+import com.vscing.model.mapper.OrderMapper;
 import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -11,87 +18,98 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Component
 public class MessageReceiver {
 
+  private static final String ORDER_STATUS_GENERATE_SUCCESS = "GENERATE_SUCCESS";
+
+  @Autowired
+  private SupplierServiceFactory supplierServiceFactory;
+
+  @Autowired
+  private OrderService orderService;
+
   @Autowired
   private RedisService redisService;
+
+  @Autowired
+  private RabbitMQService rabbitMQService;
+
+  @Autowired
+  private OrderMapper orderMapper;
 
   /**
    * 使用的自动应答，所以抛出异常就一直消费，死循环了。
    * 正确应该是异常之后还是当正常消费，再执行一个消息。
   */
   @RabbitListener(queues = RabbitMQConfig.SYNC_CODE_QUEUE)
-  public void receiveSyncCodeMessage(Message message, Channel channel) throws Exception {
+  public void receiveSyncCodeMessage(Message message) {
     try {
-      // 获取 x-death 头信息
-      List<Map<String, Object>> xDeathHeaders = (List<Map<String, Object>>) message.getMessageProperties().getHeaders().get("x-death");
-      int retryCount = 0;
-      if (xDeathHeaders != null && !xDeathHeaders.isEmpty()) {
-        Map<String, Object> lastDeathInfo = xDeathHeaders.get(xDeathHeaders.size() - 1);
-        retryCount = (Integer) lastDeathInfo.getOrDefault("count", 0);
-      }
-      System.out.println(" [x] Retry count1: " + retryCount);
-      if (redisService.hasKey("retryCount")) {
-        retryCount = (Integer) redisService.get("retryCount");
-      }
-      System.out.println(" [x] Retry count2: " + retryCount);
       // 处理同步场次码消息
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.info("场次队列消息: {}" + msg);
-      Map<String, Object> map = JsonUtils.parseMap(msg);
-      if("123".equals(map.get("key")) && retryCount == 0) {
-        redisService.set("retryCount", 1);
-        throw new Exception("key不对");
+      Long orderId = Long.parseLong(msg);
+      log.info("orderId: {}", orderId);
+      // 查询订单信息
+      Order order = orderMapper.selectById(orderId);
+      // 准备请求参数
+      Map<String, String> params = new HashMap<>();
+      params.put("tradeNo", order.getOrderSn());
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+      // 发送请求并获取响应
+      String responseBody = supplierService.sendRequest("/order/query", params);
+      // 将 JSON 字符串解析为 JsonNode 对象
+      ObjectMapper objectMapper = new ObjectMapper();
+
+      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+      Integer code = (Integer) responseMap.getOrDefault("code", 0);
+      String apiMessage = (String) responseMap.getOrDefault("message", "未知错误");
+      if(code != ResultCode.SUCCESS.getCode()) {
+        log.info("code: {}, message: {}", code, apiMessage);
+        throw new Exception(apiMessage);
       }
-      log.info("场次队列处理成功");
-//      // 如果处理成功，确认消息
-//      if (channel.isOpen()) {
-//        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-//        log.info("场次队列处理成功");
-//      } else {
-//        log.error("Channel is not open to acknowledge the message.");
-//      }
+      Object data = responseMap.get("data");
+      if(data == null){
+        throw new Exception("未获取到取票数据");
+      }
+      HttpOrder httpOrder = objectMapper.convertValue(data, HttpOrder.class);
+      if(httpOrder == null || !ORDER_STATUS_GENERATE_SUCCESS.equals(httpOrder.getOrderStatus())){
+        throw new Exception("未获取到取票数据");
+      }
+      boolean res = orderService.supplierOrder(httpOrder);
+      if(!res) {
+        throw new Exception("同步出票中订单失败");
+      }
+      log.info("同步出票中订单处理成功");
     } catch (Exception e) {
       log.error("场次队列异常: " + e.getMessage());
-      throw e;
-
-//      // 检查通道是否打开
-//      if (channel != null && channel.isOpen()) {
-//        try {
-//          // 根据业务逻辑决定是否重新加入队列
-//          channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
-//          // requeue为true表示重新入队
-//        } catch (Exception nackEx) {
-//          log.error("Failed to nack message: " + nackEx.getMessage());
-//        }
-//      } else {
-//        log.error("Channel is not open to negatively acknowledge the message.");
-//
-//        // 使用 RabbitTemplate 尝试确认消息
-//        // 注意：这种方式不推荐，因为它绕过了正常的确认流程
-//        // rabbitTemplate.execute(c -> c.basicAck(message.getMessageProperties().getDeliveryTag(), false));
-//      }
+//      throw e;
     }
   }
 
   @RabbitListener(queues = RabbitMQConfig.CANCEL_ORDER_QUEUE)
-  public void receiveCancelOrderMessage(Message message) throws Exception {
+  public void receiveCancelOrderMessage(Message message) {
     try {
-      // 处理取消订单消息
-      System.out.println(" [x] Received cancel order message: " + message);
-      // 模拟处理失败的情况
-//      if (/* some condition */) {
-//        throw new Exception("Failed to process cancel order message");
-//      }
+      // 处理同步场次码消息
+      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      log.info("取消订单队列消息: {}" + msg);
+      Long orderId = Long.parseLong(msg);
+      log.info("orderId: {}", orderId);
+      // 修改订单状态
+      Order order = new Order();
+      order.setId(orderId);
+      order.setStatus(5);
+      int rowsAffected = orderMapper.update(order);
+      if (rowsAffected <= 0) {
+        throw new Exception("取消订单失败");
+      }
+      log.info("取消订单成功");
     } catch (Exception e) {
-      System.err.println(" [x] Failed to process cancel order message: " + e.getMessage());
-      // 抛出异常后，RabbitMQ 不会确认消息，它会被重新入队或发送到死信队列
-      throw e;
+      log.error("取消订单队列异常: " + e.getMessage());
     }
   }
 

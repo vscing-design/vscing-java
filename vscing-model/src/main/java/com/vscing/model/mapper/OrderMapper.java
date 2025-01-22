@@ -7,6 +7,7 @@ import com.vscing.model.vo.OrderApiListVo;
 import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,6 +33,9 @@ public interface OrderMapper {
   OrderDetailVo selectEditById(long id);
 
   Order selectByOrderSn(String orderSn);
+
+  @Insert("INSERT INTO vsc_order_score (user_id, order_id, score) values (#{userId, jdbcType=BIGINT}, #{orderId, jdbcType=BIGINT}, #{score, jdbcType=TINYINT})")
+  int insertScore(@Param("userId") long userId, @Param("orderId") long orderId, @Param("score") int score);
 
   int insert(Order record);
 

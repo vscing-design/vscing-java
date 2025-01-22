@@ -7,6 +7,7 @@ import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
 import com.vscing.model.dto.OrderApiListDto;
+import com.vscing.model.dto.OrderApiScoreDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.OrderApiConfirmDetailsVo;
@@ -194,6 +195,29 @@ public class OrderController {
         return CommonResult.success("取票接口返回成功");
       } else {
         return CommonResult.failed("取票接口返回失败");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/score")
+  @Operation(summary = "评分")
+  public CommonResult<Object> ticket(@Validated @RequestBody OrderApiScoreDto orderApiScoreDto,
+                                     BindingResult bindingResult,
+                                     @AuthenticationPrincipal UserDetails userInfo) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    try {
+      boolean res = orderService.scoreOrder(userInfo.getUserId(), orderApiScoreDto);
+      if (res) {
+        return CommonResult.success("评分接口返回成功");
+      } else {
+        return CommonResult.failed("评分接口返回失败");
       }
     } catch (Exception e) {
       log.error("请求错误: ", e);
