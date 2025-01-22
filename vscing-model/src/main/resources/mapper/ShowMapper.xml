@@ -257,42 +257,44 @@
     <!-- 根据MovieApiCinemaDto查询全部列表 -->
     <select id="selectByMovieApiCinema" resultType="com.vscing.model.vo.CinemaApiVo">
         SELECT
-            c.id,
-            c.name,
-            c.province_name as provinceName,
-            c.city_name as cityName,
-            c.district_name as districtName,
-            c.address,
-            c.lng,
-            c.lat,
-            (
-                6371 * acos(
-                cos(radians(#{lat, jdbcType=DECIMAL})) *
-                cos(radians(c.lat)) *
-                cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +
-                sin(radians(#{lat, jdbcType=DECIMAL})) *
-                sin(radians(c.lat))
-                )
-            ) AS distance,
-            subq.min_show_price as maxPrice,
-            subq.min_user_price as minPrice
-        FROM <include refid="cinemaTableName" /> c
+        c.id,
+        c.name,
+        c.province_name as provinceName,
+        c.city_name as cityName,
+        c.district_name as districtName,
+        c.address,
+        c.lng,
+        c.lat,
+        (
+        6371 * acos(
+        cos(radians(#{lat, jdbcType=DECIMAL})) *
+        cos(radians(c.lat)) *
+        cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +
+        sin(radians(#{lat, jdbcType=DECIMAL})) *
+        sin(radians(c.lat))
+        )
+        ) AS distance,
+        s.show_time as showTime,
+        subq.min_show_price as maxPrice,
+        subq.min_user_price as minPrice
+        FROM <include refid="tableName" /> s
+        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
         INNER JOIN (
-            SELECT
-            s.cinema_id,
-            MIN(sa.user_price) as min_user_price,
-            MIN(sa.show_price) as min_show_price
-            FROM <include refid="tableName" /> s
-            INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
-            INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
-            <where>
-                <if test="movieId != null">
-                    AND s.movie_id = #{movieId}
-                </if>
-                AND s.stop_sell_time >= NOW()
-            </where>
-            GROUP BY s.cinema_id
-            ORDER BY s.stop_sell_time ASC
+        SELECT
+        s.cinema_id,
+        MIN(sa.user_price) as min_user_price,
+        MIN(sa.show_price) as min_show_price
+        FROM <include refid="tableName" /> s
+        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
+        INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
+        <where>
+            <if test="movieId != null">
+                AND s.movie_id = #{movieId}
+            </if>
+            AND s.stop_sell_time >= NOW()
+        </where>
+        GROUP BY s.cinema_id
+        ORDER BY s.stop_sell_time ASC
         ) subq ON c.id = subq.cinema_id
         <where>
             <!-- 动态条件 -->
