@@ -506,16 +506,19 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public OrderApiPaymentVo paymentOrder(Long userId, Long id) {
-    Order orderInfo = orderMapper.selectById(id);
+    Order order = orderMapper.selectById(id);
+    if(order == null || order.getStatus() != 1) {
+      return null;
+    }
     // 下发支付参数
     OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
     // 处理微信参数
-    if(AppletServiceFactory.WECHAT.equals(orderInfo.getPlatform())) {
+    if(AppletServiceFactory.WECHAT.equals(order.getPlatform())) {
 
     }
     // 处理支付宝参数
-    if(AppletServiceFactory.ALIPAY.equals(orderInfo.getPlatform())) {
-      orderApiPaymentVo.setTradeNo(orderInfo.getTradeNo());
+    if(AppletServiceFactory.ALIPAY.equals(order.getPlatform())) {
+      orderApiPaymentVo.setTradeNo(order.getTradeNo());
     }
     return orderApiPaymentVo;
   }

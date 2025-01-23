@@ -62,6 +62,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--  微信支付 APIv3 Java SDK -->
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-java</artifactId>
+        </dependency>
         <!-- BouncyCastle Provider for PKCS#7 and CMS support -->
 <!--        <dependency>-->
 <!--            <groupId>org.bouncycastle</groupId>-->

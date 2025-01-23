@@ -8,6 +8,15 @@ import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
+import com.wechat.pay.java.core.Config;
+import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.exception.ServiceException;
+import com.wechat.pay.java.service.payments.model.Transaction;
+import com.wechat.pay.java.service.payments.jsapi.JsapiServiceExtension;
+import com.wechat.pay.java.service.payments.jsapi.model.Amount;
+import com.wechat.pay.java.service.payments.jsapi.model.PrepayRequest;
+import com.wechat.pay.java.service.payments.jsapi.model.PrepayWithRequestPaymentResponse;
+import com.wechat.pay.java.service.payments.jsapi.model.QueryOrderByIdRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +48,23 @@ public class AppletServiceImpl implements AppletService {
   @Autowired
   private OkHttpService okHttpService;
 
-  public String getKey() {
+  /**
+   * 配置文件
+   */
+  private Config getConfig() {
+    // 返回配置
+    return new RSAAutoCertificateConfig.Builder()
+        .merchantId(appletProperties.getMerchantId())
+        .privateKeyFromPath(appletProperties.getPrivateKeyPath())
+        .merchantSerialNumber(appletProperties.getMerchantSerialNumber())
+        .apiV3Key(appletProperties.getApiV3Key())
+        .build();
+  }
+
+  /**
+   * 缓存key
+  */
+  private String getKey() {
     if (this.key == null) {
       this.key = String.format("%s.access_token.%s.%s.%d",
           CACHE_KEY_PREFIX, appletProperties.getAppId(), appletProperties.getAppSecret(), appletProperties.getStable() ? 1 : 0);
@@ -47,7 +72,10 @@ public class AppletServiceImpl implements AppletService {
     return this.key;
   }
 
-  public String getToken() {
+  /**
+   * 获取token
+  */
+  private String getToken() {
     String token = (String) redisService.get(this.getKey());
 
     // 检查 token 是否为 null 或空字符串
@@ -58,11 +86,17 @@ public class AppletServiceImpl implements AppletService {
     return this.refresh();
   }
 
-  public String refresh() {
+  /**
+   * 刷新token
+  */
+  private String refresh() {
     return appletProperties.getStable() ? this.getStableAccessToken(false) : this.getAccessToken();
   }
 
-  public String getStableAccessToken(boolean forceRefresh) {
+  /**
+   * 调用 getStableAccessToken
+  */
+  private String getStableAccessToken(boolean forceRefresh) {
     try {
       Map<String, Object> params = Map.of(
           "grant_type", "client_credential",
@@ -99,7 +133,10 @@ public class AppletServiceImpl implements AppletService {
     }
   }
 
-  public String getAccessToken() {
+  /**
+   * 调用 getAccessToken
+   */
+  private String getAccessToken() {
     try {
       Map<String, String> params = Map.of(
           "grant_type", "client_credential",
@@ -205,11 +242,46 @@ public class AppletServiceImpl implements AppletService {
 
   @Override
   public String getPayment(Map<String, Object> paymentData) {
+    try {
+      JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
+
+      // 跟之前下单示例一样，填充预下单参数
+      PrepayRequest request = new PrepayRequest();
+
+      Amount amount = new Amount();
+      amount.setTotal(100);
+      request.setAmount(amount);
+      request.setAppid("wxa9d9651ae******");
+      request.setMchid("190000****");
+      request.setDescription("测试商品标题");
+      request.setNotifyUrl("https://notify_url");
+      request.setOutTradeNo("out_trade_no_001");
+
+      // response包含了调起支付所需的所有参数，可直接用于前端调起支付
+      PrepayWithRequestPaymentResponse response = service.prepayWithRequestPayment(request);
+    } catch (Exception e) {
+
+    }
     return "";
   }
 
   @Override
   public boolean queryOrder(Map<String, String> queryData) {
+//    https://github.com/wechatpay-apiv3/wechatpay-java
+    JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
+
+    QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
+    queryRequest.setMchid("190000****");
+    queryRequest.setTransactionId("4200001569202208304701234567");
+
+    try {
+      Transaction result = service.queryOrderById(queryRequest);
+      System.out.println(result.getTradeState());
+    } catch (ServiceException e) {
+      // API返回失败, 例如ORDER_NOT_EXISTS
+      System.out.printf("code=[%s], message=[%s]\n", e.getErrorCode(), e.getErrorMessage());
+      System.out.printf("reponse body=[%s]\n", e.getResponseBody());
+    }
     return false;
   }
 

@@ -30,4 +30,26 @@ public class AppletProperties {
   */
   private Boolean stable;
 
+  /**
+   * 商户号
+   */
+  private String merchantId;
+
+  /**
+   * 商户API私钥路径
+   */
+  private String privateKeyPath;
+
+  /**
+   * 商户证书序列号
+   */
+  private String merchantSerialNumber;
+
+  /**
+   * 商户APIV3密钥
+   */
+  private String apiV3Key;
+
+
+
 }
