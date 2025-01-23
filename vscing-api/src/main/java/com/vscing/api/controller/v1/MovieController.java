@@ -5,11 +5,11 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MovieApiCinemaDto;
 import com.vscing.model.dto.MovieApiListDto;
+import com.vscing.model.entity.Banner;
 import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.vo.MovieApiCinemaVo;
 import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
-import com.vscing.model.vo.MovieBannersVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +44,8 @@ public class MovieController {
 
   @GetMapping("/banners")
   @Operation(summary = "获取影片轮播图")
-  public CommonResult<List<MovieBannersVo>> banners() {
-    List<MovieBannersVo> list = movieService.getBanners();
+  public CommonResult<List<Banner>> banners() {
+    List<Banner> list = movieService.getBanners();
     return CommonResult.success(list);
   }
 

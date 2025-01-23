@@ -80,7 +80,7 @@ public class OrderApiDetailsVo {
   @Schema(description = "海报图片")
   private String posterUrl;
 
-  @Schema(description = "影厅名称")
+  @Schema(description = "影厅名称 - 返回null代表场次已过期")
   private String hallName;
 
   @Schema(description = "放映开始时间")
@@ -95,13 +95,13 @@ public class OrderApiDetailsVo {
   @Schema(description = "电影售卖结束时间")
   private LocalDateTime stopSellTime;
 
+  @Schema(description = "评分")
+  private Integer score;
+
 //  @Schema(description = "座位列表，票数取列表长度")
 //  private List<OrderApiSeatListVo> seatList;
 
   @Schema(description = "座位列表")
   private List<OrderDetail> orderDetailList;
-
-  @Schema(description = "评分")
-  private Integer score;
 
 }

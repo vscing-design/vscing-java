@@ -2,11 +2,11 @@ package com.vscing.api.service;
 
 import com.vscing.model.dto.MovieApiCinemaDto;
 import com.vscing.model.dto.MovieApiListDto;
+import com.vscing.model.entity.Banner;
 import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.vo.MovieApiCinemaVo;
 import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
-import com.vscing.model.vo.MovieBannersVo;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface MovieService {
   /**
    * 轮播图
    */
-  List<MovieBannersVo> getBanners();
+  List<Banner> getBanners();
 
   /**
    * 列表

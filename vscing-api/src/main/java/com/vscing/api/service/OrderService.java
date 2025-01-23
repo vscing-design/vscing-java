@@ -81,7 +81,7 @@ public interface OrderService {
   /**
    * 评价
    */
-  boolean scoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto);
+  boolean insertScoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto);
 
   /**
    * 同步三方订单列表

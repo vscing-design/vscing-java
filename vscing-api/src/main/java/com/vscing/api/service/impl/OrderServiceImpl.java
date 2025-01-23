@@ -24,6 +24,7 @@ import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.OrderDetail;
+import com.vscing.model.entity.OrderScore;
 import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
@@ -32,6 +33,7 @@ import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
+import com.vscing.model.mapper.OrderScoreMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
@@ -85,6 +87,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private OrderMapper orderMapper;
+
+  @Autowired
+  private OrderScoreMapper orderScoreMapper;
 
   @Autowired
   private ShowMapper showMapper;
@@ -464,6 +469,9 @@ public class OrderServiceImpl implements OrderService {
       // 座位列表
       List<OrderDetail> orderDetailList = orderDetailMapper.selectByApiOrderId(id);
       orderApiDetailsVo.setOrderDetailList(orderDetailList);
+      // 获取评分
+      OrderScore orderScore = orderScoreMapper.selectByOrderId(userId, id);
+      orderApiDetailsVo.setScore(orderScore.getScore());
     }
     return orderApiDetailsVo;
   }
@@ -585,7 +593,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public boolean scoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto) {
+  public boolean insertScoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto) {
 
     try {
       // 订单详情
@@ -594,7 +602,12 @@ public class OrderServiceImpl implements OrderService {
         throw new ServiceException("订单数据不存在");
       }
       // 增加分数
-      int rowsAffected = orderMapper.insertScore(userId, orderApiScoreDto.getId(), orderApiScoreDto.getScore());
+      OrderScore orderScore = new OrderScore();
+      orderScore.setId(IdUtil.getSnowflakeNextId());
+      orderScore.setOrderId(orderApiScoreDto.getId());
+      orderScore.setUserId(userId);
+      orderScore.setScore(orderApiScoreDto.getScore());
+      int rowsAffected = orderScoreMapper.insert(orderScore);
       if (rowsAffected <= 0) {
         throw new ServiceException("评分失败");
       }

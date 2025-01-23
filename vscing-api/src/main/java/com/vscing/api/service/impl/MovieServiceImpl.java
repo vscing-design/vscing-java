@@ -6,9 +6,11 @@ import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.MovieApiCinemaDto;
 import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.PricingRuleListDto;
+import com.vscing.model.entity.Banner;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.entity.PricingRule;
+import com.vscing.model.mapper.BannerMapper;
 import com.vscing.model.mapper.MovieMapper;
 import com.vscing.model.mapper.MovieProducerMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
@@ -18,7 +20,6 @@ import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.MovieApiCinemaVo;
 import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
-import com.vscing.model.vo.MovieBannersVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class MovieServiceImpl implements MovieService {
   private MovieMapper movieMapper;
 
   @Autowired
+  private BannerMapper bannerMapper;
+
+  @Autowired
   private MovieProducerMapper movieProducerMapper;
 
   @Autowired
@@ -52,9 +56,9 @@ public class MovieServiceImpl implements MovieService {
   private PricingRuleMapper pricingRuleMapper;
 
   @Override
-  public List<MovieBannersVo> getBanners() {
+  public List<Banner> getBanners() {
     // 获取轮播图
-    return movieMapper.selectBanners();
+    return bannerMapper.selectAllList();
   }
 
   @Override

@@ -213,11 +213,11 @@ public class OrderController {
       return CommonResult.validateFailed(errorMessage);
     }
     try {
-      boolean res = orderService.scoreOrder(userInfo.getUserId(), orderApiScoreDto);
+      boolean res = orderService.insertScoreOrder(userInfo.getUserId(), orderApiScoreDto);
       if (res) {
-        return CommonResult.success("评分接口返回成功");
+        return CommonResult.success("评分成功");
       } else {
-        return CommonResult.failed("评分接口返回失败");
+        return CommonResult.failed("评分失败");
       }
     } catch (Exception e) {
       log.error("请求错误: ", e);
