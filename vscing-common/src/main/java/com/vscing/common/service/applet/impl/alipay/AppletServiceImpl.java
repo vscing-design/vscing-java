@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -181,7 +182,8 @@ public class AppletServiceImpl implements AppletService {
   }
 
   @Override
-  public String getPayment(Map<String, Object> paymentData) {
+  public Map<String, String> getPayment(Map<String, Object> paymentData) {
+    Map<String, String> res = new HashMap<>();
     try {
       // 初始化SDK
       AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
@@ -220,7 +222,8 @@ public class AppletServiceImpl implements AppletService {
           // 获取 tradeNo
           String tradeNo = jsonNode.path("trade_no").asText(null);
           if (tradeNo != null && !tradeNo.isEmpty()) {
-            return tradeNo;
+            res.put("tradeNo", tradeNo);
+            return res;
           } else {
             throw new RuntimeException("支付宝下单未获取到有效的 trade_no");
           }

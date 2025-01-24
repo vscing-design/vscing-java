@@ -25,7 +25,7 @@ public interface AppletService {
   /** 
    * 获取小程序支付参数
   */
-  String getPayment(Map<String, Object> paymentData);
+  Map<String, String> getPayment(Map<String, Object> paymentData);
 
   /**
    * 查询小程序订单是否支付成功

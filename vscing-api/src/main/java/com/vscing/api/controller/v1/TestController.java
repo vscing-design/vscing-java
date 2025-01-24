@@ -66,7 +66,7 @@ public class TestController {
         Map<String, Object> paymentData = new HashMap<>(3);
         paymentData.put("outTradeNo", "HY1010101010101010TEST");
         paymentData.put("totalAmount", 0.01);
-        paymentData.put("openid", "047RtYzw5zu6b1kQGd5rT2EpQJEYL0J_AIKbPAaYkwx8sUf");
+        paymentData.put("openid", "o9Yfs6-bjseDWe2DVXcUFSIQkjrk");
         return CommonResult.success(appletService.getPayment(paymentData));
     }
 

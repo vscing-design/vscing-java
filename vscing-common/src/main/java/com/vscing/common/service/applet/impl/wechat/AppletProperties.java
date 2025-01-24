@@ -41,6 +41,16 @@ public class AppletProperties {
   private String privateKeyPath;
 
   /**
+   * 微信支付公钥的存放路径
+   */
+  private String publicKeyPath;
+
+  /**
+   * 微信支付公钥ID
+   */
+  private String publicKeyId;
+
+  /**
    * 商户证书序列号
    */
   private String merchantSerialNumber;

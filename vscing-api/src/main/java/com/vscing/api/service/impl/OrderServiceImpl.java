@@ -283,8 +283,6 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public OrderApiPaymentVo create(Long userId, OrderApiCreatedDto orderApiCreatedDto) {
-    // 支付需要的参数
-    String paymentStr;
     // 平台转换
     Integer platform = 0;
     // 处理微信参数
@@ -381,7 +379,7 @@ public class OrderServiceImpl implements OrderService {
       paymentData.put("outTradeNo", orderSn);
       paymentData.put("totalAmount", totalPrice);
       paymentData.put("openid", userAuth.getOpenid());
-      paymentStr = appletService.getPayment(paymentData);
+      Map<String, String> paymentRes = appletService.getPayment(paymentData);
       int rowsAffected = 0;
       // 创建订单数据
       Order order = new Order();
@@ -391,8 +389,8 @@ public class OrderServiceImpl implements OrderService {
       order.setCinemaId(show.getCinemaId());
       order.setMovieId(show.getMovieId());
       order.setShowId(show.getId());
-      // 支付订单号 支付宝直接写入，微信写入交易prepay_id预支付交易会话标识（后期再改成订单号）
-      order.setTradeNo(paymentStr);
+      // 支付订单号 支付宝直接写入，微信后期再改成订单号
+      order.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
       // 手机号
       order.setPhone(orderApiCreatedDto.getPhone());
       // 状态
@@ -433,14 +431,12 @@ public class OrderServiceImpl implements OrderService {
       rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-      // 处理微信参数
-      if(AppletServiceFactory.WECHAT.equals(orderApiCreatedDto.getPlatform())) {
-
-      }
-      // 处理支付宝参数
-      if(AppletServiceFactory.ALIPAY.equals(orderApiCreatedDto.getPlatform())) {
-        orderApiPaymentVo.setTradeNo(paymentStr);
-      }
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("timeStamp", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("nonceStr", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("packageStr", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("signType", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("paySign", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
       return orderApiPaymentVo;
     } catch (Exception e) {
       log.error("下单异常：", e);
@@ -535,7 +531,20 @@ public class OrderServiceImpl implements OrderService {
     OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
     // 处理微信参数
     if(AppletServiceFactory.WECHAT.equals(order.getPlatform())) {
-
+      // 查询用户的openid
+      UserAuth userAuth = userAuthMapper.findOpenid(userId, 1);
+      // 再次支付
+      AppletService appletService = appletServiceFactory.getAppletService("wechat");
+      Map<String, Object> paymentData = new HashMap<>(3);
+      paymentData.put("outTradeNo", order.getOrderSn());
+      paymentData.put("totalAmount", order.getTotalPrice());
+      paymentData.put("openid", userAuth.getOpenid());
+      Map<String, String> paymentRes = appletService.getPayment(paymentData);
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("timeStamp", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("nonceStr", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("packageStr", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("signType", ""));
+      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("paySign", ""));
     }
     // 处理支付宝参数
     if(AppletServiceFactory.ALIPAY.equals(order.getPlatform())) {

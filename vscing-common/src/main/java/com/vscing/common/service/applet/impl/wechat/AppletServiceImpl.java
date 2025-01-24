@@ -9,19 +9,26 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
 import com.wechat.pay.java.core.Config;
-import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.exception.ServiceException;
-import com.wechat.pay.java.service.payments.model.Transaction;
 import com.wechat.pay.java.service.payments.jsapi.JsapiServiceExtension;
 import com.wechat.pay.java.service.payments.jsapi.model.Amount;
+import com.wechat.pay.java.service.payments.jsapi.model.Payer;
 import com.wechat.pay.java.service.payments.jsapi.model.PrepayRequest;
 import com.wechat.pay.java.service.payments.jsapi.model.PrepayWithRequestPaymentResponse;
 import com.wechat.pay.java.service.payments.jsapi.model.QueryOrderByIdRequest;
+import com.wechat.pay.java.service.payments.model.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -52,11 +59,19 @@ public class AppletServiceImpl implements AppletService {
    * 配置文件
    */
   private Config getConfig() {
-    // 返回配置
-    return new RSAAutoCertificateConfig.Builder()
+    // 可以根据实际情况使用publicKeyFromPath或publicKey加载公钥
+    return new RSAPublicKeyConfig.Builder()
+        //微信支付的商户号
         .merchantId(appletProperties.getMerchantId())
+        // 商户API证书私钥的存放路径
         .privateKeyFromPath(appletProperties.getPrivateKeyPath())
+        // 微信支付公钥的存放路径
+        .publicKeyFromPath(appletProperties.getPublicKeyPath())
+        //微信支付公钥ID
+        .publicKeyId(appletProperties.getPublicKeyId())
+        //商户API证书序列号
         .merchantSerialNumber(appletProperties.getMerchantSerialNumber())
+        //APIv3密钥
         .apiV3Key(appletProperties.getApiV3Key())
         .build();
   }
@@ -241,7 +256,8 @@ public class AppletServiceImpl implements AppletService {
   }
 
   @Override
-  public String getPayment(Map<String, Object> paymentData) {
+  public Map<String, String> getPayment(Map<String, Object> paymentData) {
+    Map<String, String> res = new HashMap<>();
     try {
       JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
 
@@ -249,21 +265,37 @@ public class AppletServiceImpl implements AppletService {
       PrepayRequest request = new PrepayRequest();
 
       Amount amount = new Amount();
+      BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
+      BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
+//      amount.setTotal(multipliedAmount.intValueExact());
       amount.setTotal(100);
       request.setAmount(amount);
       request.setAppid(appletProperties.getAppId());
       request.setMchid(appletProperties.getMerchantId());
-      request.setDescription("测试商品标题");
+      Payer payer = new Payer();
+      payer.setOpenid((String) paymentData.get("openid"));
+      request.setPayer(payer);
+      request.setDescription("嗨呀电影票订单" + paymentData.get("outTradeNo"));
       request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/wechatCreate");
       request.setOutTradeNo((String) paymentData.get("outTradeNo"));
-
+      // 定义时区为中国标准时间（CST）
+      ZoneId zone = ZoneId.of("Asia/Shanghai");
+      // 获取支付结束时间（当前时间加10分钟）
+      ZonedDateTime expireTime = ZonedDateTime.now(zone).plus(10, ChronoUnit.MINUTES);
+      // 使用预定义的ISO_8601格式化器来格式化时间，这符合RFC 3339
+      DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+      request.setTimeExpire(formatter.format(expireTime));
       // response包含了调起支付所需的所有参数，可直接用于前端调起支付
       PrepayWithRequestPaymentResponse response = service.prepayWithRequestPayment(request);
-      log.info("返回结果: {}", response);
-
-      return response.toString();
+      res.put("timeStamp", response.getTimeStamp());
+      res.put("nonceStr", response.getNonceStr());
+      res.put("packageStr", response.getPackageVal());
+      res.put("signType", response.getSignType());
+      res.put("paySign", response.getPaySign());
+      return res;
     } catch (Exception e) {
-      throw e;
+      log.error("微信下单方法异常", e);
+      throw new HttpException("微信下单方法异常: " + e.getMessage(), e);
     }
   }
 
