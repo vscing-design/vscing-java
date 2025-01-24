@@ -4,6 +4,7 @@ import com.vscing.api.po.UserDetails;
 import com.vscing.api.service.UserService;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.UserLoginDto;
+import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -144,6 +145,12 @@ public class UserController {
       return CommonResult.failed("用户不存在");
     }
     return CommonResult.success(userData);
+  }
+
+  @GetMapping("/location")
+  @Operation(summary = "用户当前经纬度获取")
+  public CommonResult<UserApiLocationVo> location(HttpServletRequest request) {
+    return CommonResult.success(userService.getLocation(request));
   }
 
 }

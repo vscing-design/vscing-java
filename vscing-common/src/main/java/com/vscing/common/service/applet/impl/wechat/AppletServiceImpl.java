@@ -251,18 +251,20 @@ public class AppletServiceImpl implements AppletService {
       Amount amount = new Amount();
       amount.setTotal(100);
       request.setAmount(amount);
-      request.setAppid("wxa9d9651ae******");
-      request.setMchid("190000****");
+      request.setAppid(appletProperties.getAppId());
+      request.setMchid(appletProperties.getMerchantId());
       request.setDescription("测试商品标题");
-      request.setNotifyUrl("https://notify_url");
-      request.setOutTradeNo("out_trade_no_001");
+      request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/wechatCreate");
+      request.setOutTradeNo((String) paymentData.get("outTradeNo"));
 
       // response包含了调起支付所需的所有参数，可直接用于前端调起支付
       PrepayWithRequestPaymentResponse response = service.prepayWithRequestPayment(request);
-    } catch (Exception e) {
+      log.info("返回结果: {}", response);
 
+      return response.toString();
+    } catch (Exception e) {
+      throw e;
     }
-    return "";
   }
 
   @Override

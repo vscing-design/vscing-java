@@ -2,6 +2,7 @@ package com.vscing.api.service;
 
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.model.dto.UserLoginDto;
+import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -42,5 +43,10 @@ public interface UserService {
    * 退出登陆
   */
   boolean logout(UserDetailVo user, String authToken);
+
+  /**
+   * 获取当前用户的经纬度
+   */
+  UserApiLocationVo getLocation(HttpServletRequest request);
 
 }

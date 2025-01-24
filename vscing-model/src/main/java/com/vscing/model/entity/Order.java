@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * @author vscing (vscing@foxmail.com)
@@ -89,5 +90,8 @@ public class Order extends BaseEntity {
 
   @Schema(description = "备注信息")
   private String memo;
+
+  @Schema(description = "放映结束时间")
+  private LocalDateTime stopShowTime;
 
 }

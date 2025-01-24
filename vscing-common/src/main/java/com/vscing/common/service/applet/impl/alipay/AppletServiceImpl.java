@@ -253,7 +253,7 @@ public class AppletServiceImpl implements AppletService {
       // 请求参数的集合
       request.setBizModel(model);
       // 调用接口
-      AlipayTradeQueryResponse response = alipayClient.execute(request);
+      AlipayTradeQueryResponse response = alipayClient.certificateExecute(request);
       log.info("支付宝查询订单调用结果: ", response);
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象

@@ -30,6 +30,7 @@
         <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
         <result column="response_body" property="responseBody" jdbcType="VARCHAR" />
         <result column="memo" property="memo" jdbcType="VARCHAR" />
+        <result column="stop_show_time" property="stopShowTime" jdbcType="TIMESTAMP" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -153,6 +154,7 @@
         `order`.status,
         `order`.purchase_quantity AS purchaseQuantity,
         `order`.total_price as totalPrice,
+        `order`.stop_show_time AS stopShowTime,
         `order`.created_at as createdAt,
         `order`.updated_at as updatedAt,
         cinema.name AS cinemaName,
@@ -196,6 +198,7 @@
         `order`.ticket_code AS ticketCode,
         `order`.total_price AS totalPrice,
         `order`.official_price AS officialPrice,
+        `order`.stop_show_time AS stopShowTime,
         `order`.created_at AS createdAt,
         cinema.name AS cinemaName,
         cinema.province_name AS provinceName,
@@ -299,6 +302,7 @@
             <if test="officialPrice != null">official_price,</if>
             <if test="settlementPrice != null">settlement_price,</if>
             <if test="memo != null">memo,</if>
+            <if test="stopShowTime != null">stop_show_time,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
@@ -327,6 +331,7 @@
             <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">#{settlementPrice, jdbcType=DECIMAL},</if>
             <if test="memo != null">#{memo, jdbcType=VARCHAR},</if>
+            <if test="stopShowTime != null">#{stopShowTime, jdbcType=TIMESTAMP},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>

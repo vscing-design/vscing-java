@@ -2,15 +2,19 @@ package com.vscing.api.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.api.po.impl.UserDetailsImpl;
 import com.vscing.api.service.UserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
 import com.vscing.common.exception.ServiceException;
+import com.vscing.common.service.OkHttpService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.dto.UserLoginDto;
@@ -18,6 +22,7 @@ import com.vscing.model.entity.User;
 import com.vscing.model.entity.UserAuth;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +65,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private AppletServiceFactory appletServiceFactory;
+
+  @Autowired
+  private OkHttpService okHttpService;
 
   @Override
   public VscingUserDetails userInfo(long id) {
@@ -239,6 +247,50 @@ public class UserServiceImpl implements UserService {
     // 删除缓存
     String redisKey = cachePrefix + user.getId() + ":" + authToken;
     return redisService.del(redisKey);
+  }
+
+  @Override
+  public UserApiLocationVo getLocation(HttpServletRequest request) {
+    // 兜底地址
+    UserApiLocationVo userApiLocationVo = new UserApiLocationVo();
+    userApiLocationVo.setLat("39.91092455");
+    userApiLocationVo.setLng("116.41338370");
+    try {
+      // 获取用户IP
+      String ip = RequestUtil.getRequestIp(request);
+      if (ip == null || ip.isEmpty()) {
+        throw new ServiceException("无法获取有效的IP地址");
+      }
+      // 调用百度地图API获取位置信息
+      String url = String.format("http://api.map.baidu.com/location/ip?ak=QHrdfdfuYiLoRs81XtQRCwXhlhjusKhR&ip=%s&coor=bd09ll", ip);
+      String response = okHttpService.doGet(url, null, null);
+      // 将响应字符串解析为 JSON 对象
+      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(response);
+      // 检查是否有错误信息
+      if (jsonNode.has("status") && jsonNode.get("status").asInt() != 0) {
+        throw new HttpException("调用百度地图API获取位置信息失败: " + jsonNode.toPrettyString());
+      }
+      // 导航到 content 节点
+      JsonNode contentNode = jsonNode.path("content");
+      if (!contentNode.isMissingNode()) {
+        JsonNode pointNode = contentNode.path("point");
+        if (!pointNode.isMissingNode()) {
+          String lng = pointNode.path("x").asText(null);
+          String lat = pointNode.path("y").asText(null);
+          if (lng != null && lat != null) {
+            userApiLocationVo.setLat(lat);
+            userApiLocationVo.setLng(lng);
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      // 这里应该有更详细的异常处理逻辑
+      log.error("获取地理位置错误: {}", e.getMessage());
+    }
+
+    return userApiLocationVo;
   }
 
 }

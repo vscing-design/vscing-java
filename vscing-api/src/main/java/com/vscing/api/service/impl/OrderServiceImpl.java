@@ -413,6 +413,8 @@ public class OrderServiceImpl implements OrderService {
       order.setSeatAdjusted(orderApiCreatedDto.getSeatAdjusted());
       // 备注信息
       order.setMemo(orderApiCreatedDto.getMemo());
+      // 场次结束时间
+      order.setStopShowTime(show.getShowTime().plusMinutes(show.getDuration()));
       // 订单号
       order.setOrderSn(orderSn);
       // 开始创建
@@ -426,7 +428,8 @@ public class OrderServiceImpl implements OrderService {
         if (rowsAffected != orderDetailList.size()) {
           throw new ServiceException("创建订单详情数据失败");
         }
-      }// 发送mq消息
+      }
+      // 发送mq消息
       rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
@@ -462,17 +465,35 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public OrderApiDetailsVo getDetails(Long userId, Long id) {
+    // 从数据库获取订单详情
     OrderApiDetailsVo orderApiDetailsVo = orderMapper.getApiDetails(userId, id);
-    if(orderApiDetailsVo != null) {
-      // 计算优惠
-      orderApiDetailsVo.setDiscount(orderApiDetailsVo.getOfficialPrice().subtract(orderApiDetailsVo.getTotalPrice()));
-      // 座位列表
+
+    if (orderApiDetailsVo != null) {
+      // 计算优惠，确保官方价格和总价格都不为 null
+      BigDecimal officialPrice = orderApiDetailsVo.getOfficialPrice();
+      BigDecimal totalPrice = orderApiDetailsVo.getTotalPrice();
+
+      if (officialPrice != null && totalPrice != null) {
+        orderApiDetailsVo.setDiscount(officialPrice.subtract(totalPrice));
+      } else {
+        // 设置默认折扣值或处理异常情况
+        orderApiDetailsVo.setDiscount(BigDecimal.ZERO); // 或者其他默认值
+      }
+
+      // 获取座位列表并设置到 Vo 对象中
       List<OrderDetail> orderDetailList = orderDetailMapper.selectByApiOrderId(id);
       orderApiDetailsVo.setOrderDetailList(orderDetailList);
-      // 获取评分
+
+      // 获取评分并设置到 Vo 对象中
       OrderScore orderScore = orderScoreMapper.selectByOrderId(userId, id);
-      orderApiDetailsVo.setScore(orderScore.getScore());
+      if (orderScore != null && orderScore.getScore() != null) {
+        orderApiDetailsVo.setScore(orderScore.getScore());
+      } else {
+        // 设置默认评分值或处理异常情况
+        orderApiDetailsVo.setScore(null); // 或者其他默认值
+      }
     }
+
     return orderApiDetailsVo;
   }
 
@@ -569,8 +590,6 @@ public class OrderServiceImpl implements OrderService {
       SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
       String responseBody = supplierService.sendRequest("/order/preferential/submit", params);
-
-      log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();

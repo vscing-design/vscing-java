@@ -42,6 +42,9 @@ public class OrderApiListVo {
   @Schema(description = "放映开始时间")
   private LocalDateTime showTime;
 
+  @Schema(description = "放映结束时间")
+  private LocalDateTime stopShowTime;
+
   @Schema(description = "更新日期")
   private LocalDateTime createdAt;
 

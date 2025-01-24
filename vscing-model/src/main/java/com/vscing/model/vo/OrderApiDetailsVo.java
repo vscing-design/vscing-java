@@ -80,6 +80,9 @@ public class OrderApiDetailsVo {
   @Schema(description = "海报图片")
   private String posterUrl;
 
+  @Schema(description = "放映结束时间")
+  private LocalDateTime stopShowTime;
+
   @Schema(description = "影厅名称 - 返回null代表场次已过期")
   private String hallName;
 
