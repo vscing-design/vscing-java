@@ -28,6 +28,11 @@ public interface AppletService {
   Map<String, String> getPayment(Map<String, Object> paymentData);
 
   /**
+   * 小程序签名验证
+   */
+  Object signValidation(Map<String, String> params);
+
+  /**
    * 查询小程序订单是否支付成功
    */
   boolean queryOrder(Map<String, String> queryData);

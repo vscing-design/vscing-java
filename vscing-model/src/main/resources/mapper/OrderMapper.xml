@@ -376,6 +376,13 @@
         WHERE order_sn = #{orderSn, jdbcType=VARCHAR} AND trade_no = #{tradeNo, jdbcType=VARCHAR}
     </update>
 
+    <!-- 更新微信订单信息 -->
+    <update id="updateWechatOrder" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET status = 2, payment_status = 1, trade_no = #{tradeNo, jdbcType=VARCHAR}
+        WHERE order_sn = #{orderSn, jdbcType=VARCHAR}
+    </update>
+
     <!-- 根据 ID 软删除 -->
     <update id="softDeleteById" parameterType="map">
         UPDATE <include refid="tableName" />

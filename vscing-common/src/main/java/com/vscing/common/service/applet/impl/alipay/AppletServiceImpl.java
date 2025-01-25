@@ -242,6 +242,16 @@ public class AppletServiceImpl implements AppletService {
   }
 
   @Override
+  public Object signValidation(Map<String, String> params) {
+    try {
+      return AlipaySignature.rsaCertCheckV1(params, appletProperties.getAlipayPublicCertPath(), "UTF-8", "RSA2");
+    } catch (Exception e) {
+      log.error("支付宝签名验证失败: {}", e.getMessage());
+    }
+    return false;
+  }
+
+  @Override
   public boolean queryOrder(Map<String, String> queryData) {
     try {
       // 初始化SDK
@@ -250,9 +260,9 @@ public class AppletServiceImpl implements AppletService {
       AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
       AlipayTradeQueryModel model = new AlipayTradeQueryModel();
       // 设置订单支付时传入的商户订单号
-      model.setOutTradeNo(queryData.get("outTradeNo"));
+      model.setOutTradeNo(queryData.get("out_trade_no"));
       // 设置支付宝交易号
-      model.setTradeNo(queryData.get("tradeNo"));
+      model.setTradeNo(queryData.get("trade_no"));
       // 请求参数的集合
       request.setBizModel(model);
       // 调用接口
@@ -280,7 +290,7 @@ public class AppletServiceImpl implements AppletService {
         throw new HttpException("支付宝查询订单接口失败: " + diagnosisUrl);
       }
     } catch (Exception e) {
-      log.error("支付宝查询订单方法异常", e);
+      log.error("支付宝查询订单方法异常", e.getMessage());
       throw new HttpException("支付宝查询订单方法异常: " + e.getMessage(), e);
     }
   }

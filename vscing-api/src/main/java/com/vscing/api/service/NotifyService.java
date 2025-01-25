@@ -1,6 +1,6 @@
 package com.vscing.api.service;
 
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * NotifyService
@@ -11,8 +11,18 @@ import java.util.Map;
 public interface NotifyService {
 
   /**
-   * 查询阿里订单是否成功
+   * 查询支付宝订单是否成功
   */
-  boolean queryAlipayOrder(Map<String, String> params);
+  boolean queryAlipayOrder(HttpServletRequest request);
+
+  /**
+   * 查询微信订单是否成功
+   */
+  boolean queryWechatOrder(HttpServletRequest request);
+
+  /**
+   * 出票
+   */
+  void ticketOrder(String orderSn);
 
 }

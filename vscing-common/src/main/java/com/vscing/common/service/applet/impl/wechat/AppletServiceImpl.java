@@ -11,6 +11,11 @@ import com.vscing.common.utils.StringUtils;
 import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.exception.ServiceException;
+import com.wechat.pay.java.core.exception.ValidationException;
+import com.wechat.pay.java.core.notification.NotificationConfig;
+import com.wechat.pay.java.core.notification.NotificationParser;
+import com.wechat.pay.java.core.notification.RSAPublicKeyNotificationConfig;
+import com.wechat.pay.java.core.notification.RequestParam;
 import com.wechat.pay.java.service.payments.jsapi.JsapiServiceExtension;
 import com.wechat.pay.java.service.payments.jsapi.model.Amount;
 import com.wechat.pay.java.service.payments.jsapi.model.Payer;
@@ -70,6 +75,20 @@ public class AppletServiceImpl implements AppletService {
         .publicKeyId(appletProperties.getPublicKeyId())
         //商户API证书序列号
         .merchantSerialNumber(appletProperties.getMerchantSerialNumber())
+        //APIv3密钥
+        .apiV3Key(appletProperties.getApiV3Key())
+        .build();
+  }
+
+  /**
+   * 配置文件
+   */
+  private NotificationConfig getNotificationConfig() {
+    return new RSAPublicKeyNotificationConfig.Builder()
+        // 微信支付公钥的存放路径
+        .publicKeyFromPath(appletProperties.getPublicKeyPath())
+        //微信支付公钥ID
+        .publicKeyId(appletProperties.getPublicKeyId())
         //APIv3密钥
         .apiV3Key(appletProperties.getApiV3Key())
         .build();
@@ -267,7 +286,7 @@ public class AppletServiceImpl implements AppletService {
       BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
       BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
 //      amount.setTotal(multipliedAmount.intValueExact());
-      amount.setTotal(100);
+      amount.setTotal(1);
       request.setAmount(amount);
       request.setAppid(appletProperties.getAppId());
       request.setMchid(appletProperties.getMerchantId());
@@ -299,21 +318,44 @@ public class AppletServiceImpl implements AppletService {
   }
 
   @Override
+  public Object signValidation(Map<String, String> params) {
+    // 初始化 NotificationParser
+    NotificationParser parser = new NotificationParser(getNotificationConfig());
+
+    try {
+      // 构造 RequestParam
+      RequestParam requestParam = new RequestParam.Builder()
+          .serialNumber(params.get("Wechatpay-Serial"))
+          .nonce(params.get("Wechatpay-Nonce"))
+          .signature(params.get("Wechatpay-Signature"))
+          .timestamp(params.get("Wechatpay-Timestamp"))
+          .body(params.get("requestBody"))
+          .build();
+      // 以支付通知回调为例，验签、解密并转换成 Transaction
+      Transaction transaction = parser.parse(requestParam, Transaction.class);
+      return transaction;
+    } catch (ValidationException e) {
+      log.error("微信签名验证失败: {}", e.getMessage());
+    }
+    return false;
+  }
+
+  @Override
   public boolean queryOrder(Map<String, String> queryData) {
 //    https://github.com/wechatpay-apiv3/wechatpay-java
     JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
 
     QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
-    queryRequest.setMchid("190000****");
-    queryRequest.setTransactionId("4200001569202208304701234567");
+    queryRequest.setMchid(appletProperties.getMerchantId());
+    queryRequest.setTransactionId(queryData.get("transaction_id"));
 
     try {
       Transaction result = service.queryOrderById(queryRequest);
-      System.out.println(result.getTradeState());
+      if(result.getTradeState().name().equals("SUCCESS")) {
+        return true;
+      }
     } catch (ServiceException e) {
-      // API返回失败, 例如ORDER_NOT_EXISTS
-      System.out.printf("code=[%s], message=[%s]\n", e.getErrorCode(), e.getErrorMessage());
-      System.out.printf("reponse body=[%s]\n", e.getResponseBody());
+      log.error("微信查询订单方法异常: {}", e.getErrorMessage());
     }
     return false;
   }
