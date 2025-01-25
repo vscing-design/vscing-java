@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -278,13 +277,13 @@ public class AppletServiceImpl implements AppletService {
       request.setDescription("嗨呀电影票订单" + paymentData.get("outTradeNo"));
       request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/wechatCreate");
       request.setOutTradeNo((String) paymentData.get("outTradeNo"));
-      // 定义时区为中国标准时间（CST）
+      // 假设你需要生成一个支付结束时间并返回
       ZoneId zone = ZoneId.of("Asia/Shanghai");
-      // 获取支付结束时间（当前时间加10分钟）
-      ZonedDateTime expireTime = ZonedDateTime.now(zone).plus(10, ChronoUnit.MINUTES);
-      // 使用预定义的ISO_8601格式化器来格式化时间，这符合RFC 3339
-      DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-      request.setTimeExpire(formatter.format(expireTime));
+      ZonedDateTime expireTime = ZonedDateTime.now(zone).plus(10, java.time.temporal.ChronoUnit.MINUTES);
+      // 创建一个符合 RFC 3339 的格式化器，保留到毫秒级别
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+      // setTimeExpire 方法
+      request.setTimeExpire(expireTime.format(formatter));
       // response包含了调起支付所需的所有参数，可直接用于前端调起支付
       PrepayWithRequestPaymentResponse response = service.prepayWithRequestPayment(request);
       res.put("timeStamp", response.getTimeStamp());

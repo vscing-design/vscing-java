@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,8 +65,8 @@ public class TestController {
     public CommonResult<Object> wechat() {
         AppletService appletService = appletServiceFactory.getAppletService("wechat");
         Map<String, Object> paymentData = new HashMap<>(3);
-        paymentData.put("outTradeNo", "HY1010101010101010TEST");
-        paymentData.put("totalAmount", 0.01);
+        paymentData.put("outTradeNo", "HY1010101010101011TEST");
+        paymentData.put("totalAmount", new BigDecimal(0.01));
         paymentData.put("openid", "o9Yfs6-bjseDWe2DVXcUFSIQkjrk");
         return CommonResult.success(appletService.getPayment(paymentData));
     }

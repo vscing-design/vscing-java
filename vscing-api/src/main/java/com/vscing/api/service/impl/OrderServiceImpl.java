@@ -431,11 +431,11 @@ public class OrderServiceImpl implements OrderService {
       rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("timeStamp", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("nonceStr", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("packageStr", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("signType", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("paySign", ""));
+      orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
+      orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
+      orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
+      orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
+      orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
       return orderApiPaymentVo;
     } catch (Exception e) {
