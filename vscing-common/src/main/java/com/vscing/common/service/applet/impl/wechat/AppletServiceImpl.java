@@ -285,8 +285,8 @@ public class AppletServiceImpl implements AppletService {
       Amount amount = new Amount();
       BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
       BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
-//      amount.setTotal(multipliedAmount.intValueExact());
-      amount.setTotal(1);
+      amount.setTotal(multipliedAmount.intValueExact());
+//      amount.setTotal(1);
       request.setAmount(amount);
       request.setAppid(appletProperties.getAppId());
       request.setMchid(appletProperties.getMerchantId());
@@ -325,10 +325,10 @@ public class AppletServiceImpl implements AppletService {
     try {
       // 构造 RequestParam
       RequestParam requestParam = new RequestParam.Builder()
-          .serialNumber(params.get("Wechatpay-Serial"))
-          .nonce(params.get("Wechatpay-Nonce"))
-          .signature(params.get("Wechatpay-Signature"))
-          .timestamp(params.get("Wechatpay-Timestamp"))
+          .serialNumber(params.get("wechatPaySerial"))
+          .nonce(params.get("wechatpayNonce"))
+          .signature(params.get("wechatSignature"))
+          .timestamp(params.get("wechatTimestamp"))
           .body(params.get("requestBody"))
           .build();
       // 以支付通知回调为例，验签、解密并转换成 Transaction
@@ -342,16 +342,20 @@ public class AppletServiceImpl implements AppletService {
 
   @Override
   public boolean queryOrder(Map<String, String> queryData) {
-//    https://github.com/wechatpay-apiv3/wechatpay-java
-    JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
-
-    QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
-    queryRequest.setMchid(appletProperties.getMerchantId());
-    queryRequest.setTransactionId(queryData.get("transaction_id"));
-
     try {
+      log.error("queryData: {}, mchid: {}, transaction_id: {}", queryData, appletProperties.getMerchantId(), queryData.get("transaction_id"));
+
+      JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
+
+      QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
+      queryRequest.setMchid(appletProperties.getMerchantId());
+      queryRequest.setTransactionId(queryData.get("transaction_id"));
+
+      log.error("queryRequest: {}", queryRequest);
+
       Transaction result = service.queryOrderById(queryRequest);
-      if(result.getTradeState().name().equals("SUCCESS")) {
+      log.error("result: {}", result);
+      if(result.getTradeState() == Transaction.TradeStateEnum.SUCCESS) {
         return true;
       }
     } catch (ServiceException e) {

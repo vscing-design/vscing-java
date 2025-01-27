@@ -37,6 +37,8 @@ public interface OrderMapper {
 
   int update(Order record);
 
+  int updateStatus(Order record);
+
   int updateAlipayOrder(@Param("orderSn") String orderSn, @Param("tradeNo") String tradeNo);
 
   int updateWechatOrder(@Param("orderSn") String orderSn, @Param("tradeNo") String tradeNo);

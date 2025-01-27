@@ -1,17 +1,15 @@
 package com.vscing.api.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vscing.api.service.NotifyService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
-import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
+import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
@@ -28,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -118,57 +115,17 @@ public class NotifyServiceImpl implements NotifyService {
   @Override
   public boolean queryWechatOrder(HttpServletRequest request) {
     try {
-      StringBuilder stringBuilder = new StringBuilder();
-      try (BufferedReader reader = request.getReader()) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          stringBuilder.append(line);
-        }
-      }
       // 原始请求体内容
-      String requestBody = stringBuilder.toString();
+      String requestBody = RequestUtil.getRequestBody(request);
       log.error("微信下单异步通知请求参数: {}", requestBody);
-      // 解析响应字符串为 JSON 对象
-      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
-      JsonNode jsonNode = objectMapper.readTree(requestBody);
-      String id = jsonNode.path("id").asText(null);
-      String createTime = jsonNode.path("create_time").asText(null);
-      String eventType = jsonNode.path("event_type").asText(null);
-      String resourceType = jsonNode.path("resource_type").asText(null);
-      String summary = jsonNode.path("summary").asText(null);
-      JsonNode resourceJsonNode = jsonNode.path("resource");
-      String algorithm = resourceJsonNode.path("algorithm").asText(null);
-      String ciphertext = resourceJsonNode.path("ciphertext").asText(null);
-      String associatedData = resourceJsonNode.path("associated_data").asText(null);
-      String originalType = resourceJsonNode.path("original_type").asText(null);
-      String nonce = resourceJsonNode.path("nonce").asText(null);
-
-      // 创建新的JsonNode用于存储重组后的数据
-      ObjectNode newNode = objectMapper.createObjectNode();
-      newNode.put("id", id);
-      newNode.put("create_time", createTime);
-      newNode.put("resource_type", resourceType);
-      newNode.put("event_type", eventType);
-      newNode.put("summary", summary);
-
-      // 创建资源节点
-      ObjectNode resourceNode = objectMapper.createObjectNode();
-      resourceNode.put("original_type", originalType);
-      resourceNode.put("algorithm", algorithm);
-      resourceNode.put("ciphertext", ciphertext);
-      resourceNode.put("associated_data", associatedData);
-      resourceNode.put("nonce", nonce);
-      // 将资源节点添加到新节点中
-      newNode.set("resource", resourceNode);
-      requestBody = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(newNode);
-      log.info("微信下单异步通知请求参数[转换后]：{}", requestBody);
       // 返回结果
-      Map<String, String> params = new HashMap<String,String>(5);
-      params.put("Wechatpay-Serial", request.getHeader("Wechatpay-Serial"));
-      params.put("Wechatpay-Nonce", request.getHeader("Wechatpay-Nonce"));
-      params.put("Wechatpay-Signature", request.getHeader("Wechatpay-Signature"));
-      params.put("Wechatpay-Timestamp", request.getHeader("Wechatpay-Timestamp"));
+      Map<String, String> params = new HashMap<>(6);
+      params.put("wechatPaySerial", request.getHeader("Wechatpay-Serial"));
+      params.put("wechatpayNonce", request.getHeader("Wechatpay-Nonce"));
+      params.put("wechatSignature", request.getHeader("Wechatpay-Signature"));
+      params.put("wechatTimestamp", request.getHeader("Wechatpay-Timestamp"));
       params.put("requestBody", requestBody);
+      log.error("微信下单异步通知请求参数集合: {}", params);
       // 支付类
       AppletService appletService = appletServiceFactory.getAppletService("wechat");
       // 签名认证
@@ -176,16 +133,17 @@ public class NotifyServiceImpl implements NotifyService {
       if (!Objects.nonNull(transaction)) {
         throw new ServiceException("微信订单验证签名未通过");
       }
+      log.error("微信下单异步通知数据解密: {}, transaction_id: {}", transaction, transaction.getTransactionId());
       // 查询微信订单
       Map<String, String> queryData = new HashMap<>(10);
       queryData.put("out_trade_no", transaction.getOutTradeNo());
       queryData.put("transaction_id", transaction.getTransactionId());
-      boolean res = appletService.queryOrder(params);
+      boolean res = appletService.queryOrder(queryData);
       if (!res) {
         throw new ServiceException("微信订单支付未成功");
       }
-      String orderSn = params.get("out_trade_no");
-      String tradeNo = params.get("transaction_id");
+      String orderSn = queryData.get("out_trade_no");
+      String tradeNo = queryData.get("transaction_id");
       // 修改订单
       int rowsAffected = orderMapper.updateWechatOrder(orderSn, tradeNo);
       if (rowsAffected <= 0) {

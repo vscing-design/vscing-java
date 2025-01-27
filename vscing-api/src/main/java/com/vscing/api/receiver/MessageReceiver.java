@@ -48,12 +48,12 @@ public class MessageReceiver {
   */
   @RabbitListener(queues = RabbitMQConfig.SYNC_CODE_QUEUE)
   public void receiveSyncCodeMessage(Message message) {
+    int tag = 0;
+    // 处理同步场次码消息
+    String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+    log.error("场次队列消息: {}" + msg);
+    Long orderId = Long.parseLong(msg);
     try {
-      // 处理同步场次码消息
-      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-      log.info("场次队列消息: {}" + msg);
-      Long orderId = Long.parseLong(msg);
-      log.info("orderId: {}", orderId);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 准备请求参数
@@ -69,25 +69,31 @@ public class MessageReceiver {
       Integer code = (Integer) responseMap.getOrDefault("code", 0);
       String apiMessage = (String) responseMap.getOrDefault("message", "未知错误");
       if(code != ResultCode.SUCCESS.getCode()) {
-        log.info("code: {}, message: {}", code, apiMessage);
+        log.error("code: {}, message: {}", code, apiMessage);
         throw new Exception(apiMessage);
       }
       Object data = responseMap.get("data");
       if(data == null){
+        tag = 1;
         throw new Exception("未获取到取票数据");
       }
       HttpOrder httpOrder = objectMapper.convertValue(data, HttpOrder.class);
       if(httpOrder == null || !ORDER_STATUS_GENERATE_SUCCESS.equals(httpOrder.getOrderStatus())){
+        tag = 1;
         throw new Exception("未获取到取票数据");
       }
       boolean res = orderService.supplierOrder(httpOrder);
       if(!res) {
         throw new Exception("同步出票中订单失败");
       }
-      log.info("同步出票中订单处理成功");
+      log.error("同步出票中订单处理成功");
     } catch (Exception e) {
       log.error("场次队列异常: " + e.getMessage());
 //      throw e;
+    }
+    if(tag == 1) {
+      // 发送mq异步处理
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 2*60 *1000);
     }
   }
 
@@ -103,7 +109,7 @@ public class MessageReceiver {
       Order order = new Order();
       order.setId(orderId);
       order.setStatus(5);
-      int rowsAffected = orderMapper.update(order);
+      int rowsAffected = orderMapper.updateStatus(order);
       if (rowsAffected <= 0) {
         throw new Exception("取消订单失败");
       }

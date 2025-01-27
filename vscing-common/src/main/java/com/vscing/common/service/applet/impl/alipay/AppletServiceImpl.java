@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -196,8 +197,9 @@ public class AppletServiceImpl implements AppletService {
       // 设置商户订单号
       model.setOutTradeNo((String) paymentData.get("outTradeNo"));
       // 设置订单总金额
-//      model.setTotalAmount((String) paymentData.get("totalAmount"));
-      model.setTotalAmount("0.01");
+      BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
+      model.setTotalAmount(String.valueOf(totalAmount));
+//      model.setTotalAmount("0.01");
       // 设置订单标题
       model.setSubject("嗨呀电影票订单" + paymentData.get("outTradeNo"));
       // 设置产品码
@@ -267,12 +269,12 @@ public class AppletServiceImpl implements AppletService {
       request.setBizModel(model);
       // 调用接口
       AlipayTradeQueryResponse response = alipayClient.certificateExecute(request);
-      log.info("支付宝查询订单调用结果: ", response);
+      log.error("支付宝查询订单调用结果: {}", response.getBody());
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
-        jsonNode = jsonNode.path("alipay_trade_create_response");
+        jsonNode = jsonNode.path("alipay_trade_query_response");
         if (!jsonNode.isMissingNode()) {
           // 获取 tradeStatus
           String tradeStatus = jsonNode.path("trade_status").asText(null);

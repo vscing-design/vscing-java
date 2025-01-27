@@ -124,22 +124,22 @@ public class TaskServiceImpl implements TaskService {
 
     // 迁移数据
     String migrateShowSQL = String.format(
-        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time >= CURDATE()",
         showTableName
     );
     jdbcTemplate.update(migrateShowSQL);
 
     String migrateShowAreaSQL = String.format(
         "INSERT INTO %s SELECT * FROM vscing_show_area WHERE show_id IN " +
-            "(SELECT id FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY))",
+            "(SELECT id FROM vscing_show WHERE stop_sell_time >= CURDATE())",
         showAreaTableName
     );
     jdbcTemplate.update(migrateShowAreaSQL);
 
     // 删除已迁移的数据，确保事务一致性
     jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
-        "(SELECT id FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY))");
-    jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time <= DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
+        "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
+    jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
   }
 
   @Async("threadPoolTaskExecutor")

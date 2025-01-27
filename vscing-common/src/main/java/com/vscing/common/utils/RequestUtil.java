@@ -1,8 +1,14 @@
 package com.vscing.common.utils;
 
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 请求工具类
@@ -43,6 +49,24 @@ public class RequestUtil {
             }
         }
         return ipAddress;
+    }
+
+    /**
+     * 获取 HTTP 请求体 body。使用原始报文。
+    */
+    public static String getRequestBody(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        try (ServletInputStream inputStream = request.getInputStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        ) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return sb.toString();
     }
 
 }

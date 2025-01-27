@@ -271,7 +271,7 @@
     <!-- 根据 order_sn 查询订单信息 -->
     <select id="selectByOrderSn" parameterType="String" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
-        WHERE order_sn = #{orderSn, jdbcType=BIGINT} and status = 3 and deleted_at IS NULL
+        WHERE order_sn = #{orderSn, jdbcType=BIGINT} and status > 1 and deleted_at IS NULL
     </select>
 
     <!-- 插入信息 -->
@@ -367,6 +367,15 @@
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 取消订单信息 -->
+    <update id="updateStatus" parameterType="com.vscing.model.entity.Order">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="status != null">status = #{status, jdbcType=TINYINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT} AND status = 1
     </update>
 
     <!-- 更新支付宝订单信息 -->
