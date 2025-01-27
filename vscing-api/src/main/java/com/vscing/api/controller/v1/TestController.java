@@ -63,6 +63,8 @@ public class TestController {
     @GetMapping("/wechat")
     @Operation(summary = "测试微信支付")
     public CommonResult<Object> wechat() {
+//        Long orderId = 1883894846693003264L;
+//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 10 *1000);
         AppletService appletService = appletServiceFactory.getAppletService("wechat");
         Map<String, Object> paymentData = new HashMap<>(3);
         paymentData.put("outTradeNo", "HY1010101010101011TEST");

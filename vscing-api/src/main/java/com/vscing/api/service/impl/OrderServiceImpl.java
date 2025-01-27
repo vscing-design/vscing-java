@@ -610,7 +610,7 @@ public class OrderServiceImpl implements OrderService {
       // 调用保存
       orderMapper.update(updateOrder);
       // 发送mq异步处理
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
       // 调用三方成功
       if(SUCCESS_CODES.contains(code)) {
         log.error("调用三方下单写入数据：", order.getOrderSn());

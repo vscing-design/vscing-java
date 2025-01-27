@@ -213,6 +213,7 @@
         `show`.hall_name AS hallName,
         `show`.duration,
         `show`.show_time AS showTime,
+        `show`.show_time AS showDate,
         `show`.show_version_type AS showVersionType,
         `show`.stop_sell_time AS stopSellTime
         FROM <include refid="tableName" /> `order`

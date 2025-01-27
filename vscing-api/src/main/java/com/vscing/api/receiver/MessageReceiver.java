@@ -93,7 +93,7 @@ public class MessageReceiver {
     }
     if(tag == 1) {
       // 发送mq异步处理
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 2*60 *1000);
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 3*60 *1000);
     }
   }
 
