@@ -37,4 +37,14 @@ public interface AppletService {
    */
   boolean queryOrder(Map<String, String> queryData);
 
+  /**
+   * 小程序退款
+   */
+  void refundOrder(Map<String, Object> refundData);
+
+  /**
+   * 查询小程序订单是否退款成功
+   */
+  boolean queryRefund(Map<String, String> queryData);
+
 }

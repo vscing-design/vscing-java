@@ -1,7 +1,6 @@
 package com.vscing.model.enums;
 
 import cn.hutool.core.util.StrUtil;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -13,7 +12,6 @@ import java.util.Arrays;
  * @date 2025/2/6 22:03
  */
 @Getter
-@AllArgsConstructor
 public enum OrderStatusEnum {
 
   PENDING_PAYMENT(1, "待付款"),
@@ -33,6 +31,14 @@ public enum OrderStatusEnum {
    * 状态描述
    */
   private final String desc;
+
+  /**
+   * 手动定义全参构造函数
+  */
+  OrderStatusEnum(int status, String desc) {
+    this.status = status;
+    this.desc = desc;
+  }
 
   /**
    * 状态码查状态描述

@@ -364,4 +364,14 @@ public class AppletServiceImpl implements AppletService {
     return false;
   }
 
+  @Override
+  public void refundOrder(Map<String, Object> paymentData) {
+
+  }
+
+  @Override
+  public boolean queryRefund(Map<String, String> queryData) {
+    return false;
+  }
+
 }

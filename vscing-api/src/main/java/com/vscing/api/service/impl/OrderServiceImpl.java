@@ -29,6 +29,7 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.UserAuth;
+import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
@@ -57,7 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +73,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
-
-  private static final List<Integer> SUCCESS_CODES = Arrays.asList(200, -530, 9999, 9008, 9011);
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
@@ -607,12 +605,13 @@ public class OrderServiceImpl implements OrderService {
       String message = (String) responseMap.getOrDefault("message", "未知错误");
       // 保存三方接口的返回结果
       updateOrder.setResponseBody(responseBody);
+      // TODO 如果失败、直接走退款
       // 调用保存
       orderMapper.update(updateOrder);
       // 发送mq异步处理
       rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
       // 调用三方成功
-      if(SUCCESS_CODES.contains(code)) {
+      if(JfshouOrderSubmitResponseCodeEnum.isSuccessCode(code)) {
         log.error("调用三方下单写入数据：", order.getOrderSn());
         return true;
       }
