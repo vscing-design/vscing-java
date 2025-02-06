@@ -60,7 +60,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     if (!unprotectedUrls.contains(request.getRequestURI()) && authHeader != null && authHeader.startsWith(this.tokenHead)) {
       String authToken = authHeader.substring(this.tokenHead.length());
       Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
-      log.info("checking userId:{}", userId);
+      log.error("checking userId:{}", userId);
       if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         VscingUserDetails userDetails = this.vscingUserDetailsService.loadUserByUserId(userId);
         if (userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails.getUserId())) {
@@ -69,7 +69,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
           if (redisService.get(redisKey) != null) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            log.info("authenticated user:{}", userId);
+            log.error("authenticated user:{}", userId);
             SecurityContextHolder.getContext().setAuthentication(authentication);
           }
         }

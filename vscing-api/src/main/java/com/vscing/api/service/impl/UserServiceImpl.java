@@ -73,7 +73,10 @@ public class UserServiceImpl implements UserService {
   public VscingUserDetails userInfo(long id) {
     // 获取用户信息
     UserDetailVo userData = this.self(id);
-    return new UserDetailsImpl(userData);
+    if (userData != null) {
+      return new UserDetailsImpl(userData);
+    }
+    return null;
   }
 
   @Override

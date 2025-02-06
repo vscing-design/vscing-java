@@ -95,7 +95,10 @@ public class AdminUserServiceImpl implements AdminUserService {
   public VscingUserDetails adminUserInfo(long id) {
     // 获取用户信息
     AdminUserDetailVo adminUser = this.self(id);
-    return new AdminUserDetailsImpl(adminUser);
+    if (adminUser != null) {
+      return new AdminUserDetailsImpl(adminUser);
+    }
+    return null;
   }
 
   @Override
