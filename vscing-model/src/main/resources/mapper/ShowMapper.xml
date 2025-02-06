@@ -140,7 +140,7 @@
             <if test="cinemaId != null">
                 AND s.cinema_id = #{cinemaId}
             </if>
-            <!--            AND s.stop_sell_time > NOW()-->
+            AND s.stop_sell_time > NOW()
             AND s.deleted_at IS NULL
         </where>
     </select>
