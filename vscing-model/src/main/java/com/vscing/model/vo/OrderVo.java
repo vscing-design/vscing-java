@@ -119,6 +119,9 @@ public class OrderVo {
     @Schema(description = "购票座位")
     private String seatInfo;
 
+    @Schema(description = "无座位时，接受系统调座 1 是 2 否")
+    private Integer seatAdjusted;
+
     @Schema(description = "是否调座 1 是 2 否")
     private Integer isAdjusted;
 
