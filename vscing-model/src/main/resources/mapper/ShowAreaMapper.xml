@@ -177,4 +177,25 @@
         ORDER BY s.stop_sell_time ASC, sa.show_price ASC
     </select>
 
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (
+        id, show_id, area, show_price, user_price
+        ) VALUES
+        <foreach collection="list" item="record" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{record.id, jdbcType=BIGINT},
+                #{record.showId, jdbcType=BIGINT},
+                #{record.area, jdbcType=VARCHAR},
+                #{record.showPrice, jdbcType=DECIMAL},
+                #{record.userPrice, jdbcType=DECIMAL}
+            </trim>
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        show_id = VALUES(show_id),
+        area = VALUES(area),
+        show_price = VALUES(show_price),
+        user_price = VALUES(user_price)
+    </insert>
+
 </mapper>

@@ -25,6 +25,11 @@ public interface ShowAreaMapper {
 
   int batchInsert(@Param("list") List<ShowArea> list);
 
+  /**
+   * 批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
+   */
+  int batchUpsert(@Param("list") List<ShowArea> list);
+
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(ShowArea record);

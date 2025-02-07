@@ -30,16 +30,18 @@ public class MovieServiceImpl implements MovieService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-  public boolean initMovie(Movie movie, List<MovieProducer> movieProducerList) {
+  public boolean initMovie(List<Movie> movieList, List<MovieProducer> movieProducerList) {
     try {
-
-      // 创建
-      int rowsAffected = movieMapper.insert(movie);
-      if (rowsAffected <= 0) {
-        throw new ServiceException("新增失败");
+      int rowsAffected;
+      if(movieList.size() > 0) {
+        // 创建
+        rowsAffected = movieMapper.batchUpsert(movieList);
+        if (rowsAffected <= 0) {
+          throw new ServiceException("新增失败");
+        }
       }
-      // 增加机构
-      if(movieProducerList != null && !movieProducerList.isEmpty()) {
+      if(movieProducerList.size() > 0) {
+        // 增加机构
         rowsAffected = movieProducerMapper.batchInsert(movieProducerList);
         if (rowsAffected != movieProducerList.size()) {
           throw new ServiceException("新增关联失败");

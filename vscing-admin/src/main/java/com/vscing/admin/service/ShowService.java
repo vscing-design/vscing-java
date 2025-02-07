@@ -21,7 +21,7 @@ import java.util.List;
  */
 public interface ShowService {
 
-  boolean initShow(Show show, List<ShowArea> showAreaList);
+  boolean initShow(List<Show> showList, List<ShowArea> showAreaList);
 
   List<ShowListVo> getList(ShowListDto data, Integer pageSize, Integer pageNum);
 

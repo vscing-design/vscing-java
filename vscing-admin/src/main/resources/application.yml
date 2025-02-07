@@ -16,6 +16,7 @@ logging:
     com.vscing.admin: INFO
     org.springdoc: DEBUG
     com.github.xiaoymin: DEBUG
+#    com.vscing.model.mapper: DEBUG
 springdoc:
   api-docs:
     path: /v3/api-docs

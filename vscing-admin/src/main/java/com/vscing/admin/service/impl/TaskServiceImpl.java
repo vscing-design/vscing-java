@@ -10,7 +10,6 @@ import com.vscing.admin.service.TaskService;
 import com.vscing.common.api.ResultCode;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
-import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
 import com.vscing.model.entity.City;
@@ -124,14 +123,14 @@ public class TaskServiceImpl implements TaskService {
 
     // 迁移数据
     String migrateShowSQL = String.format(
-        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time >= CURDATE()",
+        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time < CURDATE()",
         showTableName
     );
     jdbcTemplate.update(migrateShowSQL);
 
     String migrateShowAreaSQL = String.format(
         "INSERT INTO %s SELECT * FROM vscing_show_area WHERE show_id IN " +
-            "(SELECT id FROM vscing_show WHERE stop_sell_time >= CURDATE())",
+            "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())",
         showAreaTableName
     );
     jdbcTemplate.update(migrateShowAreaSQL);
@@ -230,199 +229,6 @@ public class TaskServiceImpl implements TaskService {
 
   @Async("threadPoolTaskExecutor")
   @Override
-  public void syncCityCinema() {
-    // 获取城市
-    List<City> cityList = cityMapper.getList(new AddressListDto());
-    for(City city : cityList){
-      Province province = provinceMapper.selectById(city.getProvinceId());
-      if(province == null){
-        continue;
-      }
-      log.info("cityName: {}", city.getName());
-
-      try {
-        // 准备请求参数
-        Map<String, String> params = new HashMap<>();
-        params.put("cityId", String.valueOf(city.getS1CityId()));
-        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
-        // 发送请求并获取响应
-        String responseBody = supplierService.sendRequest("/cinema/query", params);
-
-//        log.info("responseBody: {}", responseBody);
-
-        // 将 JSON 字符串解析为 JsonNode 对象
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-        Integer code = (Integer) responseMap.getOrDefault("code", 0);
-        String message = (String) responseMap.getOrDefault("message", "未知错误");
-        if(code != ResultCode.SUCCESS.getCode()) {
-          log.info("code: {}, message: {}", code, message);
-          continue;
-        }
-
-        List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
-
-        for (Map<String, Object> data : dataList) {
-          log.info("开始处理数据");
-          try {
-            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
-            String cinemaName = (String) data.get("cinemaName");
-            String cinemaAddress = (String) data.get("cinemaAddress");
-            Double longitude = (Double) data.get("longitude");
-            Double latitude = (Double) data.get("latitude");
-            // 可能没有
-            String cinemaPhone = (String) data.get("cinemaPhone");
-            String regionName = (String) data.get("regionName");
-
-            log.info("cinemaId: {}, cinemaName: {}, cinemaAddress: {}, longitude: {}, latitude: {}, cinemaPhone: {}, regionName: {}",
-                cinemaId, cinemaName, cinemaAddress, longitude, latitude, cinemaPhone, regionName);
-
-            // 查找影院是否存在
-            Cinema oldCinema = cinemaMapper.selectByTpCinemaId(cinemaId);
-            if (oldCinema != null) {
-              log.info("cinemaId: {}, 已存在", cinemaId);
-              continue;
-            }
-
-            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
-
-              Cinema cinema = new Cinema();
-              cinema.setId(IdUtil.getSnowflakeNextId());
-              cinema.setSupplierId(1869799230973227008L);
-              cinema.setTpCinemaId(cinemaId);
-              cinema.setName(cinemaName);
-              cinema.setAddress(cinemaAddress);
-              cinema.setLng(longitude);
-              cinema.setLat(latitude);
-
-              cinema.setProvinceId(province.getId());
-              cinema.setProvinceName(province.getName());
-              cinema.setCityId(city.getId());
-              cinema.setCityName(city.getName());
-              cinema.setCreatedBy(0L);
-              if(cinemaPhone != null){
-                cinema.setPhone(cinemaPhone);
-              }
-              if(regionName != null){
-                District district = districtMapper.findByName(regionName, city.getId());
-                if(district != null){
-                  cinema.setDistrictId(district.getId());
-                  cinema.setDistrictName(district.getName());
-                }
-              }
-              int res = cinemaMapper.insert(cinema);
-              log.info("res: {}", res);
-            }
-          } catch (Exception e) {
-            log.error("影院同步错误原因", e);
-          }
-        }
-
-        log.info(city.getName() + "同步地址结束");
-
-      } catch (Exception e) {
-        log.error(city.getName() + "同步影院失败", e);
-      }
-    }
-
-    log.info("全部影院同步结束");
-  }
-
-  @Async("threadPoolTaskExecutor")
-  @Override
-  public void syncDistrictCinema() {
-    List<District> districtList = districtMapper.getTaskList();
-    for(District district : districtList){
-      City city = cityMapper.selectById(district.getCityId());
-      if(city == null){
-        continue;
-      }
-      Province province = provinceMapper.selectById(city.getProvinceId());
-      if(province == null){
-        continue;
-      }
-      log.info("districtName: {}", district.getName());
-
-      try {
-        // 准备请求参数
-        Map<String, String> params = new HashMap<>();
-        params.put("cityId", String.valueOf(district.getS1CityId()));
-        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
-        // 发送请求并获取响应
-        String responseBody = supplierService.sendRequest("/cinema/query", params);
-
-//        log.info("responseBody: {}", responseBody);
-
-        // 将 JSON 字符串解析为 JsonNode 对象
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-        Integer code = (Integer) responseMap.getOrDefault("code", 0);
-        String message = (String) responseMap.getOrDefault("message", "未知错误");
-        if(code != ResultCode.SUCCESS.getCode()) {
-          log.info("code: {}, message: {}", code, message);
-          continue;
-        }
-
-        List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
-
-        for (Map<String, Object> data : dataList) {
-          log.info("开始处理数据");
-          try {
-            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
-            String cinemaName = (String) data.get("cinemaName");
-            String cinemaAddress = (String) data.get("cinemaAddress");
-            Double longitude = (Double) data.get("longitude");
-            Double latitude = (Double) data.get("latitude");
-            // 可能没有
-            String cinemaPhone = (String) data.get("cinemaPhone");
-            String regionName = (String) data.get("regionName");
-
-            log.info("cinemaId: {}, cinemaName: {}, cinemaAddress: {}, longitude: {}, latitude: {}, cinemaPhone: {}, regionName: {}",
-                cinemaId, cinemaName, cinemaAddress, longitude, latitude, cinemaPhone, regionName);
-
-            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
-
-              Cinema cinema = new Cinema();
-              cinema.setId(IdUtil.getSnowflakeNextId());
-              cinema.setSupplierId(1869799230973227008L);
-              cinema.setTpCinemaId(cinemaId);
-              cinema.setName(cinemaName);
-              cinema.setAddress(cinemaAddress);
-              cinema.setLng(longitude);
-              cinema.setLat(latitude);
-
-              cinema.setProvinceId(province.getId());
-              cinema.setProvinceName(province.getName());
-              cinema.setCityId(city.getId());
-              cinema.setCityName(city.getName());
-              cinema.setCreatedBy(0L);
-              if(cinemaPhone != null){
-                cinema.setPhone(cinemaPhone);
-              }
-              cinema.setDistrictId(district.getId());
-              cinema.setDistrictName(district.getName());
-              int res = cinemaMapper.insert(cinema);
-              log.info("res: {}", res);
-            }
-          } catch (Exception e) {
-            log.error("影院同步错误原因", e);
-          }
-        }
-
-        log.info(city.getName() + "同步地址结束");
-
-      } catch (Exception e) {
-        log.error(city.getName() + "同步影院失败", e);
-      }
-    }
-
-    log.info("全部影院同步结束");
-  }
-
-  @Async("threadPoolTaskExecutor")
-  @Override
   public void syncMovie() {
 
     try {
@@ -431,7 +237,6 @@ public class TaskServiceImpl implements TaskService {
       SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
       String responseBody = supplierService.sendRequest("/film/query", params);
-//      log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();
@@ -440,10 +245,15 @@ public class TaskServiceImpl implements TaskService {
       Integer code = (Integer) responseMap.getOrDefault("code", 0);
       String message = (String) responseMap.getOrDefault("message", "未知错误");
       if(code != ResultCode.SUCCESS.getCode()) {
-        log.info("code: {}, message: {}", code, message);
+        log.error("code: {}, message: {}", code, message);
         return;
       }
       List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+
+      // 需要增加或者修改的数据源
+      List<Movie> movieList = new ArrayList<>();
+      // 需要增加的数据源
+      List<MovieProducer> movieProducerList = new ArrayList<>();
 
       for (Map<String, Object> data : dataList) {
         try {
@@ -464,17 +274,10 @@ public class TaskServiceImpl implements TaskService {
           String publishStatus = (String) data.get("publishStatus");
           Map<String, Object> producer = (Map<String, Object>) data.get("producer");
 
-          log.info("movieId: {}, movieName: {}, duration: {}, publishDate: {}, director: {}, cast: {}, intro: {}, versionType: {}, language: {}, movieType: {}, posterUrl: {}, plotUrl: {}, grade: {}, like: {}, publishStatus: {}, producer: {}",
-              movieId, movieName, duration, publishDate, director, cast, intro, versionType, language, movieType, posterUrl, plotUrl, grade, like, publishStatus, producer);
-          // 查找影片是否存在
-          Movie oldmovie = movieMapper.selectByTpMovieId(movieId);
-          if (oldmovie != null) {
-            log.info("movieId: {}, 已存在", movieId);
-            continue;
-          }
+          // 组装影片数据
+          Movie movie = new Movie();
           // 影片信息
           Long id = IdUtil.getSnowflakeNextId();
-          Movie movie = new Movie();
           movie.setId(id);
           movie.setSupplierId(1869799230973227008L);
           movie.setTpMovieId(movieId);
@@ -493,8 +296,15 @@ public class TaskServiceImpl implements TaskService {
           movie.setLike(like);
           movie.setPublishStatus(publishStatus);
 
+          // 查找影片是否存在
+          Movie oldmovie = movieMapper.selectByTpMovieId(movieId);
+          if (oldmovie != null) {
+            movie.setId(oldmovie.getId());
+            movieList.add(movie);
+            continue;
+          }
+          movieList.add(movie);
           // 影片主演、演员
-          List<MovieProducer> movieProducers = new ArrayList<>();
           if (producer != null) {
             List<Map<String, Object>> actorsList = (List<Map<String, Object>>) producer.get("actors");
             if (actorsList != null && !actorsList.isEmpty()) {
@@ -503,7 +313,6 @@ public class TaskServiceImpl implements TaskService {
                 String enName = (String) actors.get("enName");
                 String scName = (String) actors.get("scName");
                 String actName = (String) actors.get("actName");
-                log.info("演员 avatar: {}, enName: {}, scName: {}, actName: {}", avatar, enName, scName, actName);
                 MovieProducer movieProducer = new MovieProducer();
                 movieProducer.setId(IdUtil.getSnowflakeNextId());
                 movieProducer.setMovieId(id);
@@ -513,7 +322,7 @@ public class TaskServiceImpl implements TaskService {
                 movieProducer.setScName(scName);
                 movieProducer.setActName(actName);
                 movieProducer.setCreatedBy(0L);
-                movieProducers.add(movieProducer);
+                movieProducerList.add(movieProducer);
               }
             }
 
@@ -523,7 +332,6 @@ public class TaskServiceImpl implements TaskService {
                 String avatar = (String) directors.get("avatar");
                 String enName = (String) directors.get("enName");
                 String scName = (String) directors.get("scName");
-                log.info("导演 avatar: {}, enName: {}, scName: {}", avatar, enName, scName);
                 MovieProducer movieProducer = new MovieProducer();
                 movieProducer.setId(IdUtil.getSnowflakeNextId());
                 movieProducer.setMovieId(id);
@@ -533,22 +341,222 @@ public class TaskServiceImpl implements TaskService {
                 movieProducer.setScName(scName);
                 movieProducer.setActName("");
                 movieProducer.setCreatedBy(0L);
-                movieProducers.add(movieProducer);
+                movieProducerList.add(movieProducer);
               }
             }
           }
-
-          // 开始保存数据
-          boolean res = movieService.initMovie(movie, movieProducers);
-          log.info("res: {}", res);
 
         } catch (Exception e) {
           log.error("影片同步错误原因", e);
         }
       }
-      log.info("同步影片结束");
+      // 开始保存数据
+      boolean res = movieService.initMovie(movieList, movieProducerList);
+      log.info("同步影片结束 res: {}", res);
     } catch (Exception e) {
       log.error("同步影片失败", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncCityCinema() {
+    // 获取城市
+    List<City> cityList = cityMapper.getTaskList();
+    for(City city : cityList){
+      Province province = provinceMapper.selectById(city.getProvinceId());
+      if(province == null){
+        continue;
+      }
+
+      // 存储批量数据
+      List<Cinema> cinemaList = new ArrayList<>();
+
+      try {
+        // 准备请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put("cityId", String.valueOf(city.getS1CityId()));
+        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+        // 发送请求并获取响应
+        String responseBody = supplierService.sendRequest("/cinema/query", params);
+
+        // 将 JSON 字符串解析为 JsonNode 对象
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+        Integer code = (Integer) responseMap.getOrDefault("code", 0);
+        String message = (String) responseMap.getOrDefault("message", "未知错误");
+        if(code != ResultCode.SUCCESS.getCode()) {
+          log.error(city.getName() + "code: {}, message: {}", code, message);
+          continue;
+        }
+
+        List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+        if(dataList == null){
+          continue;
+        }
+
+        for (Map<String, Object> data : dataList) {
+          try {
+            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
+            String cinemaName = (String) data.get("cinemaName");
+            String cinemaAddress = (String) data.get("cinemaAddress");
+            Double longitude = (Double) data.get("longitude");
+            Double latitude = (Double) data.get("latitude");
+            // 可能没有
+            String cinemaPhone = (String) data.get("cinemaPhone");
+            String regionName = (String) data.get("regionName");
+
+            Cinema cinema = new Cinema();
+
+            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
+
+              cinema.setId(IdUtil.getSnowflakeNextId());
+
+              // 查找影院是否存在
+              Cinema oldCinema = cinemaMapper.selectByTpCinemaId(cinemaId);
+              if (oldCinema != null) {
+                cinema.setId(oldCinema.getId());
+              }
+
+              cinema.setSupplierId(1869799230973227008L);
+              cinema.setTpCinemaId(cinemaId);
+              cinema.setName(cinemaName);
+              cinema.setAddress(cinemaAddress);
+              cinema.setLng(longitude);
+              cinema.setLat(latitude);
+
+              cinema.setProvinceId(province.getId());
+              cinema.setProvinceName(province.getName());
+              cinema.setCityId(city.getId());
+              cinema.setCityName(city.getName());
+              if(cinemaPhone != null){
+                cinema.setPhone(cinemaPhone);
+              }
+              if(regionName != null){
+                District district = districtMapper.findByName(regionName, city.getId());
+                if(district != null){
+                  cinema.setDistrictId(district.getId());
+                  cinema.setDistrictName(district.getName());
+                }
+              }
+              cinemaList.add(cinema);
+            }
+          } catch (Exception e) {
+            log.error("影院同步错误原因", e);
+          }
+        }
+
+        if(cinemaList.size() == 0){
+          continue;
+        }
+
+        // 开始保存数据
+        int res = cinemaMapper.batchUpsert(cinemaList);
+        log.info(city.getName() + "同步影院结束 res: {}", res);
+      } catch (Exception e) {
+        log.error(city.getName() + "同步影院失败", e);
+      }
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void syncDistrictCinema() {
+    List<District> districtList = districtMapper.getTaskList();
+    for(District district : districtList){
+      City city = cityMapper.selectById(district.getCityId());
+      if(city == null){
+        continue;
+      }
+      Province province = provinceMapper.selectById(city.getProvinceId());
+      if(province == null){
+        continue;
+      }
+
+      // 存储批量数据
+      List<Cinema> cinemaList = new ArrayList<>();
+
+      try {
+        // 准备请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put("cityId", String.valueOf(district.getS1CityId()));
+        SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+        // 发送请求并获取响应
+        String responseBody = supplierService.sendRequest("/cinema/query", params);
+
+        // 将 JSON 字符串解析为 JsonNode 对象
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+        Integer code = (Integer) responseMap.getOrDefault("code", 0);
+        String message = (String) responseMap.getOrDefault("message", "未知错误");
+        if(code != ResultCode.SUCCESS.getCode()) {
+          log.error(district.getName() + "code: {}, message: {}", code, message);
+          continue;
+        }
+
+        List<Map<String, Object>> dataList = (List<Map<String, Object>>) responseMap.get("data");
+        if(dataList == null){
+          continue;
+        }
+
+        for (Map<String, Object> data : dataList) {
+          try {
+            Long cinemaId = objectMapper.convertValue(data.get("cinemaId"), Long.class);
+            String cinemaName = (String) data.get("cinemaName");
+            String cinemaAddress = (String) data.get("cinemaAddress");
+            Double longitude = (Double) data.get("longitude");
+            Double latitude = (Double) data.get("latitude");
+            // 可能没有
+            String cinemaPhone = (String) data.get("cinemaPhone");
+
+            if(cinemaId != null || cinemaName != null || cinemaAddress != null || longitude != null || latitude != null){
+
+              Cinema cinema = new Cinema();
+              cinema.setId(IdUtil.getSnowflakeNextId());
+
+              // 查找影院是否存在
+              Cinema oldCinema = cinemaMapper.selectByTpCinemaId(cinemaId);
+              if (oldCinema != null) {
+                cinema.setId(oldCinema.getId());
+              }
+
+              cinema.setSupplierId(1869799230973227008L);
+              cinema.setTpCinemaId(cinemaId);
+              cinema.setName(cinemaName);
+              cinema.setAddress(cinemaAddress);
+              cinema.setLng(longitude);
+              cinema.setLat(latitude);
+
+              cinema.setProvinceId(province.getId());
+              cinema.setProvinceName(province.getName());
+              cinema.setCityId(city.getId());
+              cinema.setCityName(city.getName());
+              cinema.setCreatedBy(0L);
+              if(cinemaPhone != null){
+                cinema.setPhone(cinemaPhone);
+              }
+              cinema.setDistrictId(district.getId());
+              cinema.setDistrictName(district.getName());
+              cinemaList.add(cinema);
+            }
+          } catch (Exception e) {
+            log.error("影院同步错误原因", e);
+          }
+        }
+
+        if(cinemaList.size() == 0){
+          continue;
+        }
+
+        // 开始保存数据
+        int res = cinemaMapper.batchUpsert(cinemaList);
+        log.info(district.getName() + "同步影院结束 res: {}", res);
+
+      } catch (Exception e) {
+        log.error(district.getName() + "同步影院失败", e);
+      }
     }
   }
 
@@ -578,112 +586,109 @@ public class TaskServiceImpl implements TaskService {
 
       if(cinemaList != null && !cinemaList.isEmpty()){
         for (Cinema cinema : cinemaList) {
-          // 准备请求参数
-          Map<String, String> params = new HashMap<>();
-          params.put("cinemaId", String.valueOf(cinema.getTpCinemaId()));
-
-          SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
-          // 发送请求并获取响应
-          String responseBody = supplierService.sendRequest("/show/preferential/query", params);
-
-          // 将 JSON 字符串解析为 JsonNode 对象
-//          log.info("responseBody: {}", responseBody);
-
-          // 将 JSON 字符串解析为 JsonNode 对象
-          ObjectMapper objectMapper = new ObjectMapper();
-
-          Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-          Integer code = (Integer) responseMap.getOrDefault("code", 0);
-          String message = (String) responseMap.getOrDefault("message", "未知错误");
-          if(code != ResultCode.SUCCESS.getCode()) {
-            log.info("code: {}, message: {}", code, message);
-            continue;
-          }
-          Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
-          if (data == null) {
-            continue;
-          }
-          List<Map<String, Object>> showInforList = (List<Map<String, Object>>) data.get("showInfor");
-          if (showInforList != null && !showInforList.isEmpty()) {
-            for (Map<String, Object> showInfor : showInforList) {
-              try {
-                String showId = (String) showInfor.get("showId");
-                String hallName = (String) showInfor.get("hallName");
-                Integer duration = (Integer) showInfor.get("duration");
-                String showTime = (String) showInfor.get("showTime");
-                String stopSellTime = (String) showInfor.get("stopSellTime");
-                String showVersionType = (String) showInfor.get("showVersionType");
-                BigDecimal showPrice = Convert.toBigDecimal(data.get("showPrice"));
-                BigDecimal userPrice = Convert.toBigDecimal(data.get("userPrice"));
-                // 需要用这个去找影片信息
-                Long tpMovieId = Convert.toLong(showInfor.get("movieId"));
-                Movie movie = movieMapper.findByTpMovieId(tpMovieId);
-                if (movie == null) {
-                  log.info("tpMovieId: {}, 不存在", tpMovieId);
-                  continue;
-                }
-                // 补充电影id和影院id
-                log.info("tpCinemaId: {}, tpMovieId: {}, showId: {}, hallName: {}, duration: {}, showTime: {}, stopSellTime: {}, showVersionType: {}, showPrice: {}, userPrice: {}",
-                    cinema.getTpCinemaId(), tpMovieId, showId, hallName, duration, showTime, stopSellTime, showVersionType, showPrice, userPrice);
-                // 查找影片是否存在
-                Show oldShow = showMapper.selectByTpShowId(showId);
-                if (oldShow != null) {
-                  log.info("showId: {}, 已存在", showId);
-                  continue;
-                }
-                Show show = new Show();
-                Long id = IdUtil.getSnowflakeNextId();
-                show.setId(id);
-                show.setTpShowId(showId);
-                show.setSupplierId(1869799230973227008L);
-                show.setCinemaId(cinema.getId());
-                show.setMovieId(movie.getId());
-                show.setHallName(hallName);
-                show.setDuration(duration);
-                show.setShowTime(LocalDateTime.parse(showTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                show.setStopSellTime(LocalDateTime.parse(stopSellTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                show.setShowVersionType(showVersionType);
-                show.setShowPrice(showPrice);
-                show.setUserPrice(userPrice);
-
-                // 区间定价
-                List<ShowArea> showAreaList = new ArrayList<>();
-                List<Map<String, Object>> areaPriceList = (List<Map<String, Object>>) showInfor.get("areaPrice");
-
-                if (areaPriceList != null && !areaPriceList.isEmpty()) {
-                  for (Map<String, Object> areaPrice : areaPriceList) {
-                    String area = (String) areaPrice.get("area");
-                    BigDecimal areaShowPrice = Convert.toBigDecimal(areaPrice.get("showPrice"));
-                    BigDecimal areaUserPrice = Convert.toBigDecimal(areaPrice.get("userPrice"));
-
-                    log.info("showId: {}, area: {}, areaShowPrice: {}, areaUserPrice: {}", id, area, areaShowPrice, areaUserPrice);
-
-                    ShowArea showArea = new ShowArea();
-                    showArea.setId(IdUtil.getSnowflakeNextId());
-                    showArea.setShowId(id);
-                    showArea.setArea(area);
-                    showArea.setShowPrice(areaShowPrice);
-                    showArea.setUserPrice(areaUserPrice);
-                    showArea.setCreatedBy(0L);
-
-                    showAreaList.add(showArea);
-                  }
-                } else {
-                  log.info("区域价格不存在");
-                  continue;
-                }
-
-                boolean res = showService.initShow(show, showAreaList);
-                log.info("同步场次成功 res: {}", res);
-
-              } catch (Exception e) {
-                log.error("同步场次失败", e);
-              }
+          try {
+            // 准备请求参数
+            Map<String, String> params = new HashMap<>();
+            params.put("cinemaId", String.valueOf(cinema.getTpCinemaId()));
+            SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
+            // 发送请求并获取响应
+            String responseBody = supplierService.sendRequest("/show/preferential/query", params);
+            // 将 JSON 字符串解析为 JsonNode 对象
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+            Integer code = (Integer) responseMap.getOrDefault("code", 0);
+            String message = (String) responseMap.getOrDefault("message", "未知错误");
+            if(code != ResultCode.SUCCESS.getCode()) {
+              log.info("code: {}, message: {}", code, message);
+              continue;
             }
+            Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
+            if (data == null) {
+              continue;
+            }
+            List<Map<String, Object>> showInforList = (List<Map<String, Object>>) data.get("showInfor");
+            if (showInforList != null && !showInforList.isEmpty()) {
+              // 批量操作
+              List<Show> showList = new ArrayList<>();
+              List<ShowArea> showAreaList = new ArrayList<>();
+
+              for (Map<String, Object> showInfor : showInforList) {
+                try {
+                  String showId = (String) showInfor.get("showId");
+                  String hallName = (String) showInfor.get("hallName");
+                  Integer duration = (Integer) showInfor.get("duration");
+                  String showTime = (String) showInfor.get("showTime");
+                  String stopSellTime = (String) showInfor.get("stopSellTime");
+                  String showVersionType = (String) showInfor.get("showVersionType");
+                  BigDecimal showPrice = Convert.toBigDecimal(data.get("showPrice"));
+                  BigDecimal userPrice = Convert.toBigDecimal(data.get("userPrice"));
+                  // 需要用这个去找影片信息
+                  Long tpMovieId = Convert.toLong(showInfor.get("movieId"));
+                  Movie movie = movieMapper.findByTpMovieId(tpMovieId);
+                  if (movie == null) {
+                    continue;
+                  }
+                  // 场次数据
+                  Show show = new Show();
+                  Long id = IdUtil.getSnowflakeNextId();
+                  show.setId(id);
+                  show.setTpShowId(showId);
+                  show.setSupplierId(1869799230973227008L);
+                  show.setCinemaId(cinema.getId());
+                  show.setMovieId(movie.getId());
+                  show.setHallName(hallName);
+                  show.setDuration(duration);
+                  show.setShowTime(LocalDateTime.parse(showTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                  show.setStopSellTime(LocalDateTime.parse(stopSellTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                  show.setShowVersionType(showVersionType);
+                  show.setShowPrice(showPrice);
+                  show.setUserPrice(userPrice);
+                  // 查找影片是否存在
+                  Show oldShow = showMapper.selectByTpShowId(showId);
+                  if (oldShow != null) {
+                    show.setId(oldShow.getId());
+                  }
+                  showList.add(show);
+                  // 区间定价
+                  List<Map<String, Object>> areaPriceList = (List<Map<String, Object>>) showInfor.get("areaPrice");
+
+                  if (areaPriceList != null && !areaPriceList.isEmpty()) {
+                    for (Map<String, Object> areaPrice : areaPriceList) {
+                      String area = (String) areaPrice.get("area");
+                      BigDecimal areaShowPrice = Convert.toBigDecimal(areaPrice.get("showPrice"));
+                      BigDecimal areaUserPrice = Convert.toBigDecimal(areaPrice.get("userPrice"));
+
+                      ShowArea showArea = new ShowArea();
+                      showArea.setId(IdUtil.getSnowflakeNextId());
+                      showArea.setShowId(id);
+                      showArea.setArea(area);
+                      showArea.setShowPrice(areaShowPrice);
+                      showArea.setUserPrice(areaUserPrice);
+
+                      showAreaList.add(showArea);
+                    }
+                  }
+
+                } catch (Exception e) {
+                  log.error(cinema.getName() + "场次数据异常: {}", e);
+                }
+              }
+
+              boolean res = showService.initShow(showList, showAreaList);
+
+              log.info(cinema.getName() + "同步场次结束 res: {}", res);
+            }
+          } catch (Exception e) {
+            log.error(cinema.getName() + "同步场次异常: {}", e);
           }
         }
       }
-      log.info("同步场次结束");
+
+      // 删除已迁移的数据，确保事务一致性
+      jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
+          "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
+      jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
+
     } catch (Exception e) {
       log.error("同步场次失败", e);
     }

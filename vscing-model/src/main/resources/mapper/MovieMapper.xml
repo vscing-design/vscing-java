@@ -142,4 +142,33 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (
+            id, supplier_id, tp_movie_id, `name`, duration, publish_date, director, `cast`, intro, version_type,
+            `language`, movie_type, poster_url, plot_url, grade, `like`, publish_status
+        ) VALUES
+        <foreach collection="list" item="record" separator=",">
+            (
+            #{record.id}, #{record.supplierId}, #{record.tpMovieId}, #{record.name}, #{record.duration},
+            #{record.publishDate}, #{record.director}, #{record.cast}, #{record.intro}, #{record.versionType},
+            #{record.language}, #{record.movieType}, #{record.posterUrl}, #{record.plotUrl}, #{record.grade},
+            #{record.like}, #{record.publishStatus}
+            )
+        </foreach> ON DUPLICATE KEY UPDATE
+        duration = VALUES(duration),
+        publish_date = VALUES(publish_date),
+        director = VALUES(director),
+        `cast` = VALUES(`cast`),
+        intro = VALUES(intro),
+        version_type = VALUES(version_type),
+        `language` = VALUES(`language`),
+        movie_type = VALUES(movie_type),
+        poster_url = VALUES(poster_url),
+        plot_url = VALUES(plot_url),
+        grade = VALUES(grade),
+        `like` = VALUES(`like`),
+        publish_status = VALUES(publish_status)
+    </insert>
+
 </mapper>

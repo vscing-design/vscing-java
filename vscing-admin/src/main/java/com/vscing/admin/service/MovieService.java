@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface MovieService {
 
-  boolean initMovie(Movie movie, List<MovieProducer> movieProducers);
+  boolean initMovie(List<Movie> movieList, List<MovieProducer> movieProducerList);
 
 }

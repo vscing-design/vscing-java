@@ -157,4 +157,33 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (
+            id, supplier_id, tp_cinema_id, `name`, address, lng, lat, province_id, province_name, city_id,
+            city_name, phone, district_id, district_name
+        ) VALUES
+        <foreach collection="list" item="record" separator=",">
+            (
+            #{record.id}, #{record.supplierId}, #{record.tpCinemaId}, #{record.name}, #{record.address},
+            #{record.lng}, #{record.lat}, #{record.provinceId}, #{record.provinceName}, #{record.cityId},
+            #{record.cityName}, #{record.phone}, #{record.districtId}, #{record.districtName}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        supplier_id = VALUES(supplier_id),
+        tp_cinema_id = VALUES(tp_cinema_id),
+        `name` = VALUES(`name`),
+        address = VALUES(address),
+        lng = VALUES(lng),
+        lat = VALUES(lat),
+        province_id = VALUES(province_id),
+        province_name = VALUES(province_name),
+        city_id = VALUES(city_id),
+        city_name = VALUES(city_name),
+        phone = VALUES(phone),
+        district_id = VALUES(district_id),
+        district_name = VALUES(district_name)
+    </insert>
+
 </mapper>

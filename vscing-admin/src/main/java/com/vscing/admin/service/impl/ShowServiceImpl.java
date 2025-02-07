@@ -65,18 +65,22 @@ public class ShowServiceImpl implements ShowService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-  public boolean initShow(Show show, List<ShowArea> showAreaList) {
+  public boolean initShow(List<Show> showList, List<ShowArea> showAreaList) {
     try {
-
-      // 创建
-      int rowsAffected = showMapper.insert(show);
-      if (rowsAffected <= 0) {
-        throw new ServiceException("新增失败");
+      int rowsAffected;
+      if(showList.size() > 0) {
+        // 创建
+        rowsAffected = showMapper.batchUpsert(showList);
+        if (rowsAffected <= 0) {
+          throw new ServiceException("新增失败");
+        }
       }
-      // 增加机构
-      rowsAffected = showAreaMapper.batchInsert(showAreaList);
-      if (rowsAffected != showAreaList.size()) {
-        throw new ServiceException("新增关联失败");
+      if(showAreaList.size() > 0) {
+        // 增加机构
+        rowsAffected = showAreaMapper.batchUpsert(showAreaList);
+        if (rowsAffected != showAreaList.size()) {
+          throw new ServiceException("新增关联失败");
+        }
       }
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());

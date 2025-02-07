@@ -26,6 +26,11 @@ public interface CityMapper {
 
   List<City> getAllList();
 
+  /**
+   * 定时任务使用的城市列表
+  */
+  List<City> getTaskList();
+
   List<City> getList(@Param("record") AddressListDto record);
 
   City selectById(long id);

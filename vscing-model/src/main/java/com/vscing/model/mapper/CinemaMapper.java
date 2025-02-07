@@ -31,5 +31,10 @@ public interface CinemaMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(Cinema record);
+
+  /**
+   * 批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
+   */
+  int batchUpsert(@Param("list") List<Cinema> list);
   
 }

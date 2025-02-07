@@ -549,4 +549,30 @@
         TRUNCATE TABLE <include refid="tableName" />
     </delete>
 
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (
+        id, tp_show_id, supplier_id, cinema_id, movie_id, hall_name, duration,
+        show_time, stop_sell_time, show_version_type, show_price, user_price
+        ) VALUES
+        <foreach collection="list" item="record" separator=",">
+            (
+            #{record.id}, #{record.tpShowId}, #{record.supplierId}, #{record.cinemaId}, #{record.movieId}, #{record.hallName}, #{record.duration},
+            #{record.showTime}, #{record.stopSellTime}, #{record.showVersionType}, #{record.showPrice}, #{record.userPrice}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        supplier_id = VALUES(supplier_id),
+        tp_show_id = VALUES(tp_show_id),
+        cinema_id = VALUES(cinema_id),
+        movie_id = VALUES(movie_id),
+        hall_name = VALUES(hall_name),
+        duration = VALUES(duration),
+        show_time = VALUES(show_time),
+        stop_sell_time = VALUES(stop_sell_time),
+        show_version_type = VALUES(show_version_type),
+        show_price = VALUES(show_price),
+        user_price = VALUES(user_price)
+    </insert>
+
 </mapper>
