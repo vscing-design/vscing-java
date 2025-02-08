@@ -221,10 +221,10 @@
             </if>
             <if test="publishStatus != null and publishStatus != ''">
                 <choose>
-                    <when test="publishStatus == 'hot'">
+                    <when test="publishStatus == 'HOT'">
                         AND m.publish_date <![CDATA[ <= ]]> CURDATE()
                     </when>
-                    <when test="publishStatus == 'wait'">
+                    <when test="publishStatus == 'WAIT'">
                         AND m.publish_date <![CDATA[ > ]]> CURDATE()
                     </when>
                 </choose>
@@ -235,7 +235,7 @@
             </if>
         </where>
         GROUP BY m.id
-        ORDER BY m.publish_date DESC
+        ORDER BY m.grade DESC, m.like DESC, m.publish_date DESC
     </select>
 
     <!-- 根据CinemaApiListDto查询全部列表 -->
