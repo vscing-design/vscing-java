@@ -10,15 +10,13 @@ import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.api.domain.AlipayTradeCreateModel;
+import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.alipay.api.request.AlipaySystemOauthTokenRequest;
-import com.alipay.api.request.AlipayTradeCreateRequest;
-import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.response.AlipaySystemOauthTokenResponse;
-import com.alipay.api.response.AlipayTradeCreateResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.request.*;
+import com.alipay.api.response.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.service.OkHttpService;
@@ -92,7 +90,7 @@ public class AppletServiceImpl implements AppletService {
     try {
       return AlipaySignature.rsaCheck(signContent, sign, signVeriKey, charset, signType);
     } catch (AlipayApiException e) {
-      log.error("验签异常", e);
+      log.error("验签异常: {}", e.getMessage());
       return false;
     }
   }
@@ -165,12 +163,10 @@ public class AppletServiceImpl implements AppletService {
       request.setGrantType("authorization_code");
       // 发起请求
       AlipaySystemOauthTokenResponse response = alipayClient.certificateExecute(request);
-      log.info("支付宝获取openid调用结果: " , response);
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(response.getBody());
-        return jsonNode;
+        return objectMapper.readTree(response.getBody());
       } else {
         // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
         String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
@@ -214,7 +210,6 @@ public class AppletServiceImpl implements AppletService {
       request.setBizModel(model);
       // 调用接口
       AlipayTradeCreateResponse response = alipayClient.certificateExecute(request);
-      log.info("支付宝下单调用结果: " , response);
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
@@ -281,10 +276,10 @@ public class AppletServiceImpl implements AppletService {
           if (tradeStatus != null && !tradeStatus.isEmpty()) {
             return "TRADE_SUCCESS".equals(tradeStatus);
           } else {
-            throw new RuntimeException("支付宝下单未获取到有效的 trade_no");
+            throw new RuntimeException("支付宝查询订单未获取到有效的 trade_no");
           }
         } else {
-          throw new RuntimeException("支付宝下单未获取到有效的 alipay_trade_create_response");
+          throw new RuntimeException("支付宝查询订单未获取到有效的 alipay_trade_create_response");
         }
       } else {
         // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
@@ -292,73 +287,108 @@ public class AppletServiceImpl implements AppletService {
         throw new HttpException("支付宝查询订单接口失败: " + diagnosisUrl);
       }
     } catch (Exception e) {
-      log.error("支付宝查询订单方法异常", e.getMessage());
+      log.error("支付宝查询订单方法异常: {}", e.getMessage());
       throw new HttpException("支付宝查询订单方法异常: " + e.getMessage(), e);
     }
   }
 
   @Override
-  public void refundOrder(Map<String, Object> paymentData) {
-    Map<String, String> res = new HashMap<>();
+  public boolean refundOrder(Map<String, Object> refundData) {
     try {
       // 初始化SDK
       AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
       // 构造请求参数以调用接口
-      AlipayTradeCreateRequest request = new AlipayTradeCreateRequest();
+      AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
       // 业务请求参数
-      AlipayTradeCreateModel model = new AlipayTradeCreateModel();
+      AlipayTradeRefundModel model = new AlipayTradeRefundModel();
       // 设置商户订单号
-      model.setOutTradeNo((String) paymentData.get("outTradeNo"));
-      // 设置订单总金额
-      BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
-      model.setTotalAmount(String.valueOf(totalAmount));
-//      model.setTotalAmount("0.01");
-      // 设置订单标题
-      model.setSubject("嗨呀电影票订单" + paymentData.get("outTradeNo"));
-      // 设置产品码
-      model.setProductCode("JSAPI_PAY");
-      // 设置小程序支付中
-      model.setOpAppId(appletProperties.getAppId());
-      // 设置买家支付宝用户唯一标识
-      model.setBuyerOpenId((String) paymentData.get("openid"));
-      // 设置订单相对超时时间
-      model.setTimeoutExpress("10m");
+      model.setOutTradeNo((String) refundData.get("outTradeNo"));
+      // 设置支付宝交易号
+      model.setTradeNo((String) refundData.get("tradeNo"));
+      // 设置退款请求号
+      model.setOutRequestNo((String) refundData.get("refundNo"));
+      // 设置退款金额
+      BigDecimal totalAmount = (BigDecimal) refundData.get("totalAmount");
+      model.setRefundAmount(String.valueOf(totalAmount));
       // 请求参数的集合
       request.setBizModel(model);
       // 调用接口
-      AlipayTradeCreateResponse response = alipayClient.certificateExecute(request);
-      log.info("支付宝下单调用结果: " , response);
+      AlipayTradeRefundResponse response = alipayClient.certificateExecute(request);
+      log.info("支付宝退款调用结果: {}" , response.getBody());
+
       if (response.isSuccess()) {
         // 将响应字符串解析为 JSON 对象
         ObjectMapper objectMapper = JsonUtils.getObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
-        jsonNode = jsonNode.path("alipay_trade_create_response");
+        jsonNode = jsonNode.path("alipay_trade_refund_response");
         if (!jsonNode.isMissingNode()) {
-          // 获取 tradeNo
-          String tradeNo = jsonNode.path("trade_no").asText(null);
-          if (tradeNo != null && !tradeNo.isEmpty()) {
-            res.put("tradeNo", tradeNo);
-            return;
+          // 获取 fundChange
+          String fundChange = jsonNode.path("fund_change").asText(null);
+          if (fundChange != null && !fundChange.isEmpty()) {
+            return "Y".equals(fundChange);
           } else {
-            throw new RuntimeException("支付宝下单未获取到有效的 trade_no");
+            throw new RuntimeException("支付宝退款未获取到有效的 fund_change");
           }
         } else {
-          throw new RuntimeException("支付宝下单未获取到有效的 alipay_trade_create_response");
+          throw new RuntimeException("支付宝退款未获取到有效的 alipay_trade_refund_response");
         }
       } else {
         // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
         String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
-        throw new HttpException("支付宝下单接口失败: " + diagnosisUrl);
+        throw new HttpException("支付宝退款接口失败: " + diagnosisUrl);
       }
     } catch (Exception e) {
-      log.error("支付宝下单方法异常", e);
-      throw new HttpException("支付宝下单方法异常: " + e.getMessage(), e);
+      log.error("支付宝退款方法异常: {}", e.getMessage());
+      throw new HttpException("支付宝退款方法异常: " + e.getMessage(), e);
     }
   }
 
   @Override
   public boolean queryRefund(Map<String, String> queryData) {
-    return false;
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
+      // 业务请求参数
+      AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
+      // 设置商户订单号
+      model.setOutTradeNo(queryData.get("outTradeNo"));
+      // 设置支付宝交易号
+      model.setTradeNo(queryData.get("tradeNo"));
+      // 设置退款请求号
+      model.setOutRequestNo(queryData.get("refundNo"));
+      // 请求参数的集合
+      request.setBizModel(model);
+      // 调用接口
+      AlipayTradeFastpayRefundQueryResponse response = alipayClient.certificateExecute(request);
+      log.info("支付宝查询退款订单调用结果: {}" , response.getBody());
+
+      if (response.isSuccess()) {
+        // 将响应字符串解析为 JSON 对象
+        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(response.getBody());
+        jsonNode = jsonNode.path("alipay_trade_fastpay_refund_query_response");
+        if (!jsonNode.isMissingNode()) {
+          // 获取 refund_status
+          String refundStatus = jsonNode.path("refund_status").asText(null);
+          if (refundStatus != null && !refundStatus.isEmpty()) {
+            return "REFUND_SUCCESS".equals(refundStatus);
+          } else {
+            throw new RuntimeException("支付宝查询退款订单未获取到有效的 refund_status");
+          }
+        } else {
+          throw new RuntimeException("支付宝查询退款订单未获取到有效的 alipay_trade_fastpay_refund_query_response");
+        }
+      } else {
+        // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝查询退款订单接口失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      log.error("支付宝查询退款订单方法异常: {}", e.getMessage());
+      throw new HttpException("支付宝查询退款订单方法异常: " + e.getMessage(), e);
+    }
   }
 
 }

@@ -23,6 +23,12 @@ import com.wechat.pay.java.service.payments.jsapi.model.PrepayRequest;
 import com.wechat.pay.java.service.payments.jsapi.model.PrepayWithRequestPaymentResponse;
 import com.wechat.pay.java.service.payments.jsapi.model.QueryOrderByIdRequest;
 import com.wechat.pay.java.service.payments.model.Transaction;
+import com.wechat.pay.java.service.refund.RefundService;
+import com.wechat.pay.java.service.refund.model.AmountReq;
+import com.wechat.pay.java.service.refund.model.CreateRequest;
+import com.wechat.pay.java.service.refund.model.QueryByOutRefundNoRequest;
+import com.wechat.pay.java.service.refund.model.Refund;
+import com.wechat.pay.java.service.refund.model.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,7 +102,7 @@ public class AppletServiceImpl implements AppletService {
 
   /**
    * 缓存key
-  */
+   */
   private String getKey() {
     if (this.key == null) {
       this.key = String.format("%s.access_token.%s.%s.%d",
@@ -107,7 +113,7 @@ public class AppletServiceImpl implements AppletService {
 
   /**
    * 获取token
-  */
+   */
   private String getToken() {
     String token = (String) redisService.get(this.getKey());
 
@@ -121,14 +127,14 @@ public class AppletServiceImpl implements AppletService {
 
   /**
    * 刷新token
-  */
+   */
   private String refresh() {
     return appletProperties.getStable() ? this.getStableAccessToken(false) : this.getAccessToken();
   }
 
   /**
    * 调用 getStableAccessToken
-  */
+   */
   private String getStableAccessToken(boolean forceRefresh) {
     try {
       Map<String, Object> params = Map.of(
@@ -343,18 +349,14 @@ public class AppletServiceImpl implements AppletService {
   @Override
   public boolean queryOrder(Map<String, String> queryData) {
     try {
-      log.error("queryData: {}, mchid: {}, transaction_id: {}", queryData, appletProperties.getMerchantId(), queryData.get("transaction_id"));
-
       JsapiServiceExtension service = new JsapiServiceExtension.Builder().config(getConfig()).build();
-
+      // 创建请求
       QueryOrderByIdRequest queryRequest = new QueryOrderByIdRequest();
       queryRequest.setMchid(appletProperties.getMerchantId());
       queryRequest.setTransactionId(queryData.get("transaction_id"));
-
-      log.error("queryRequest: {}", queryRequest);
-
+      // 调用接口
       Transaction result = service.queryOrderById(queryRequest);
-      log.error("result: {}", result);
+      // 根据返回值进行业务处理
       if(result.getTradeState() == Transaction.TradeStateEnum.SUCCESS) {
         return true;
       }
@@ -365,13 +367,55 @@ public class AppletServiceImpl implements AppletService {
   }
 
   @Override
-  public void refundOrder(Map<String, Object> paymentData) {
-
+  public boolean refundOrder(Map<String, Object> refundData) {
+    try {
+      RefundService service = new RefundService.Builder().config(getConfig()).build();
+      // 创建请求
+      CreateRequest request = new CreateRequest();
+      // 商户订单号
+      request.setOutTradeNo((String) refundData.get("outTradeNo"));
+      // 微信支付订单号
+      request.setTransactionId((String) refundData.get("tradeNo"));
+      // 商户退款单号
+      request.setOutRefundNo((String) refundData.get("refundNo"));
+      // 设置退款金额
+      AmountReq amount = new AmountReq();
+      BigDecimal totalAmount = (BigDecimal) refundData.get("totalAmount");
+      BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
+      amount.setTotal(multipliedAmount.longValueExact());
+      request.setAmount(amount);
+      // 调用接口
+      Refund refund = service.create(request);
+      log.info("微信退款调用结果: {}", refund);
+      if(refund.getStatus() == Status.SUCCESS) {
+        return true;
+      }
+      throw new RuntimeException("微信退款未获取到有效的 status");
+    } catch (Exception e) {
+      log.error("微信退款方法异常: {}", e.getMessage());
+      throw new RuntimeException("微信退款方法异常: " + e.getMessage(), e);
+    }
   }
 
   @Override
   public boolean queryRefund(Map<String, String> queryData) {
-    return false;
+    try {
+      RefundService service = new RefundService.Builder().config(getConfig()).build();
+      // 创建请求
+      QueryByOutRefundNoRequest request = new QueryByOutRefundNoRequest();
+      // 商户退款单号
+      request.setOutRefundNo(queryData.get("refundNo"));
+      // 调用接口
+      Refund refund = service.queryByOutRefundNo(request);
+      log.info("微信查询退款订单调用结果: {}", refund);
+      if(refund.getStatus() == Status.SUCCESS) {
+        return true;
+      }
+      throw new RuntimeException("微信查询退款订单未获取到有效的 status");
+    } catch (Exception e) {
+      log.error("微信查询退款订单方法异常: {}", e.getMessage());
+      throw new RuntimeException("微信查询退款订单方法异常: " + e.getMessage(), e);
+    }
   }
 
 }

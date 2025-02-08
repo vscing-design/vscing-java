@@ -40,7 +40,7 @@ public interface AppletService {
   /**
    * 小程序退款
    */
-  void refundOrder(Map<String, Object> refundData);
+  boolean refundOrder(Map<String, Object> refundData);
 
   /**
    * 查询小程序订单是否退款成功
