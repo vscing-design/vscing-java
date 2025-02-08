@@ -116,6 +116,30 @@
         </foreach>
     </insert>
 
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (
+        id, movie_id, `type`, avatar, en_name, sc_name, act_name
+        ) VALUES
+        <foreach collection="list" item="record" separator=",">
+            (
+            #{record.id},
+            #{record.movieId},
+            #{record.type},
+            #{record.avatar},
+            #{record.enName},
+            #{record.scName},
+            #{record.actName}
+            )
+        </foreach> ON DUPLICATE KEY UPDATE
+        movie_id = VALUES(movie_id),
+        `type` = VALUES(`type`),
+        avatar = VALUES(avatar),
+        en_name = VALUES(en_name),
+        sc_name = VALUES(sc_name),
+        act_name = VALUES(act_name)
+    </insert>
+
     <!-- 更新信息 -->
     <update id="update" parameterType="com.vscing.model.entity.MovieProducer">
         UPDATE <include refid="tableName" />

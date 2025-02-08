@@ -321,7 +321,6 @@ public class TaskServiceImpl implements TaskService {
                 movieProducer.setEnName(enName);
                 movieProducer.setScName(scName);
                 movieProducer.setActName(actName);
-                movieProducer.setCreatedBy(0L);
                 movieProducerList.add(movieProducer);
               }
             }
@@ -340,7 +339,6 @@ public class TaskServiceImpl implements TaskService {
                 movieProducer.setEnName(enName);
                 movieProducer.setScName(scName);
                 movieProducer.setActName("");
-                movieProducer.setCreatedBy(0L);
                 movieProducerList.add(movieProducer);
               }
             }
@@ -688,6 +686,10 @@ public class TaskServiceImpl implements TaskService {
       jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
           "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
       jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
+
+      // 优化表
+      jdbcTemplate.execute("OPTIMIZE TABLE vscing_show");
+      jdbcTemplate.execute("OPTIMIZE TABLE vscing_show_area");
 
     } catch (Exception e) {
       log.error("同步场次失败", e);
