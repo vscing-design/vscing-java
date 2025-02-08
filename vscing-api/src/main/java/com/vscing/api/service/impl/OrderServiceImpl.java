@@ -493,6 +493,11 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public boolean deleteOrder(Long userId, Long id) {
+    Order orderInfo = orderMapper.selectById(id);
+    // 判断订单状态 已出票、已退款订单才可以删除
+    if (orderInfo == null || (orderInfo.getStatus() != 4 && orderInfo.getStatus() != 5 && orderInfo.getStatus() != 7) || !orderInfo.getUserId().equals(userId)) {
+      return false;
+    }
     // 删除订单
     int rowsAffected = orderMapper.softDeleteById(id, 0L);
     if (rowsAffected <= 0) {
@@ -504,8 +509,8 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public boolean cancelOrder(Long userId, Long id) {
     Order orderInfo = orderMapper.selectById(id);
-    // 判断订单状态
-    if (orderInfo == null || orderInfo.getStatus() >= 5) {
+    // 判断订单状态 待支付才可以取消
+    if (orderInfo == null || orderInfo.getStatus() != 1) {
       return false;
     }
     // 修改订单状态
@@ -522,6 +527,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderApiPaymentVo paymentOrder(Long userId, Long id) {
     Order order = orderMapper.selectById(id);
+    // 判断订单状态 待支付才可以2次支付
     if(order == null || order.getStatus() != 1) {
       return null;
     }
