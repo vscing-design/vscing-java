@@ -277,8 +277,7 @@ public class TaskServiceImpl implements TaskService {
           // 组装影片数据
           Movie movie = new Movie();
           // 影片信息
-          Long id = IdUtil.getSnowflakeNextId();
-          movie.setId(id);
+          movie.setId(IdUtil.getSnowflakeNextId());
           movie.setSupplierId(1869799230973227008L);
           movie.setTpMovieId(movieId);
           movie.setName(movieName);
@@ -300,8 +299,6 @@ public class TaskServiceImpl implements TaskService {
           Movie oldmovie = movieMapper.selectByTpMovieId(movieId);
           if (oldmovie != null) {
             movie.setId(oldmovie.getId());
-            movieList.add(movie);
-            continue;
           }
           movieList.add(movie);
           // 影片主演、演员
@@ -315,7 +312,7 @@ public class TaskServiceImpl implements TaskService {
                 String actName = (String) actors.get("actName");
                 MovieProducer movieProducer = new MovieProducer();
                 movieProducer.setId(IdUtil.getSnowflakeNextId());
-                movieProducer.setMovieId(id);
+                movieProducer.setMovieId(movie.getId());
                 movieProducer.setType(2);
                 movieProducer.setAvatar(avatar);
                 movieProducer.setEnName(enName);
@@ -325,15 +322,15 @@ public class TaskServiceImpl implements TaskService {
               }
             }
 
-            List<Map<String, Object>> directorsList = (List<Map<String, Object>>) producer.get("directors");
-            if (directorsList != null && !directorsList.isEmpty()) {
-              for (Map<String, Object> directors : directorsList) {
-                String avatar = (String) directors.get("avatar");
-                String enName = (String) directors.get("enName");
-                String scName = (String) directors.get("scName");
+            List<Map<String, Object>> directorList = (List<Map<String, Object>>) producer.get("director");
+            if (directorList != null && !directorList.isEmpty()) {
+              for (Map<String, Object> record : directorList) {
+                String avatar = (String) record.get("avatar");
+                String enName = (String) record.get("enName");
+                String scName = (String) record.get("scName");
                 MovieProducer movieProducer = new MovieProducer();
                 movieProducer.setId(IdUtil.getSnowflakeNextId());
-                movieProducer.setMovieId(id);
+                movieProducer.setMovieId(movie.getId());
                 movieProducer.setType(1);
                 movieProducer.setAvatar(avatar);
                 movieProducer.setEnName(enName);

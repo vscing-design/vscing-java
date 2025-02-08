@@ -42,8 +42,8 @@ public class MovieServiceImpl implements MovieService {
       }
       if(movieProducerList.size() > 0) {
         // 增加机构
-        rowsAffected = movieProducerMapper.batchInsert(movieProducerList);
-        if (rowsAffected != movieProducerList.size()) {
+        rowsAffected = movieProducerMapper.batchUpsert(movieProducerList);
+        if (rowsAffected <= 0) {
           throw new ServiceException("新增关联失败");
         }
       }
