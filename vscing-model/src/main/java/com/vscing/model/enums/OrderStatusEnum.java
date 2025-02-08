@@ -20,7 +20,8 @@ public enum OrderStatusEnum {
   ISSUED(4, "已出票"),
   CANCELLED(5, "已取消"),
   REFUND_IN_PROGRESS(6, "退款中"),
-  REFUNDED(7, "退款完成");
+  REFUNDED(7, "退款完成"),
+  REFUNDED_FAILED(8, "退款失败");
 
   /**
    * 状态码
