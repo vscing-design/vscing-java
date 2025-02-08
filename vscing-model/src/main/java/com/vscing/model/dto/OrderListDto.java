@@ -30,7 +30,7 @@ public class OrderListDto {
   @Schema(description = "订单号")
   private String orderSn;
 
-  @Schema(description = "订单状态 多个以英文逗号分隔 1 待付款 2 待出票 3 出票中 4 已出票 5 已取消 6 退款中 7 退款完成")
+  @Schema(description = "订单状态 多个以英文逗号分隔 1 待付款 2 待出票 3 出票中 4 已出票 5 已取消 6 退款中 7 退款完成 8 退款失败")
   private String status;
 
   @Schema(description = "订单类型 1 用户下单 2 手动下单")
