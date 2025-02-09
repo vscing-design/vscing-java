@@ -1,12 +1,17 @@
 package com.vscing.api.receiver;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.api.service.OrderService;
 import com.vscing.common.api.ResultCode;
 import com.vscing.common.service.RedisService;
+import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.model.entity.Order;
+import com.vscing.model.enums.PaymentTypeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.mq.config.RabbitMQConfig;
@@ -29,6 +34,9 @@ public class MessageReceiver {
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
+
+  @Autowired
+  private AppletServiceFactory appletServiceFactory;
 
   @Autowired
   private OrderService orderService;
@@ -97,6 +105,9 @@ public class MessageReceiver {
     }
   }
 
+  /**
+   * 取消订单队列
+  */
   @RabbitListener(queues = RabbitMQConfig.CANCEL_ORDER_QUEUE)
   public void receiveCancelOrderMessage(Message message) {
     try {
@@ -116,6 +127,99 @@ public class MessageReceiver {
       log.info("取消订单成功");
     } catch (Exception e) {
       log.error("取消订单队列异常: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
+   */
+  private String generateOrderSn() {
+
+    // 获取当前时间戳，格式为yyyyMMddHHmmssSSS（17位）
+    String timestamp = DateUtil.now().replaceAll("-", "").replaceAll(" ", "").replaceAll(":", "") + DateUtil.format(DateUtil.date(), "SSS");
+
+    // 生成5位随机数字，用于补足18位
+    String randomNum = RandomUtil.randomNumbers(5);
+
+    // 组合生成订单号
+    return "HY-TD" + (timestamp + randomNum).substring(0, 18);
+  }
+
+  /**
+   * 出票失败 或 出票结果迟迟不响应 走退款流程
+   */
+  @RabbitListener(queues = RabbitMQConfig.REFUND_QUEUE)
+  public void receiveRefundMessage(Message message) {
+    try {
+      // 获取订单ID
+      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      Long orderId = Long.parseLong(msg);
+      log.info("orderId: {}", orderId);
+      // 查询订单信息
+      Order order = orderMapper.selectById(orderId);
+      // 获取支付句柄
+      String paymentType = PaymentTypeEnum.findByCode(order.getPlatform());
+      AppletService appletService = appletServiceFactory.getAppletService(paymentType);
+      // 扭转订单状态到退款中，并生成退款订单号
+      String refundNo = generateOrderSn();
+      order.setStatus(6);
+      order.setRefundNo(refundNo);
+      // 调用保存
+      orderMapper.update(order);
+      // 组装参数
+      Map<String, Object> refundData = new HashMap<>(4);
+      refundData.put("outTradeNo", order.getTradeNo());
+      refundData.put("tradeNo", order.getOrderSn());
+      refundData.put("refundNo", refundNo);
+      refundData.put("totalAmount", order.getTotalPrice());
+      // 发送退款请求
+      boolean res = appletService.refundOrder(refundData);
+      log.info("退款结果: {}", res);
+      // 处理退款结果
+      if (res) {
+        order.setStatus(7);
+        orderMapper.update(order);
+      } else {
+        // 发送mq异步处理 2分钟后查询退款订单
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+      }
+    } catch (Exception e) {
+      log.error("退款队列异常: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * 退款订单查询
+   */
+  @RabbitListener(queues = RabbitMQConfig.REFUND_QUERY_QUEUE)
+  public void receiveRefundQueryMessage(Message message) {
+    try {
+      // 获取订单ID
+      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      Long orderId = Long.parseLong(msg);
+      log.info("orderId: {}", orderId);
+      // 查询订单信息
+      Order order = orderMapper.selectById(orderId);
+      // 获取支付句柄
+      String paymentType = PaymentTypeEnum.findByCode(order.getPlatform());
+      AppletService appletService = appletServiceFactory.getAppletService(paymentType);
+      // 组装参数
+      Map<String, String> queryData = new HashMap<>(4);
+      queryData.put("outTradeNo", order.getTradeNo());
+      queryData.put("tradeNo", order.getOrderSn());
+      queryData.put("refundNo", order.getRefundNo());
+      // 发送退款请求
+      boolean res = appletService.queryRefund(queryData);
+      log.info("退款订单查询结果: {}", res);
+      // 处理退款结果
+      if (res) {
+        order.setStatus(7);
+      } else {
+        order.setStatus(8);
+      }
+      orderMapper.update(order);
+    } catch (Exception e) {
+      log.error("退款队列异常: {}", e.getMessage());
     }
   }
 

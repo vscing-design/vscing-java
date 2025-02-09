@@ -14,6 +14,7 @@
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
         <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
+        <result column="refund_no" property="refundNo" jdbcType="VARCHAR" />
         <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
         <result column="ticket_code" property="ticketCode" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
@@ -288,6 +289,7 @@
             <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
             <if test="tradeNo != null">trade_no,</if>
+            <if test="refundNo != null">refund_no,</if>
             <if test="supplierOrderSn != null">supplier_order_sn,</if>
             <if test="ticketCode != null">ticket_code,</if>
             <if test="status != null">status,</if>
@@ -317,6 +319,7 @@
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
             <if test="tradeNo != null">#{tradeNo, jdbcType=VARCHAR},</if>
+            <if test="refundNo != null">#{refundNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="ticketCode != null">#{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
@@ -349,6 +352,7 @@
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
             <if test="tradeNo != null">trade_no = #{tradeNo, jdbcType=VARCHAR},</if>
+            <if test="refundNo != null">refund_no = #{refundNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>
             <if test="ticketCode != null">ticket_code = #{ticketCode, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>

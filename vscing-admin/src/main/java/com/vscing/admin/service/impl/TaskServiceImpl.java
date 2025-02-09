@@ -625,8 +625,7 @@ public class TaskServiceImpl implements TaskService {
                   }
                   // 场次数据
                   Show show = new Show();
-                  Long id = IdUtil.getSnowflakeNextId();
-                  show.setId(id);
+                  show.setId(IdUtil.getSnowflakeNextId());
                   show.setTpShowId(showId);
                   show.setSupplierId(1869799230973227008L);
                   show.setCinemaId(cinema.getId());
@@ -655,7 +654,7 @@ public class TaskServiceImpl implements TaskService {
 
                       ShowArea showArea = new ShowArea();
                       showArea.setId(IdUtil.getSnowflakeNextId());
-                      showArea.setShowId(id);
+                      showArea.setShowId(show.getId());
                       showArea.setArea(area);
                       showArea.setShowPrice(areaShowPrice);
                       showArea.setUserPrice(areaUserPrice);

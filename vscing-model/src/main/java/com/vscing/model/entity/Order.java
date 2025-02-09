@@ -43,6 +43,9 @@ public class Order extends BaseEntity {
   @Schema(description = "支付平台订单号")
   private String tradeNo;
 
+  @Schema(description = "支付平台退款订单号")
+  private String refundNo;
+
   @Schema(description = "供应商订单号")
   private String supplierOrderSn;
 

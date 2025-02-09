@@ -14,6 +14,7 @@ import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Show;
+import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
@@ -216,13 +217,14 @@ public class NotifyServiceImpl implements NotifyService {
       updateOrder.setResponseBody(responseBody);
       // 调用保存
       orderMapper.update(updateOrder);
-      // 发送mq异步处理
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
-      // 调用三方成功
-      if(SUCCESS_CODES.contains(code)) {
-        log.error("调用三方下单写入数据：", order.getOrderSn());
-      } else {
+      // 判断出票是否异常
+      if(JfshouOrderSubmitResponseCodeEnum.isErrorCode(code)) {
+        // 发送mq异步处理 退款
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
         throw new ServiceException(message);
+      } else {
+        // 发送mq异步处理 同步出票信息
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
       }
     } catch (Exception e) {
       log.error("调用三方下单异常：{}", e);
