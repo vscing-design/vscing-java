@@ -116,8 +116,12 @@ public class MessageReceiver {
       log.info("取消订单队列消息: {}" + msg);
       Long orderId = Long.parseLong(msg);
       log.info("orderId: {}", orderId);
+      // 查询订单信息
+      Order order = orderMapper.selectById(orderId);
+      if(order.getStatus() != 1) {
+        throw new Exception("订单状态错误");
+      }
       // 修改订单状态
-      Order order = new Order();
       order.setId(orderId);
       order.setStatus(5);
       int rowsAffected = orderMapper.updateStatus(order);
