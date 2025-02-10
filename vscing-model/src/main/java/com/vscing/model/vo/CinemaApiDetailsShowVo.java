@@ -87,4 +87,10 @@ public class CinemaApiDetailsShowVo {
     @Schema(description = "优惠金额")
     private BigDecimal discount;
 
+    @Schema(description = "临时值")
+    private BigDecimal showPrice;
+
+    @Schema(description = "临时值")
+    private BigDecimal userPrice;
+
 }

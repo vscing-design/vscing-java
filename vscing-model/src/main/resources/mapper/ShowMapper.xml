@@ -121,6 +121,8 @@
             s.duration,
             s.show_version_type as showVersionType,
             s.stop_sell_time as stopSellTime,
+            s.show_price as showPrice,
+            s.user_price as userPrice,
             m.name as movieName,
             m.publish_date as publishDate,
             m.director,

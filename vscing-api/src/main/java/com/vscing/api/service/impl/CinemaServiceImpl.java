@@ -101,6 +101,7 @@ public class CinemaServiceImpl implements CinemaService {
       cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);
       return cinemaApiDetailsVo;
     }
+    // 场次列表
     List<ShowArea> showAreaList = showAreaMapper.selectByShowIds(showIds);
     if (showAreaList == null || showAreaList.isEmpty()) {
       cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);
@@ -118,14 +119,26 @@ public class CinemaServiceImpl implements CinemaService {
     // 循环影片场次列表，并计算出最低价格和最高价格
     cinemaApiDetailsShowVoList.forEach(cinemaApiDetailsShowVo -> {
       ShowArea showArea = ShowAreaMinPrice.get(cinemaApiDetailsShowVo.getShowId());
+      BigDecimal showPrice = cinemaApiDetailsShowVo.getShowPrice();
+      BigDecimal userPrice = cinemaApiDetailsShowVo.getUserPrice();
+      if(showArea != null) {
+        showPrice = showArea.getShowPrice();
+        userPrice = showArea.getUserPrice();
+      }
+      // 置空
+      cinemaApiDetailsShowVo.setShowPrice(null);
+      cinemaApiDetailsShowVo.setUserPrice(null);
+      if(showPrice == null || userPrice == null) {
+        return;
+      }
       // 实际销售价格
-      BigDecimal price = PricingUtil.calculateActualPrice(showArea.getShowPrice(), showArea.getUserPrice(), pricingRules);
+      BigDecimal price = PricingUtil.calculateActualPrice(showPrice, userPrice, pricingRules);
       // 官方价格
-      cinemaApiDetailsShowVo.setMaxPrice(showArea.getShowPrice());
+      cinemaApiDetailsShowVo.setMaxPrice(showPrice);
       // 实际售价
       cinemaApiDetailsShowVo.setMinPrice(price);
       // 优惠金额
-      cinemaApiDetailsShowVo.setDiscount(showArea.getShowPrice().subtract(price));
+      cinemaApiDetailsShowVo.setDiscount(showPrice.subtract(price));
     });
     // 赋值
     cinemaApiDetailsVo.setShowList(cinemaApiDetailsShowVoList);

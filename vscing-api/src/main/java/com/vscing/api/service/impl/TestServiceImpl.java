@@ -44,8 +44,6 @@ public class TestServiceImpl implements TestService {
             SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
             // 发送请求并获取响应
             String responseBody = supplierService.sendRequest("/seat/query", params);
-            log.info("responseBody: {}", responseBody);
-
             return responseBody;
 
         } catch (Exception e) {
