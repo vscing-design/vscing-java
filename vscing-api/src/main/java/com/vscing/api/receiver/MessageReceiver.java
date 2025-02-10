@@ -59,7 +59,7 @@ public class MessageReceiver {
     int tag = 0;
     // 处理同步场次码消息
     String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-    log.error("场次队列消息: {}" + msg);
+    log.info("场次队列消息: {}" + msg);
     Long orderId = Long.parseLong(msg);
     try {
       // 查询订单信息
@@ -115,7 +115,6 @@ public class MessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.info("取消订单队列消息: {}" + msg);
       Long orderId = Long.parseLong(msg);
-      log.info("orderId: {}", orderId);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       if(order.getStatus() != 1) {
@@ -157,8 +156,8 @@ public class MessageReceiver {
     try {
       // 获取订单ID
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      log.info("退款队列消息: {}" + msg);
       Long orderId = Long.parseLong(msg);
-      log.info("orderId: {}", orderId);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 获取支付句柄
@@ -200,8 +199,8 @@ public class MessageReceiver {
     try {
       // 获取订单ID
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      log.info("退款订单查询队列消息: {}" + msg);
       Long orderId = Long.parseLong(msg);
-      log.info("orderId: {}", orderId);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 获取支付句柄

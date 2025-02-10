@@ -78,7 +78,7 @@ public class ShowServiceImpl implements ShowService {
       if(showAreaList.size() > 0) {
         // 增加机构
         rowsAffected = showAreaMapper.batchUpsert(showAreaList);
-        if (rowsAffected != showAreaList.size()) {
+        if (rowsAffected <= 0) {
           throw new ServiceException("新增关联失败");
         }
       }

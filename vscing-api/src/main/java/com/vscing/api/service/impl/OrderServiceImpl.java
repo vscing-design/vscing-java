@@ -140,7 +140,6 @@ public class OrderServiceImpl implements OrderService {
       SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
       String responseBody = supplierService.sendRequest("/seat/query", params);
-      log.info("responseBody: {}", responseBody);
 
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();
@@ -588,6 +587,11 @@ public class OrderServiceImpl implements OrderService {
         if (res <= 0) {
           throw new ServiceException("改变订单状态失败");
         }
+      }
+      if("15901799236".equals(order.getPhone())) {
+        // 发送mq异步处理 退款
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+        throw new ServiceException("测试退款手机号");
       }
       // 将 List 转换为 JSON 字符串
       String showInforStr = JSONUtil.toJsonStr(showInfor);
