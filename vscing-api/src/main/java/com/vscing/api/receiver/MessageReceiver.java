@@ -10,10 +10,12 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.model.entity.Order;
 import com.vscing.model.enums.PaymentTypeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.mapper.OrderMapper;
+import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.mq.config.RabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
@@ -59,11 +61,11 @@ public class MessageReceiver {
     int tag = 0;
     // 处理同步场次码消息
     String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-    log.info("场次队列消息: {}" + msg);
-    Long orderId = Long.parseLong(msg);
+    SyncCodeMq syncCodeMq = JsonUtils.parseObject(msg, SyncCodeMq.class);
+    log.info("场次队列消息: orderId: {}, num: {}", syncCodeMq.getOrderId(), syncCodeMq.getNum());
     try {
       // 查询订单信息
-      Order order = orderMapper.selectById(orderId);
+      Order order = orderMapper.selectById(syncCodeMq.getOrderId());
       // 准备请求参数
       Map<String, String> params = new HashMap<>();
       params.put("tradeNo", order.getOrderSn());
@@ -99,9 +101,14 @@ public class MessageReceiver {
       log.error("场次队列异常: " + e.getMessage());
 //      throw e;
     }
-    if(tag == 1) {
+    if(syncCodeMq.getNum() >= 20) {
+      // 发送mq异步处理 退款
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, syncCodeMq.getOrderId().toString(), 2*60 *1000);
+    } else if(tag == 1) {
+      syncCodeMq.setNum(syncCodeMq.getNum() + 1);
+      String newMsg = JsonUtils.toJsonString(syncCodeMq);
       // 发送mq异步处理
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 3*60 *1000);
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, newMsg, 3*60 *1000);
     }
   }
 
@@ -153,11 +160,11 @@ public class MessageReceiver {
    */
   @RabbitListener(queues = RabbitMQConfig.REFUND_QUEUE)
   public void receiveRefundMessage(Message message) {
+    // 获取订单ID
+    String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+    log.info("退款队列消息: {}" + msg);
+    Long orderId = Long.parseLong(msg);
     try {
-      // 获取订单ID
-      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-      log.info("退款队列消息: {}" + msg);
-      Long orderId = Long.parseLong(msg);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 获取支付句柄
@@ -165,14 +172,18 @@ public class MessageReceiver {
       AppletService appletService = appletServiceFactory.getAppletService(paymentType);
       // 扭转订单状态到退款中，并生成退款订单号
       String refundNo = generateOrderSn();
-      order.setStatus(6);
-      order.setRefundNo(refundNo);
-      // 调用保存
-      orderMapper.update(order);
+      if(order.getRefundNo() != null) {
+        refundNo = order.getRefundNo();
+      } else {
+        order.setStatus(6);
+        order.setRefundNo(refundNo);
+        // 调用保存
+        orderMapper.update(order);
+      }
       // 组装参数
       Map<String, Object> refundData = new HashMap<>(4);
-      refundData.put("outTradeNo", order.getTradeNo());
-      refundData.put("tradeNo", order.getOrderSn());
+      refundData.put("outTradeNo", order.getOrderSn());
+      refundData.put("tradeNo", order.getTradeNo());
       refundData.put("refundNo", refundNo);
       refundData.put("totalAmount", order.getTotalPrice());
       // 发送退款请求
@@ -184,10 +195,12 @@ public class MessageReceiver {
         orderMapper.update(order);
       } else {
         // 发送mq异步处理 2分钟后查询退款订单
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, msg, 2*60 *1000);
       }
     } catch (Exception e) {
       log.error("退款队列异常: {}", e.getMessage());
+      // 发送mq异步处理 2分钟后查询退款订单
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, msg, 2*60 *1000);
     }
   }
 

@@ -5,6 +5,8 @@ import com.vscing.common.api.CommonResult;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.common.utils.JsonUtils;
+import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.config.RabbitMQConfig;
@@ -49,8 +51,18 @@ public class TestController {
     @GetMapping
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
-        Long orderId = 1L;
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 10 *1000);
+        SyncCodeMq syncCodeMq = new SyncCodeMq();
+        syncCodeMq.setOrderId(1889219011411103744L);
+        syncCodeMq.setNum(20);
+        String msg = JsonUtils.toJsonString(syncCodeMq);
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
+//
+//        SyncCodeMq result = JsonUtils.parseObject(msg, SyncCodeMq.class);
+//        log.info("orderId: {}, num: {}", result.getOrderId(), result.getNum());
+
+//        Long orderId = 1L;
+//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 10 *1000);
+
         return CommonResult.success("ok");
     }
 

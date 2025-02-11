@@ -340,10 +340,10 @@
         GROUP BY c.id
         <choose>
             <when test="orderBy == 1">
-                ORDER BY s.stop_sell_time ASC, distance ASC
+                ORDER BY distance ASC, s.stop_sell_time ASC
             </when>
             <when test="orderBy == 2">
-                ORDER BY s.stop_sell_time ASC, MIN(sa.show_price) ASC
+                ORDER BY MIN(sa.show_price) ASC, s.stop_sell_time ASC
             </when>
             <otherwise>
                 ORDER BY s.stop_sell_time ASC
@@ -456,13 +456,13 @@
                 OR c.address LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        GROUP BY c.id
+        GROUP BY s.id
         <choose>
             <when test="orderBy == 1">
-                ORDER BY s.stop_sell_time ASC, distance ASC
+                ORDER BY distance ASC, s.stop_sell_time ASC
             </when>
             <when test="orderBy == 2">
-                ORDER BY s.stop_sell_time ASC, MIN(sa.show_price) ASC
+                ORDER BY MIN(sa.show_price) ASC, s.stop_sell_time ASC
             </when>
             <otherwise>
                 ORDER BY s.stop_sell_time ASC

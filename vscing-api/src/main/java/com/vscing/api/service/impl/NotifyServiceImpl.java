@@ -8,6 +8,7 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.dto.SeatListDto;
@@ -18,6 +19,7 @@ import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.mq.config.RabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import com.wechat.pay.java.service.payments.model.Transaction;
@@ -193,6 +195,12 @@ public class NotifyServiceImpl implements NotifyService {
           throw new ServiceException("改变订单状态失败");
         }
       }
+      // 黑名单测试
+      if("15901799236".equals(order.getPhone())) {
+        // 发送mq异步处理 退款
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+        throw new ServiceException("测试退款手机号");
+      }
       // 将 List 转换为 JSON 字符串
       String showInforStr = JSONUtil.toJsonStr(showInfor);
       // 准备请求参数
@@ -224,7 +232,11 @@ public class NotifyServiceImpl implements NotifyService {
         throw new ServiceException(message);
       } else {
         // 发送mq异步处理 同步出票信息
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
+        SyncCodeMq syncCodeMq = new SyncCodeMq();
+        syncCodeMq.setOrderId(order.getId());
+        syncCodeMq.setNum(1);
+        String msg = JsonUtils.toJsonString(syncCodeMq);
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
       }
     } catch (Exception e) {
       log.error("调用三方下单异常：{}", e);

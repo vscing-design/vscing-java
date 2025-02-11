@@ -382,15 +382,14 @@ public class AppletServiceImpl implements AppletService {
       AmountReq amount = new AmountReq();
       BigDecimal totalAmount = (BigDecimal) refundData.get("totalAmount");
       BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
+      amount.setRefund(multipliedAmount.longValueExact());
       amount.setTotal(multipliedAmount.longValueExact());
+      amount.setCurrency("CNY");
       request.setAmount(amount);
       // 调用接口
       Refund refund = service.create(request);
-      log.info("微信退款调用结果: {}", refund);
-      if(refund.getStatus() == Status.SUCCESS) {
-        return true;
-      }
-      throw new RuntimeException("微信退款未获取到有效的 status");
+      log.info("微信退款调用结果: {}", refund.getStatus());
+      return refund.getStatus() == Status.SUCCESS;
     } catch (Exception e) {
       log.error("微信退款方法异常: {}", e.getMessage());
       throw new RuntimeException("微信退款方法异常: " + e.getMessage(), e);
@@ -407,11 +406,8 @@ public class AppletServiceImpl implements AppletService {
       request.setOutRefundNo(queryData.get("refundNo"));
       // 调用接口
       Refund refund = service.queryByOutRefundNo(request);
-      log.info("微信查询退款订单调用结果: {}", refund);
-      if(refund.getStatus() == Status.SUCCESS) {
-        return true;
-      }
-      throw new RuntimeException("微信查询退款订单未获取到有效的 status");
+      log.info("微信查询退款订单调用结果: {}", refund.getStatus());
+      return refund.getStatus() == Status.SUCCESS;
     } catch (Exception e) {
       log.error("微信查询退款订单方法异常: {}", e.getMessage());
       throw new RuntimeException("微信查询退款订单方法异常: " + e.getMessage(), e);
