@@ -74,11 +74,6 @@ public interface OrderService {
   OrderApiPaymentVo paymentOrder(Long userId, Long id);
 
   /**
-   * 去出票
-   */
-  boolean ticketOrder(Long userId, Long id);
-
-  /**
    * 评价
    */
   boolean insertScoreOrder(Long userId, OrderApiScoreDto orderApiScoreDto);

@@ -185,23 +185,6 @@ public class OrderController {
     }
   }
 
-  @PostMapping("/ticket/{id}")
-  @Operation(summary = "去出票")
-  public CommonResult<Object> ticket(@PathVariable("id") Long id,
-                                     @AuthenticationPrincipal UserDetails userInfo) {
-    try {
-      boolean res = orderService.ticketOrder(userInfo.getUserId(), id);
-      if (res) {
-        return CommonResult.success("取票接口返回成功");
-      } else {
-        return CommonResult.failed("取票接口返回失败");
-      }
-    } catch (Exception e) {
-      log.error("请求错误: ", e);
-      return CommonResult.failed("请求错误");
-    }
-  }
-
   @PostMapping("/score")
   @Operation(summary = "评分")
   public CommonResult<Object> ticket(@Validated @RequestBody OrderApiScoreDto orderApiScoreDto,

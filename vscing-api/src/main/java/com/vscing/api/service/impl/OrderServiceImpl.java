@@ -3,7 +3,6 @@ package com.vscing.api.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.OrderService;
@@ -14,14 +13,12 @@ import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
-import com.vscing.common.utils.MapstructUtils;
 import com.vscing.model.dto.OrderApiConfirmDetailsDto;
 import com.vscing.model.dto.OrderApiCreatedDto;
 import com.vscing.model.dto.OrderApiListDto;
 import com.vscing.model.dto.OrderApiScoreDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
-import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.OrderDetail;
 import com.vscing.model.entity.OrderScore;
@@ -29,7 +26,6 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.UserAuth;
-import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
@@ -554,82 +550,6 @@ public class OrderServiceImpl implements OrderService {
       orderApiPaymentVo.setTradeNo(order.getTradeNo());
     }
     return orderApiPaymentVo;
-  }
-
-  @Override
-  public boolean ticketOrder(Long id, Long by) {
-    // TODO 接口作废
-    try {
-      // 订单详情
-      Order order = orderMapper.selectById(id);
-      if(order == null || order.getStatus() != 2) {
-        throw new ServiceException("订单数据不存在");
-      }
-      // 场次详情
-      Show show = showMapper.selectById(order.getShowId());
-      if(show == null) {
-        throw new ServiceException("场次数据不存在");
-      }
-      // 获取订单详情
-      List<SeatListDto> seatList = orderDetailMapper.selectByOrderId(id);
-      if(seatList == null || seatList.isEmpty()) {
-        throw new ServiceException("订单详情数据不存在");
-      }
-      List<ShowInforDto> showInfor = MapstructUtils.convert(seatList, ShowInforDto.class);
-      // 判断是否需要先改变订单状态
-      Order updateOrder = new Order();
-      updateOrder.setId(order.getId());
-      if(order.getStatus() != 3) {
-        // 改变订单状态
-        updateOrder.setStatus(3);
-        updateOrder.setUpdatedBy(by);
-        int res = orderMapper.update(updateOrder);
-        if (res <= 0) {
-          throw new ServiceException("改变订单状态失败");
-        }
-      }
-      if("15901799236".equals(order.getPhone())) {
-        // 发送mq异步处理 退款
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
-        throw new ServiceException("测试退款手机号");
-      }
-      // 将 List 转换为 JSON 字符串
-      String showInforStr = JSONUtil.toJsonStr(showInfor);
-      // 准备请求参数
-      Map<String, String> params = new HashMap<>();
-      params.put("showId", show.getTpShowId());
-      params.put("showInfor", showInforStr);
-      params.put("notifyUrl", "https://sys-api.hiyaflix.cn/v1/notify/order");
-      params.put("takePhoneNumber", order.getPhone());
-      params.put("tradeNo", order.getOrderSn());
-      params.put("supportChangeSeat", "1");
-      params.put("addFlag", "1");
-      SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
-      // 发送请求并获取响应
-      String responseBody = supplierService.sendRequest("/order/preferential/submit", params);
-
-      // 将 JSON 字符串解析为 JsonNode 对象
-      ObjectMapper objectMapper = new ObjectMapper();
-      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-      Integer code = (Integer) responseMap.getOrDefault("code", 0);
-      String message = (String) responseMap.getOrDefault("message", "未知错误");
-      // 保存三方接口的返回结果
-      updateOrder.setResponseBody(responseBody);
-      // 调用保存
-      orderMapper.update(updateOrder);
-      // 判断三方出票是否异常
-      if(JfshouOrderSubmitResponseCodeEnum.isErrorCode(code)) {
-        // 发送mq异步处理 退款
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
-        throw new ServiceException(message);
-      } else {
-        // 发送mq异步处理 同步出票信息
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
-      }
-    } catch (Exception e) {
-      log.error("调用三方下单异常：{}", e);
-    }
-    return false;
   }
 
   @Override
