@@ -37,7 +37,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -102,43 +101,53 @@ public class TaskServiceImpl implements TaskService {
   @Async("threadPoolTaskExecutor")
   @Override
   public void syncTable() {
-    // 日期
-    String dateSuffix = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-    // 新增扩展表
-    String showTableName = "vscing_show_" + dateSuffix;
-    String showAreaTableName = "vscing_show_area_" + dateSuffix;
-
-    String createShowTableSQL = String.format(
-        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show",
-        showTableName
-    );
-    String createShowAreaTableSQL = String.format(
-        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show_area",
-        showAreaTableName
-    );
-
-    jdbcTemplate.execute(createShowTableSQL);
-    jdbcTemplate.execute(createShowAreaTableSQL);
-
-    // 迁移数据
-    String migrateShowSQL = String.format(
-        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time < CURDATE()",
-        showTableName
-    );
-    jdbcTemplate.update(migrateShowSQL);
-
-    String migrateShowAreaSQL = String.format(
-        "INSERT INTO %s SELECT * FROM vscing_show_area WHERE show_id IN " +
-            "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())",
-        showAreaTableName
-    );
-    jdbcTemplate.update(migrateShowAreaSQL);
 
     // 删除已迁移的数据，确保事务一致性
     jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
         "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
     jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
+
+    // 优化表
+    jdbcTemplate.execute("OPTIMIZE TABLE vscing_show");
+    jdbcTemplate.execute("OPTIMIZE TABLE vscing_show_area");
+
+//    // 日期
+//    String dateSuffix = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//
+//    // 新增扩展表
+//    String showTableName = "vscing_show_" + dateSuffix;
+//    String showAreaTableName = "vscing_show_area_" + dateSuffix;
+//
+//    String createShowTableSQL = String.format(
+//        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show",
+//        showTableName
+//    );
+//    String createShowAreaTableSQL = String.format(
+//        "CREATE TABLE IF NOT EXISTS %s LIKE vscing_show_area",
+//        showAreaTableName
+//    );
+//
+//    jdbcTemplate.execute(createShowTableSQL);
+//    jdbcTemplate.execute(createShowAreaTableSQL);
+//
+//    // 迁移数据
+//    String migrateShowSQL = String.format(
+//        "INSERT INTO %s SELECT * FROM vscing_show WHERE stop_sell_time < CURDATE()",
+//        showTableName
+//    );
+//    jdbcTemplate.update(migrateShowSQL);
+//
+//    String migrateShowAreaSQL = String.format(
+//        "INSERT INTO %s SELECT * FROM vscing_show_area WHERE show_id IN " +
+//            "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())",
+//        showAreaTableName
+//    );
+//    jdbcTemplate.update(migrateShowAreaSQL);
+//
+//    // 删除已迁移的数据，确保事务一致性
+//    jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
+//        "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
+//    jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
   }
 
   @Async("threadPoolTaskExecutor")
@@ -677,15 +686,6 @@ public class TaskServiceImpl implements TaskService {
           }
         }
       }
-
-      // 删除已迁移的数据，确保事务一致性
-      jdbcTemplate.update("DELETE FROM vscing_show_area WHERE show_id IN " +
-          "(SELECT id FROM vscing_show WHERE stop_sell_time < CURDATE())");
-      jdbcTemplate.update("DELETE FROM vscing_show WHERE stop_sell_time < CURDATE()");
-
-      // 优化表
-      jdbcTemplate.execute("OPTIMIZE TABLE vscing_show");
-      jdbcTemplate.execute("OPTIMIZE TABLE vscing_show_area");
 
     } catch (Exception e) {
       log.error("同步场次失败", e);

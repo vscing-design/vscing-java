@@ -65,6 +65,12 @@ public class ScheduledTasks {
         taskService.syncShow();
     }
 
+    @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点执行场次清空
+    public void truncateTableTask() {
+        System.out.println("执行定时任务 每天凌晨1点执行场次清空：" + LocalDateTime.now());
+        taskService.syncTable();
+    }
+
 //    @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点执行场次清空
 //    public void truncateTableTask() {
 //        System.out.println("执行定时任务 每天凌晨1点执行场次清空：" + LocalDateTime.now());

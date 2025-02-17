@@ -149,67 +149,21 @@
 
     <!-- 根据MovieApiListDto查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
-<!--        SELECT-->
-<!--            m.id,-->
-<!--            m.name,-->
-<!--            m.movie_type,-->
-<!--            m.poster_url,-->
-<!--            m.like,-->
-<!--            m.publish_date,-->
-<!--            m.version_type,-->
-<!--            m.language,-->
-<!--            m.director,-->
-<!--            m.cast,-->
-<!--            m.publish_status,-->
-<!--            m.grade,-->
-<!--            subq.min_show_price as minShowPrice,-->
-<!--            subq.min_user_price as minUserPrice-->
-<!--        FROM <include refid="movieTableName" /> m-->
-<!--        INNER JOIN (-->
-<!--            SELECT-->
-<!--                s.movie_id,-->
-<!--                MIN(sa.user_price) as min_user_price,-->
-<!--                MIN(sa.show_price) as min_show_price-->
-<!--            FROM <include refid="tableName" /> s-->
-<!--            INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id-->
-<!--            INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id-->
-<!--            <where>-->
-<!--                <if test="cityId != null">-->
-<!--                    AND c.city_id = #{cityId}-->
-<!--                </if>-->
-<!--                <if test="districtId != null">-->
-<!--                    AND c.district_id = #{districtId}-->
-<!--                </if>-->
-<!--                AND s.stop_sell_time >= NOW()-->
-<!--            </where>-->
-<!--            GROUP BY s.movie_id-->
-<!--            ORDER BY s.stop_sell_time ASC-->
-<!--        ) subq ON m.id = subq.movie_id-->
-<!--        <where>-->
-<!--            <if test="name != null and name != ''">-->
-<!--                AND m.name LIKE CONCAT(#{name}, '%')-->
-<!--            </if>-->
-<!--            <if test="publishStatus != null and publishStatus != ''">-->
-<!--                AND m.publish_status = #{publishStatus}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--        ORDER BY m.publish_date DESC-->
-
         SELECT
-        m.id,
-        m.name,
-        m.movie_type,
-        m.poster_url,
-        m.like,
-        m.publish_date,
-        m.version_type,
-        m.language,
-        m.director,
-        m.cast,
-        m.publish_status,
-        m.grade,
-        MIN(sa.user_price) AS minUserPrice,
-        MIN(sa.show_price) AS minShowPrice
+            m.id,
+            m.name,
+            m.movie_type,
+            m.poster_url,
+            m.like,
+            m.publish_date,
+            m.version_type,
+            m.language,
+            m.director,
+            m.cast,
+            m.publish_status,
+            m.grade,
+            MIN(sa.user_price) AS minUserPrice,
+            MIN(sa.show_price) AS minShowPrice
         FROM <include refid="movieTableName" /> m
         INNER JOIN <include refid="tableName" /> s ON s.movie_id = m.id
         INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
@@ -236,69 +190,24 @@
                 AND m.name LIKE CONCAT(#{name}, '%')
             </if>
         </where>
-        GROUP BY m.id
+        GROUP BY
+            m.id,
+            m.name,
+            m.movie_type,
+            m.poster_url,
+            m.like,
+            m.publish_date,
+            m.version_type,
+            m.language,
+            m.director,
+            m.cast,
+            m.publish_status,
+            m.grade
         ORDER BY m.grade DESC, m.like DESC, m.publish_date DESC
     </select>
 
     <!-- 根据CinemaApiListDto查询全部列表 -->
     <select id="selectByCinemaApiList" resultType="com.vscing.model.vo.CinemaApiVo">
-<!--        SELECT-->
-<!--        c.id,-->
-<!--        c.name,-->
-<!--        c.province_name as provinceName,-->
-<!--        c.city_name as cityName,-->
-<!--        c.district_name as districtName,-->
-<!--        c.address,-->
-<!--        c.lng,-->
-<!--        c.lat,-->
-<!--        (-->
-<!--            6371 * acos(-->
-<!--            cos(radians(#{lat, jdbcType=DECIMAL})) *-->
-<!--            cos(radians(c.lat)) *-->
-<!--            cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +-->
-<!--            sin(radians(#{lat, jdbcType=DECIMAL})) *-->
-<!--            sin(radians(c.lat))-->
-<!--        )-->
-<!--        ) AS distance,-->
-<!--        subq.min_show_price as maxPrice,-->
-<!--        subq.min_user_price as minPrice-->
-<!--        FROM <include refid="cinemaTableName" /> c-->
-<!--        INNER JOIN (-->
-<!--            SELECT-->
-<!--                s.cinema_id,-->
-<!--                MIN(sa.user_price) as min_user_price,-->
-<!--                MIN(sa.show_price) as min_show_price-->
-<!--            FROM <include refid="tableName" /> s-->
-<!--            INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id-->
-<!--            INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id-->
-<!--            <where>-->
-<!--                AND s.stop_sell_time >= NOW()-->
-<!--            </where>-->
-<!--            GROUP BY s.cinema_id-->
-<!--            ORDER BY s.stop_sell_time ASC-->
-<!--        ) subq ON c.id = subq.cinema_id-->
-<!--        <where>-->
-<!--            &lt;!&ndash; 动态条件 &ndash;&gt;-->
-<!--            <if test="keyword != null and keyword != ''">-->
-<!--                AND (c.name LIKE CONCAT('%', #{keyword}, '%')-->
-<!--                OR c.address LIKE CONCAT('%', #{keyword}, '%'))-->
-<!--            </if>-->
-<!--            <if test="cityId != null">-->
-<!--                AND c.city_id = #{cityId}-->
-<!--            </if>-->
-<!--            <if test="districtId != null">-->
-<!--                AND c.district_id = #{districtId}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--        <choose>-->
-<!--            <when test="orderBy == 1">-->
-<!--                ORDER BY distance ASC-->
-<!--            </when>-->
-<!--            <when test="orderBy == 2">-->
-<!--                ORDER BY subq.min_show_price ASC-->
-<!--            </when>-->
-<!--        </choose>-->
-
         SELECT
             c.id,
             c.name,
@@ -317,7 +226,7 @@
                     sin(radians(c.lat))
                 )
             ) AS distance,
-            s.show_time as showTime,
+            MIN(s.show_time) as showTime,
             MIN(sa.user_price) as minPrice,
             MIN(sa.show_price) as maxPrice
         FROM <include refid="cinemaTableName" /> c
@@ -337,84 +246,30 @@
                 OR c.address LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        GROUP BY c.id
+        GROUP BY
+            c.id,
+            c.name,
+            c.province_name,
+            c.city_name,
+            c.district_name,
+            c.address,
+            c.lng,
+            c.lat
         <choose>
             <when test="orderBy == 1">
-                ORDER BY distance ASC, s.stop_sell_time ASC
+                ORDER BY distance ASC, MIN(s.stop_sell_time) ASC
             </when>
             <when test="orderBy == 2">
-                ORDER BY MIN(sa.show_price) ASC, s.stop_sell_time ASC
+                ORDER BY MIN(sa.show_price) ASC, MIN(s.stop_sell_time) ASC
             </when>
             <otherwise>
-                ORDER BY s.stop_sell_time ASC
+                ORDER BY MIN(s.stop_sell_time) ASC
             </otherwise>
         </choose>
     </select>
 
     <!-- 根据MovieApiCinemaDto查询全部列表 -->
     <select id="selectByMovieApiCinema" resultType="com.vscing.model.vo.CinemaApiVo">
-<!--        SELECT-->
-<!--        c.id,-->
-<!--        c.name,-->
-<!--        c.province_name as provinceName,-->
-<!--        c.city_name as cityName,-->
-<!--        c.district_name as districtName,-->
-<!--        c.address,-->
-<!--        c.lng,-->
-<!--        c.lat,-->
-<!--        (-->
-<!--        6371 * acos(-->
-<!--        cos(radians(#{lat, jdbcType=DECIMAL})) *-->
-<!--        cos(radians(c.lat)) *-->
-<!--        cos(radians(c.lng) - radians(#{lng, jdbcType=DECIMAL})) +-->
-<!--        sin(radians(#{lat, jdbcType=DECIMAL})) *-->
-<!--        sin(radians(c.lat))-->
-<!--        )-->
-<!--        ) AS distance,-->
-<!--        s.show_time as showTime,-->
-<!--        subq.min_show_price as maxPrice,-->
-<!--        subq.min_user_price as minPrice-->
-<!--        FROM <include refid="tableName" /> s-->
-<!--        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id-->
-<!--        INNER JOIN (-->
-<!--        SELECT-->
-<!--        s.cinema_id,-->
-<!--        MIN(sa.user_price) as min_user_price,-->
-<!--        MIN(sa.show_price) as min_show_price-->
-<!--        FROM <include refid="tableName" /> s-->
-<!--        INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id-->
-<!--        INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id-->
-<!--        <where>-->
-<!--            <if test="movieId != null">-->
-<!--                AND s.movie_id = #{movieId}-->
-<!--            </if>-->
-<!--            AND s.stop_sell_time > NOW()-->
-<!--        </where>-->
-<!--        GROUP BY s.cinema_id-->
-<!--        ORDER BY s.stop_sell_time ASC-->
-<!--        ) subq ON c.id = subq.cinema_id-->
-<!--        <where>-->
-<!--            <if test="cityId != null">-->
-<!--                AND c.city_id = #{cityId}-->
-<!--            </if>-->
-<!--            <if test="districtId != null">-->
-<!--                AND c.district_id = #{districtId}-->
-<!--            </if>-->
-<!--            &lt;!&ndash; 动态条件 &ndash;&gt;-->
-<!--            <if test="keyword != null and keyword != ''">-->
-<!--                AND (c.name LIKE CONCAT('%', #{keyword}, '%')-->
-<!--                OR c.address LIKE CONCAT('%', #{keyword}, '%'))-->
-<!--            </if>-->
-<!--        </where>-->
-<!--        <choose>-->
-<!--            <when test="orderBy == 1">-->
-<!--                ORDER BY distance ASC-->
-<!--            </when>-->
-<!--            <when test="orderBy == 2">-->
-<!--                ORDER BY subq.min_show_price ASC-->
-<!--            </when>-->
-<!--        </choose>-->
-
         SELECT
         c.id,
         c.name,
@@ -456,7 +311,18 @@
                 OR c.address LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        GROUP BY s.id
+        GROUP BY
+            s.id,
+            c.id,
+            c.name,
+            c.province_name,
+            c.city_name,
+            c.district_name,
+            c.address,
+            c.lng,
+            c.lat,
+            s.show_time,
+            s.stop_sell_time
         <choose>
             <when test="orderBy == 1">
                 ORDER BY distance ASC, s.stop_sell_time ASC

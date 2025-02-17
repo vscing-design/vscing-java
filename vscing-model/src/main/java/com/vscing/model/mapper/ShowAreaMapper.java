@@ -38,8 +38,6 @@ public interface ShowAreaMapper {
 
   List<ShowArea> selectByShowIdAreas(@Param("showId") Long showId, @Param("areas") List<String> areas);
 
-  List<MinPriceVo> getMinPriceByMovieIds(@Param("list") List<Long> movieIds);
-
   List<MinPriceVo> getMinPriceByCinemaIds(@Param("list") List<Long> cinemaIds);
 
   void truncateTable();
