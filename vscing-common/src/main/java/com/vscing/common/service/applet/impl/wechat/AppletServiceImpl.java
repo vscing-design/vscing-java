@@ -193,60 +193,19 @@ public class AppletServiceImpl implements AppletService {
       }
       // 提取 access_token 和过期时间
       String accessToken = jsonNode.path("access_token").asText();
-      Integer expiresIn = jsonNode.path("expires_in").asInt();
-
+      long expiresIn = jsonNode.path("expires_in").asLong();
+      // 存储 access_token
       if (StringUtils.isNotBlank(accessToken) && expiresIn > 0) {
         // 设置到 Redis 并返回 access_token
         redisService.set(getKey(), accessToken, expiresIn);
-        log.info("getAccessToken 调用成功");
         return accessToken;
-      } else {
-        throw new HttpException("getAccessToken access_token 或 expires_in 值错误: " + jsonNode.toPrettyString());
       }
+      throw new HttpException("getAccessToken access_token 或 expires_in 值错误: " + jsonNode.toPrettyString());
     } catch (IOException e) {
       throw new HttpException("getAccessToken 微信API调用异常: " + e.getMessage(), e);
     } catch (Exception e) {
       log.error("getAccessToken 方法异常", e);
       throw new HttpException("getAccessToken 方法异常: " + e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public String getPhoneNumber(String code) {
-    try {
-      // 获取token
-      String token = getToken();
-      // 组装请求参数
-      Map<String, Object> params = Map.of(
-          "code", code
-      );
-      // 发送 POST 请求并获取响应
-      String response = okHttpService.doPostJson(WECHAT_BASH_URL + "/wxa/business/getuserphonenumber?access_token=" + token, JsonUtils.toJsonString(params), null);
-      log.info("微信获取手机号调用结果: " , response);
-      // 将响应字符串解析为 JSON 对象
-      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
-      JsonNode jsonNode = objectMapper.readTree(response);
-      // 检查是否有错误信息
-      if (jsonNode.has("errcode") && jsonNode.get("errcode").asInt() != 0) {
-        throw new HttpException("微信获取手机号失败: " + jsonNode.toPrettyString());
-      }
-      // 导航到 phone_info 节点并获取 purePhoneNumber
-      JsonNode phoneInfoNode = jsonNode.path("phone_info");
-      if (!phoneInfoNode.isMissingNode()) {
-        String purePhoneNumber = phoneInfoNode.path("purePhoneNumber").asText(null);
-        if (purePhoneNumber != null && !purePhoneNumber.isEmpty()) {
-          return purePhoneNumber;
-        } else {
-          throw new RuntimeException("微信获取手机号未找到有效的 purePhoneNumber");
-        }
-      } else {
-        throw new RuntimeException("微信获取手机号未找到 phone_info 节点");
-      }
-    } catch (IOException e) {
-      throw new HttpException("微信获取手机号API调用异常: " + e.getMessage(), e);
-    } catch (Exception e) {
-      log.error("微信获取手机号方法异常", e);
-      throw new HttpException("微信获取手机号方法异常: " + e.getMessage(), e);
     }
   }
 
@@ -276,6 +235,45 @@ public class AppletServiceImpl implements AppletService {
     } catch (Exception e) {
       log.error("微信获取openid方法异常", e);
       throw new HttpException("微信获取openid方法异常: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public String getPhoneNumber(String code) {
+    try {
+      // 获取token
+      String token = getToken();
+      // 组装请求参数
+      Map<String, Object> params = Map.of(
+              "code", code
+      );
+      // 发送 POST 请求并获取响应
+      String response = okHttpService.doPostJson(WECHAT_BASH_URL + "/wxa/business/getuserphonenumber?access_token=" + token, JsonUtils.toJsonString(params), null);
+      log.info("微信获取手机号调用结果: " , response);
+      // 将响应字符串解析为 JSON 对象
+      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(response);
+      // 检查是否有错误信息
+      if (jsonNode.has("errcode") && jsonNode.get("errcode").asInt() != 0) {
+        throw new HttpException("微信获取手机号失败: " + jsonNode.toPrettyString());
+      }
+      // 导航到 phone_info 节点并获取 purePhoneNumber
+      JsonNode phoneInfoNode = jsonNode.path("phone_info");
+      if (!phoneInfoNode.isMissingNode()) {
+        String purePhoneNumber = phoneInfoNode.path("purePhoneNumber").asText(null);
+        if (purePhoneNumber != null && !purePhoneNumber.isEmpty()) {
+          return purePhoneNumber;
+        } else {
+          throw new RuntimeException("微信获取手机号未找到有效的 purePhoneNumber");
+        }
+      } else {
+        throw new RuntimeException("微信获取手机号未找到 phone_info 节点");
+      }
+    } catch (IOException e) {
+      throw new HttpException("微信获取手机号API调用异常: " + e.getMessage(), e);
+    } catch (Exception e) {
+      log.error("微信获取手机号方法异常", e);
+      throw new HttpException("微信获取手机号方法异常: " + e.getMessage(), e);
     }
   }
 
