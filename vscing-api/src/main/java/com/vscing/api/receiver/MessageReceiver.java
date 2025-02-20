@@ -12,7 +12,7 @@ import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.model.entity.Order;
-import com.vscing.model.enums.PaymentTypeEnum;
+import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mq.SyncCodeMq;
@@ -168,8 +168,8 @@ public class MessageReceiver {
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 获取支付句柄
-      String paymentType = PaymentTypeEnum.findByCode(order.getPlatform());
-      AppletService appletService = appletServiceFactory.getAppletService(paymentType);
+      String appletType = AppletTypeEnum.findByCode(order.getPlatform());
+      AppletService appletService = appletServiceFactory.getAppletService(appletType);
       // 扭转订单状态到退款中，并生成退款订单号
       String refundNo = generateOrderSn();
       if(order.getRefundNo() != null) {
@@ -217,8 +217,8 @@ public class MessageReceiver {
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
       // 获取支付句柄
-      String paymentType = PaymentTypeEnum.findByCode(order.getPlatform());
-      AppletService appletService = appletServiceFactory.getAppletService(paymentType);
+      String appletType = AppletTypeEnum.findByCode(order.getPlatform());
+      AppletService appletService = appletServiceFactory.getAppletService(appletType);
       // 组装参数
       Map<String, String> queryData = new HashMap<>(4);
       queryData.put("outTradeNo", order.getTradeNo());

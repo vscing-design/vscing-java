@@ -23,7 +23,7 @@ public class UserAuth extends BaseEntity {
   @Schema(description = "主键ID")
   private Long userId;
 
-  @Schema(description = "平台 1 -> 微信小程序 2 -> 支付宝小程序")
+  @Schema(description = "平台 1 微信小程序 2 支付宝小程序 3 百度小程序")
   private Integer platform;
 
   @Schema(description = "uuid")

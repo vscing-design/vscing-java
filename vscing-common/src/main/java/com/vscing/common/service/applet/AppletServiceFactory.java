@@ -18,6 +18,8 @@ public class AppletServiceFactory {
 
   public static final String ALIPAY = "alipay";
 
+  public static final String BAIDU = "baidu";
+
   private final Map<String, AppletService> appletServices;
 
   @Autowired
@@ -30,6 +32,8 @@ public class AppletServiceFactory {
       return this.appletServices.get("wechatAppletService");
     } else if (ALIPAY.equalsIgnoreCase(type)) {
       return this.appletServices.get("alipayAppletService");
+    } else if (BAIDU.equalsIgnoreCase(type)) {
+      return this.appletServices.get("baiduAppletService");
     } else {
       throw new IllegalArgumentException("Unknown payment type: " + type);
     }

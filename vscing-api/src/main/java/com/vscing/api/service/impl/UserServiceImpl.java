@@ -20,6 +20,7 @@ import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.entity.User;
 import com.vscing.model.entity.UserAuth;
+import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.vo.UserApiLocationVo;
@@ -115,10 +116,9 @@ public class UserServiceImpl implements UserService {
       JsonNode jsonNode = appletService.getOpenid(userLogin.getCode());
       String openid = null;
       String uuid = null;
-      Integer platform = 0;
+      int platform = AppletTypeEnum.findByApplet(userLogin.getPlatform());
       // 处理微信参数
       if(AppletServiceFactory.WECHAT.equals(userLogin.getPlatform())) {
-        platform = 1;
         openid = jsonNode.path("openid").asText(null);
         uuid = jsonNode.path("unionid").asText(null);
       }
@@ -126,10 +126,13 @@ public class UserServiceImpl implements UserService {
       if(AppletServiceFactory.ALIPAY.equals(userLogin.getPlatform())) {
         jsonNode = jsonNode.path("alipay_system_oauth_token_response");
         if (!jsonNode.isMissingNode()) {
-          platform = 2;
           openid = jsonNode.path("open_id").asText(null);
           uuid = jsonNode.path("user_id").asText(null);
         }
+      }
+      // 处理百度参数
+      if(AppletServiceFactory.BAIDU.equals(userLogin.getPlatform())) {
+        openid = jsonNode.path("open_id").asText(null);
       }
       // 判断参数是否存在
       if(openid == null && uuid == null) {

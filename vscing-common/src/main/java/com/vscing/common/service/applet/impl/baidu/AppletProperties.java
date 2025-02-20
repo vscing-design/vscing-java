@@ -21,40 +21,33 @@ public class AppletProperties {
   private String appId;
 
   /**
+   * appKey
+   */
+  private String appKey;
+
+  /**
    * appSecret
    */
   private String appSecret;
 
   /**
-   * 商户号
+   * paymentAppId
    */
-  private String merchantId;
+  private String paymentAppId;
 
   /**
-   * 商户API私钥路径
+   * paymentAppKey
    */
-  private String privateKeyPath;
+  private String paymentAppKey;
 
   /**
-   * 微信支付公钥的存放路径
+   * dealId
    */
-  private String publicKeyPath;
+  private String dealId;
 
   /**
-   * 微信支付公钥ID
+   * 平台公钥
    */
-  private String publicKeyId;
-
-  /**
-   * 商户证书序列号
-   */
-  private String merchantSerialNumber;
-
-  /**
-   * 商户APIV3密钥
-   */
-  private String apiV3Key;
-
-
+  private String publicKey;
 
 }

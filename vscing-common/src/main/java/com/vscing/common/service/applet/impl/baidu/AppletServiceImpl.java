@@ -11,7 +11,6 @@ import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetSessionKe
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppDataDecrypt;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetAccessToken;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetSessionKeyV2;
-import com.vscing.common.service.applet.impl.wechat.AppletProperties;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ public class AppletServiceImpl implements AppletService {
     private String getKey() {
         if (this.key == null) {
             this.key = String.format("%s.access_token.%s.%s",
-                    CACHE_KEY_PREFIX, appletProperties.getAppId(), appletProperties.getAppSecret());
+                    CACHE_KEY_PREFIX, appletProperties.getAppKey(), appletProperties.getAppSecret());
         }
         return this.key;
     }
@@ -75,7 +74,7 @@ public class AppletServiceImpl implements AppletService {
             // 组装参数
             GetAccessTokenRequest param  = new GetAccessTokenRequest();
             param.setGrantType("client_credentials");
-            param.setClientID(appletProperties.getAppId());
+            param.setClientID(appletProperties.getAppKey());
             param.setClientSecret(appletProperties.getAppSecret());
             param.setScope("smartapp_snsapi_base");
             // 发起请求
@@ -107,11 +106,11 @@ public class AppletServiceImpl implements AppletService {
      * 缓存sessionKey
      */
     private String getSessionKey() {
-        if (this.key == null) {
-            this.key = String.format("%s.access_token.%s.%s.%s",
+        if (this.sessionKey == null) {
+            this.sessionKey = String.format("%s.access_token.%s.%s.%s",
                     CACHE_KEY_PREFIX, appletProperties.getAppId(), appletProperties.getAppSecret(), "sessionKey");
         }
-        return this.key;
+        return this.sessionKey;
     }
 
     @Override
@@ -129,15 +128,18 @@ public class AppletServiceImpl implements AppletService {
             ObjectMapper objectMapper = JsonUtils.getObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response);
             // 检查是否有错误信息
-            if (jsonNode.has("data") && jsonNode.get("errno").asInt() != 0) {
+            if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
                 throw new HttpException("百度获取openid失败: " + jsonNode.toPrettyString());
             }
+            jsonNode = jsonNode.path("data");
             if (!jsonNode.isMissingNode()) {
                 String sessionKey = jsonNode.path("session_key").asText(null);
                 // 设置到 Redis
                 redisService.set(getSessionKey(), sessionKey);
+                return jsonNode;
+            }  else {
+                throw new RuntimeException("百度获取openid未获取到有效的 data");
             }
-            return jsonNode;
         } catch (Exception e) {
             log.error("百度获取openid方法异常", e);
             throw new HttpException("百度获取openid方法异常: " + e.getMessage(), e);
