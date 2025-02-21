@@ -50,4 +50,9 @@ public class AppletProperties {
    */
   private String publicKey;
 
+  /**
+   * 平台私钥
+   */
+  private String privateKey;
+
 }

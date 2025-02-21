@@ -8,6 +8,7 @@ import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetAccessTokenRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetSessionKeyV2Request;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.RSASign;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppDataDecrypt;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetAccessToken;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetSessionKeyV2;
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -177,8 +180,24 @@ public class AppletServiceImpl implements AppletService {
 
     @Override
     public Map<String, String> getPayment(Map<String, Object> paymentData) {
-        // https://smartprogram.baidu.com/docs/develop/function/parameter/
-        return Map.of();
+        Map<String, String> res = new HashMap<>(3);
+        try {
+            Map<String, Object> params = new HashMap<>(4);
+            params.put("appKey", appletProperties.getPaymentAppKey());
+            params.put("dealId", appletProperties.getDealId());
+            params.put("tpOrderId", paymentData.get("outTradeNo"));
+            BigDecimal totalAmount = (BigDecimal) paymentData.get("totalAmount");
+            BigDecimal multipliedAmount = totalAmount.multiply(BigDecimal.valueOf(100));
+            params.put("totalAmount", multipliedAmount);
+            String rsaSign = RSASign.sign(params, appletProperties.getPrivateKey());
+            res.put("rsaSign", rsaSign);
+            res.put("appKey", appletProperties.getPaymentAppKey());
+            res.put("dealId", appletProperties.getDealId());
+            return res;
+        } catch (Exception e) {
+            log.error("微信下单方法异常", e);
+            throw new HttpException("微信下单方法异常: " + e.getMessage(), e);
+        }
     }
 
     @Override

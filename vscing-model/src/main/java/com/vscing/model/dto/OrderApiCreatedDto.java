@@ -21,7 +21,7 @@ public class OrderApiCreatedDto {
   private Long showId;
 
   @NotNull(message = "平台不能为空")
-  @Schema(description = "平台 wechat 微信小程序 alipay 支付宝小程序")
+  @Schema(description = "平台 wechat 微信小程序 alipay 支付宝小程序 baidu 百度小程序")
   private String platform;
 
   @NotNull(message = "手机号不能为空")

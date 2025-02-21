@@ -30,4 +30,7 @@ public class OrderApiPaymentVo {
   @Schema(description = "支付宝 交易号")
   private String tradeNo;
 
+  @Schema(description = "百度 订单信息")
+  private BaiduOrderInfoVo orderInfo;
+
 }

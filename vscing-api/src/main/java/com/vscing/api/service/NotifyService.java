@@ -21,6 +21,11 @@ public interface NotifyService {
   boolean queryWechatOrder(HttpServletRequest request);
 
   /**
+   * 查询百度订单是否成功
+   */
+  boolean queryBaiduOrder(HttpServletRequest request);
+
+  /**
    * 出票
    */
   void ticketOrder(String orderSn);

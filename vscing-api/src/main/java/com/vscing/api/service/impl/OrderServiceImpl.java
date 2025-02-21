@@ -26,6 +26,7 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.UserAuth;
+import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
@@ -37,6 +38,7 @@ import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.utils.PricingUtil;
+import com.vscing.model.vo.BaiduOrderInfoVo;
 import com.vscing.model.vo.OrderApiConfirmDetailsVo;
 import com.vscing.model.vo.OrderApiDetailsVo;
 import com.vscing.model.vo.OrderApiListVo;
@@ -276,16 +278,8 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public OrderApiPaymentVo create(Long userId, OrderApiCreatedDto orderApiCreatedDto) {
-    // 平台转换
-    Integer platform = 0;
-    // 处理微信参数
-    if(AppletServiceFactory.WECHAT.equals(orderApiCreatedDto.getPlatform())) {
-      platform = 1;
-    }
-    // 处理支付宝参数
-    if(AppletServiceFactory.ALIPAY.equals(orderApiCreatedDto.getPlatform())) {
-      platform = 2;
-    }
+    // 发气支付平台
+    int platform = AppletTypeEnum.findByApplet(orderApiCreatedDto.getPlatform());
     Long showId = orderApiCreatedDto.getShowId();
     // 获取场次全局价格
     Show show = showMapper.selectById(showId);
@@ -421,7 +415,7 @@ public class OrderServiceImpl implements OrderService {
         }
       }
       // 发送mq消息
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
+      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
       orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
@@ -430,6 +424,16 @@ public class OrderServiceImpl implements OrderService {
       orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
       orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
+      // 百度支付参数
+      BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
+      baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
+      baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
+      baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
+      baiduOrderInfoVo.setTotalAmount(String.valueOf(totalPrice.multiply(BigDecimal.valueOf(100))));
+      baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + orderSn);
+      baiduOrderInfoVo.setTpOrderId(orderSn);
+      baiduOrderInfoVo.setSignFieldsRange("1");
+
       return orderApiPaymentVo;
     } catch (Exception e) {
       log.error("下单异常：", e);
@@ -440,15 +444,8 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public List<OrderApiListVo> getList(Long userId, OrderApiListDto queryParam, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
-    Integer platform = 0;
-    // 处理微信参数
-    if(AppletServiceFactory.WECHAT.equals(queryParam.getPlatform())) {
-      platform = 1;
-    }
-    // 处理支付宝参数
-    if(AppletServiceFactory.ALIPAY.equals(queryParam.getPlatform())) {
-      platform = 2;
-    }
+    // 发气支付平台
+    int platform = AppletTypeEnum.findByApplet(queryParam.getPlatform());
     return orderMapper.getApiList(userId, queryParam.getStatus(), platform);
   }
 
@@ -466,7 +463,7 @@ public class OrderServiceImpl implements OrderService {
         orderApiDetailsVo.setDiscount(officialPrice.subtract(totalPrice));
       } else {
         // 设置默认折扣值或处理异常情况
-        orderApiDetailsVo.setDiscount(BigDecimal.ZERO); // 或者其他默认值
+        orderApiDetailsVo.setDiscount(BigDecimal.ZERO);
       }
 
       // 获取座位列表并设置到 Vo 对象中
@@ -479,7 +476,7 @@ public class OrderServiceImpl implements OrderService {
         orderApiDetailsVo.setScore(orderScore.getScore());
       } else {
         // 设置默认评分值或处理异常情况
-        orderApiDetailsVo.setScore(null); // 或者其他默认值
+        orderApiDetailsVo.setScore(null);
       }
     }
 

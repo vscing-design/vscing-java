@@ -163,6 +163,11 @@ public class NotifyServiceImpl implements NotifyService {
     }
   }
 
+  @Override
+  public boolean queryBaiduOrder(HttpServletRequest request) {
+    return false;
+  }
+
   @Async("threadPoolTaskExecutor")
   @Override
   public void ticketOrder(String orderSn) {

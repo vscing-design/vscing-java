@@ -17,7 +17,7 @@ public class OrderApiListDto {
   private String status;
 
   @NotNull(message = "平台不能为空")
-  @Schema(description = "平台 wechat 微信小程序 alipay 支付宝小程序")
+  @Schema(description = "平台 wechat 微信小程序 alipay 支付宝小程序 baidu 百度小程序")
   private String platform;
 
 }
