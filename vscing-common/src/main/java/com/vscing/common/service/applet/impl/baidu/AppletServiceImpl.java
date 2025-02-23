@@ -215,7 +215,7 @@ public class AppletServiceImpl implements AppletService {
             checkParams.put("tpOrderId", params.get("tpOrderId"));
             checkParams.put("totalAmount", params.get("totalAmount"));
             checkParams.put("rsaSign", params.get("rsaSign"));
-            return RSASign.checkSign(checkParams, appletProperties.getPrivateKey());
+            return RSASign.checkSign(checkParams, appletProperties.getPublicKey());
         } catch (Exception e) {
             log.error("百度签名验证失败: {}", e.getMessage());
         }
