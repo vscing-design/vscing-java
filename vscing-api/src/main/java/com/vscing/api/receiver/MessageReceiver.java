@@ -160,13 +160,25 @@ public class MessageReceiver {
    */
   @RabbitListener(queues = RabbitMQConfig.REFUND_QUEUE)
   public void receiveRefundMessage(Message message) {
-    // 获取订单ID
-    String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-    log.info("退款队列消息: " + msg);
-    Long orderId = Long.parseLong(msg);
+    String msg = null;
+    Long orderId = null;
+    try {
+      // 获取订单ID
+      msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      log.info("退款队列消息: " + msg);
+      orderId = Long.parseLong(msg);
+    } catch (Exception e) {
+      log.error("退款队列异常: " + e.getMessage());
+    }
+    if(orderId == null) {
+      return;
+    }
     try {
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
+      if(order == null || order.getStatus() == 4) {
+        return;
+      }
       // 获取支付句柄
       String appletType = AppletTypeEnum.findByCode(order.getPlatform());
       AppletService appletService = appletServiceFactory.getAppletService(appletType);

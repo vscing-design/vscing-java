@@ -260,6 +260,7 @@ public class AppletServiceImpl implements AppletService {
     @Override
     public boolean refundOrder(Map<String, Object> refundData) {
         try {
+            log.error("百度退款数据: {}", refundData);
             // 获取token
             String accessToken = getToken();
             // 请求参数
@@ -275,11 +276,12 @@ public class AppletServiceImpl implements AppletService {
             // 是否跳过审核 1 是 0 否
             param.setIsSkipAudit(1);
             // 百度订单id
-            param.setOrderID((Long) refundData.get("tradeNo"));
+            long tradeNo = Long.parseLong((String) refundData.get("tradeNo"));
+            param.setOrderID(tradeNo);
             // 退款原因
             param.setRefundReason("出票失败退款");
             // 退款类型 1：用户发起退款；2：开发者业务方客服退款；3：开发者服务异常退款。
-            param.setRefundType(3);
+            param.setRefundType(2);
             // 设置商户订单号
             param.setTpOrderID((String) refundData.get("outTradeNo"));
             // 百度订单userId
@@ -295,8 +297,9 @@ public class AppletServiceImpl implements AppletService {
             if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
                 throw new HttpException("百度获取退款订单信息失败: " + jsonNode.toPrettyString());
             }
+            log.error("百度获取退款订单信息成功: {}", jsonNode.toPrettyString());
         } catch (Exception e) {
-            log.error("百度退款方法异常: {}", e.getMessage());
+            log.error("百度退款方法异常: ", e);
         }
         return false;
     }
@@ -304,6 +307,7 @@ public class AppletServiceImpl implements AppletService {
     @Override
     public boolean queryRefund(Map<String, String> queryData) {
         try {
+            log.error("百度查询退款数据: {}", queryData);
             // 获取token
             String accessToken = getToken();
             FindOrderRefundRequest param  = new FindOrderRefundRequest();

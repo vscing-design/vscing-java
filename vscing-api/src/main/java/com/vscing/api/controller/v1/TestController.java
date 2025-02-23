@@ -2,11 +2,13 @@ package com.vscing.api.controller.v1;
 
 import com.vscing.api.service.TestService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
-import com.vscing.common.utils.JsonUtils;
-import com.vscing.model.mq.SyncCodeMq;
+import com.vscing.model.entity.Order;
+import com.vscing.model.enums.AppletTypeEnum;
+import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.config.RabbitMQConfig;
@@ -48,14 +50,40 @@ public class TestController {
     @Autowired
     private AppletServiceFactory appletServiceFactory;
 
+    @Autowired
+    private OrderMapper orderMapper;
+
     @GetMapping
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
-        SyncCodeMq syncCodeMq = new SyncCodeMq();
-        syncCodeMq.setOrderId(1889219011411103744L);
-        syncCodeMq.setNum(20);
-        String msg = JsonUtils.toJsonString(syncCodeMq);
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
+
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893507872288112640", 1000);
+        // 查询订单信息
+        Order order = orderMapper.selectByOrderSn("HY202502231147112967");
+        if(order == null) {
+            throw new ServiceException("订单数据不存在");
+        }
+        // 获取支付句柄
+        String appletType = AppletTypeEnum.findByCode(order.getPlatform());
+        AppletService appletService = appletServiceFactory.getAppletService(appletType);
+        // 组装参数
+        BigDecimal totalAmount = order.getTotalPrice();
+        totalAmount = totalAmount.multiply(BigDecimal.valueOf(100));
+        Map<String, String> queryData = new HashMap<>(5);
+        queryData.put("outTradeNo", order.getTradeNo());
+        queryData.put("tradeNo", order.getOrderSn());
+        queryData.put("refundNo", order.getRefundNo());
+        queryData.put("totalAmount", totalAmount.toString());
+        queryData.put("baiduUserId", order.getBaiduUserId().toString());
+        // 发送退款请求
+        boolean res = appletService.queryRefund(queryData);
+        log.info("百度退款订单查询结果: {}", res);
+        return CommonResult.success("ok");
+//        SyncCodeMq syncCodeMq = new SyncCodeMq();
+//        syncCodeMq.setOrderId(1889219011411103744L);
+//        syncCodeMq.setNum(20);
+//        String msg = JsonUtils.toJsonString(syncCodeMq);
+//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
 //
 //        SyncCodeMq result = JsonUtils.parseObject(msg, SyncCodeMq.class);
 //        log.info("orderId: {}, num: {}", result.getOrderId(), result.getNum());
@@ -63,7 +91,7 @@ public class TestController {
 //        Long orderId = 1L;
 //        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, orderId.toString(), 10 *1000);
 
-        return CommonResult.success("ok");
+//        return CommonResult.success("ok");
     }
 
     @GetMapping("/seat")

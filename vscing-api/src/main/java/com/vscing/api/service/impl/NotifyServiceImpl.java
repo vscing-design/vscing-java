@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -205,6 +206,8 @@ public class NotifyServiceImpl implements NotifyService {
   @Override
   public boolean queryBaiduRefund(String tpOrderId, int status, String rsaSign) {
     try {
+      log.info("百度退款异步通知请求参数集合: tpOrderId: {}, status: {}, rsaSign: {}",
+        tpOrderId, status, rsaSign);
       // 查询订单信息
       Order order = orderMapper.selectByOrderSn(tpOrderId);
       if(order == null) {
@@ -214,11 +217,13 @@ public class NotifyServiceImpl implements NotifyService {
       String appletType = AppletTypeEnum.findByCode(order.getPlatform());
       AppletService appletService = appletServiceFactory.getAppletService(appletType);
       // 组装参数
+      BigDecimal totalAmount = order.getTotalPrice();
+      totalAmount = totalAmount.multiply(BigDecimal.valueOf(100));
       Map<String, String> queryData = new HashMap<>(5);
       queryData.put("outTradeNo", order.getTradeNo());
       queryData.put("tradeNo", order.getOrderSn());
       queryData.put("refundNo", order.getRefundNo());
-      queryData.put("totalAmount", order.getTotalPrice().toString());
+      queryData.put("totalAmount", totalAmount.toString());
       queryData.put("baiduUserId", order.getBaiduUserId().toString());
       // 验签
       boolean signVerified = (boolean) appletService.signValidation(queryData);
