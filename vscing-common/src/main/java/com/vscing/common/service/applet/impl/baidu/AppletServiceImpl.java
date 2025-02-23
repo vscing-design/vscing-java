@@ -6,10 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.ApplyOrderRefundRequest;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.FindByTpOrderIDRequest;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.FindOrderRefundRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetAccessTokenRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetSessionKeyV2Request;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.RSASign;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppApplyOrderRefund;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppDataDecrypt;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppFindByTpOrderID;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppFindOrderRefund;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetAccessToken;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetSessionKeyV2;
 import com.vscing.common.utils.JsonUtils;
@@ -50,7 +56,7 @@ public class AppletServiceImpl implements AppletService {
     private String getKey() {
         if (this.key == null) {
             this.key = String.format("%s.access_token.%s.%s",
-                    CACHE_KEY_PREFIX, appletProperties.getAppKey(), appletProperties.getAppSecret());
+                CACHE_KEY_PREFIX, appletProperties.getAppKey(), appletProperties.getAppSecret());
         }
         return this.key;
     }
@@ -111,7 +117,7 @@ public class AppletServiceImpl implements AppletService {
     private String getSessionKey() {
         if (this.sessionKey == null) {
             this.sessionKey = String.format("%s.access_token.%s.%s.%s",
-                    CACHE_KEY_PREFIX, appletProperties.getAppId(), appletProperties.getAppSecret(), "sessionKey");
+                CACHE_KEY_PREFIX, appletProperties.getAppId(), appletProperties.getAppSecret(), "sessionKey");
         }
         return this.sessionKey;
     }
@@ -202,21 +208,137 @@ public class AppletServiceImpl implements AppletService {
 
     @Override
     public Object signValidation(Map<String, String> params) {
-        return null;
-    }
-
-    @Override
-    public boolean queryOrder(Map<String, String> queryData) {
+        try {
+            Map<String, Object> checkParams = new HashMap<>(5);
+            checkParams.put("appKey", appletProperties.getPaymentAppKey());
+            checkParams.put("dealId", appletProperties.getDealId());
+            checkParams.put("tpOrderId", params.get("tpOrderId"));
+            checkParams.put("totalAmount", params.get("totalAmount"));
+            checkParams.put("rsaSign", params.get("rsaSign"));
+            return RSASign.checkSign(checkParams, appletProperties.getPrivateKey());
+        } catch (Exception e) {
+            log.error("百度签名验证失败: {}", e.getMessage());
+        }
         return false;
     }
 
     @Override
+    public boolean queryOrder(Map<String, String> queryData) {
+        try {
+            // 获取token
+            String accessToken = getToken();
+            // 请求参数
+            FindByTpOrderIDRequest param  = new FindByTpOrderIDRequest();
+            // access_token
+            param.setAccessToken(accessToken);
+            // 设置商户订单号
+            param.setTpOrderID(queryData.get("tpOrderId"));
+            // 百度收银台的支付服务 appKey
+            param.setPmAppKey(appletProperties.getPaymentAppKey());
+            // 发起请求
+            String response = new Gson().toJson(SmartAppFindByTpOrderID.findByTpOrderId(param));
+            // 将响应字符串解析为 JSON 对象
+            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+            // 检查是否有错误信息
+            if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
+                throw new HttpException("百度获取订单信息失败: " + jsonNode.toPrettyString());
+            }
+            jsonNode = jsonNode.path("data");
+            if (!jsonNode.isMissingNode()) {
+                int status = jsonNode.path("status").asInt(0);
+                return status == 2;
+            }  else {
+                throw new RuntimeException("百度获取订单信息未获取到有效的 data");
+            }
+        } catch (Exception e) {
+            log.error("百度查询订单方法异常: {}", e.getMessage());
+            throw new HttpException("百度查询订单方法异常: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public boolean refundOrder(Map<String, Object> refundData) {
+        try {
+            // 获取token
+            String accessToken = getToken();
+            // 请求参数
+            ApplyOrderRefundRequest param  = new ApplyOrderRefundRequest();
+            // 金额
+            BigDecimal totalAmount = (BigDecimal) refundData.get("totalAmount");
+            int applyRefundMoney = totalAmount.multiply(BigDecimal.valueOf(100)).intValueExact();
+            param.setApplyRefundMoney(applyRefundMoney);
+            // accessToken
+            param.setAccessToken(accessToken);
+            // 退款单号
+            param.setBizRefundBatchID((String) refundData.get("refundNo"));
+            // 是否跳过审核 1 是 0 否
+            param.setIsSkipAudit(1);
+            // 百度订单id
+            param.setOrderID((Long) refundData.get("tradeNo"));
+            // 退款原因
+            param.setRefundReason("出票失败退款");
+            // 退款类型 1：用户发起退款；2：开发者业务方客服退款；3：开发者服务异常退款。
+            param.setRefundType(3);
+            // 设置商户订单号
+            param.setTpOrderID((String) refundData.get("outTradeNo"));
+            // 百度订单userId
+            param.setUserID((Long) refundData.get("baiduUserId"));
+            // 百度收银台的支付服务 appKey
+            param.setPmAppKey(appletProperties.getPaymentAppKey());
+            // 发起请求
+            String response = new Gson().toJson(SmartAppApplyOrderRefund.applyOrderRefund(param));
+            // 将响应字符串解析为 JSON 对象
+            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+            // 检查是否有错误信息
+            if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
+                throw new HttpException("百度获取退款订单信息失败: " + jsonNode.toPrettyString());
+            }
+        } catch (Exception e) {
+            log.error("百度退款方法异常: {}", e.getMessage());
+        }
         return false;
     }
 
     @Override
     public boolean queryRefund(Map<String, String> queryData) {
+        try {
+            // 获取token
+            String accessToken = getToken();
+            FindOrderRefundRequest param  = new FindOrderRefundRequest();
+            // accessToken
+            param.setAccessToken(accessToken);
+            // 设置商户订单号
+            param.setTpOrderID(queryData.get("outTradeNo"));
+            // 百度订单userId
+            param.setUserID(Long.parseLong(queryData.get("baiduUserId")));
+            // 百度收银台的支付服务 appKey
+            param.setPmAppKey(appletProperties.getPaymentAppKey());
+            // 发起请求
+            String response = new Gson().toJson(SmartAppFindOrderRefund.findOrderRefund(param));
+            // 将响应字符串解析为 JSON 对象
+            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+            // 检查是否有错误信息
+            if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
+                throw new HttpException("百度获取查询退款订单信息失败: " + jsonNode.toPrettyString());
+            }
+            int refundStatus = 0;
+            JsonNode dataNode = jsonNode.path("data");
+            // 遍历 "data" 数组中的每个对象
+            if (dataNode.isArray()) {
+                for (JsonNode item : dataNode) {
+                    String bizRefundBatchId = item.path("bizRefundBatchId").asText();
+                    if (queryData.get("refundNo").equals(bizRefundBatchId)) {
+                        refundStatus = item.path("refundStatus").asInt();
+                    }
+                }
+            }
+            return refundStatus == 2;
+        } catch (Exception e) {
+            log.error("", e);
+        }
         return false;
     }
 }

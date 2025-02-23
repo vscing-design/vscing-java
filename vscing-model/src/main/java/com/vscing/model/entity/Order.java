@@ -97,4 +97,7 @@ public class Order extends BaseEntity {
   @Schema(description = "放映结束时间")
   private LocalDateTime stopShowTime;
 
+  @Schema(description = "百度订单userId")
+  private Long baiduUserId;
+
 }

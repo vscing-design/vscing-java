@@ -32,6 +32,7 @@
         <result column="response_body" property="responseBody" jdbcType="VARCHAR" />
         <result column="memo" property="memo" jdbcType="VARCHAR" />
         <result column="stop_show_time" property="stopShowTime" jdbcType="TIMESTAMP" />
+        <result column="baidu_user_id" property="baiduUserId" jdbcType="BIGINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -394,6 +395,13 @@
     <update id="updateWechatOrder" parameterType="map">
         UPDATE <include refid="tableName" />
         SET status = 2, payment_status = 1, trade_no = #{tradeNo, jdbcType=VARCHAR}
+        WHERE order_sn = #{orderSn, jdbcType=VARCHAR}
+    </update>
+
+    <!-- 更新百度订单信息 -->
+    <update id="updateBaiduOrder" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET status = 2, payment_status = 1, trade_no = #{tradeNo, jdbcType=VARCHAR}, baidu_user_id = #{baiduUserId, jdbcType=BIGINT}
         WHERE order_sn = #{orderSn, jdbcType=VARCHAR}
     </update>
 

@@ -43,6 +43,8 @@ public interface OrderMapper {
 
   int updateWechatOrder(@Param("orderSn") String orderSn, @Param("tradeNo") String tradeNo);
 
+  int updateBaiduOrder(@Param("orderSn") String orderSn, @Param("tradeNo") String tradeNo, @Param("baiduUserId") Long baiduUserId);
+
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int cancelPendingPayments();

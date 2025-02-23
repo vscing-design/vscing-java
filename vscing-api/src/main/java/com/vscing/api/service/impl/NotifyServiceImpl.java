@@ -15,6 +15,7 @@ import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Show;
+import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
@@ -164,7 +165,79 @@ public class NotifyServiceImpl implements NotifyService {
   }
 
   @Override
-  public boolean queryBaiduOrder(HttpServletRequest request) {
+  public boolean queryBaiduOrder(Long userId, Long orderId, String tpOrderId, int totalMoney, int status, String rsaSign) {
+    try {
+      log.info("百度下单异步通知请求参数集合: userId: {}, orderId: {}, tpOrderId: {}, totalMoney: {}, status: {}, rsaSign: {}",
+          userId, orderId, tpOrderId, totalMoney, status, rsaSign);
+      // 支付类
+      AppletService appletService = appletServiceFactory.getAppletService("baidu");
+      // 签名认证
+      Map<String, String> params = new HashMap<>(3);
+      params.put("tpOrderId", tpOrderId);
+      params.put("totalAmount", String.valueOf(totalMoney));
+      params.put("rsaSign", rsaSign);
+      // 验签
+      boolean signVerified = (boolean) appletService.signValidation(params);
+      if (!signVerified) {
+        throw new ServiceException("百度订单验证签名未通过");
+      }
+      // 查询百度订单
+      boolean res = appletService.queryOrder(params);
+      if (!res) {
+        throw new ServiceException("百度订单支付未成功");
+      }
+      // 修改订单
+      int rowsAffected = orderMapper.updateBaiduOrder(tpOrderId, String.valueOf(orderId), userId);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("修改百度订单状态失败");
+      }
+      // 异步出票
+      log.info("提交百度异步出票任务，订单号: {}", tpOrderId);
+      ticketOrder(tpOrderId);
+      // 返回结果
+      return true;
+    } catch (Exception e) {
+      log.error("百度回调异常", e);
+      return false;
+    }
+  }
+
+  @Override
+  public boolean queryBaiduRefund(String tpOrderId, int status, String rsaSign) {
+    try {
+      // 查询订单信息
+      Order order = orderMapper.selectByOrderSn(tpOrderId);
+      if(order == null) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 获取支付句柄
+      String appletType = AppletTypeEnum.findByCode(order.getPlatform());
+      AppletService appletService = appletServiceFactory.getAppletService(appletType);
+      // 组装参数
+      Map<String, String> queryData = new HashMap<>(5);
+      queryData.put("outTradeNo", order.getTradeNo());
+      queryData.put("tradeNo", order.getOrderSn());
+      queryData.put("refundNo", order.getRefundNo());
+      queryData.put("totalAmount", order.getTotalPrice().toString());
+      queryData.put("baiduUserId", order.getBaiduUserId().toString());
+      // 验签
+      boolean signVerified = (boolean) appletService.signValidation(queryData);
+      if (!signVerified) {
+        throw new ServiceException("百度订单验证签名未通过");
+      }
+      // 发送退款请求
+      boolean res = appletService.queryRefund(queryData);
+      log.info("百度退款订单查询结果: {}", res);
+      // 处理退款结果
+      if (res) {
+        order.setStatus(7);
+      } else {
+        order.setStatus(8);
+      }
+      return orderMapper.update(order) > 1;
+    } catch (Exception e) {
+      log.error("百度退款订单回调异常: ", e);
+    }
     return false;
   }
 

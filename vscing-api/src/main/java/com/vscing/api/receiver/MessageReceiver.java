@@ -55,7 +55,7 @@ public class MessageReceiver {
   /**
    * 使用的自动应答，所以抛出异常就一直消费，死循环了。
    * 正确应该是异常之后还是当正常消费，再执行一个消息。
-  */
+   */
   @RabbitListener(queues = RabbitMQConfig.SYNC_CODE_QUEUE)
   public void receiveSyncCodeMessage(Message message) {
     int tag = 0;
@@ -114,13 +114,13 @@ public class MessageReceiver {
 
   /**
    * 取消订单队列
-  */
+   */
   @RabbitListener(queues = RabbitMQConfig.CANCEL_ORDER_QUEUE)
   public void receiveCancelOrderMessage(Message message) {
     try {
       // 处理同步场次码消息
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-      log.info("取消订单队列消息: {}" + msg);
+      log.info("取消订单队列消息: " + msg);
       Long orderId = Long.parseLong(msg);
       // 查询订单信息
       Order order = orderMapper.selectById(orderId);
@@ -162,7 +162,7 @@ public class MessageReceiver {
   public void receiveRefundMessage(Message message) {
     // 获取订单ID
     String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-    log.info("退款队列消息: {}" + msg);
+    log.info("退款队列消息: " + msg);
     Long orderId = Long.parseLong(msg);
     try {
       // 查询订单信息
@@ -186,6 +186,7 @@ public class MessageReceiver {
       refundData.put("tradeNo", order.getTradeNo());
       refundData.put("refundNo", refundNo);
       refundData.put("totalAmount", order.getTotalPrice());
+      refundData.put("baiduUserId", order.getBaiduUserId());
       // 发送退款请求
       boolean res = appletService.refundOrder(refundData);
       log.info("退款结果: {}", res);
@@ -194,8 +195,11 @@ public class MessageReceiver {
         order.setStatus(7);
         orderMapper.update(order);
       } else {
-        // 发送mq异步处理 2分钟后查询退款订单
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, msg, 2*60 *1000);
+        // 百度走自己的退款回调
+        if(order.getPlatform() != AppletTypeEnum.BAIDU.getCode()) {
+          // 发送mq异步处理 2分钟后查询退款订单
+          rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_QUERY_ROUTING_KEY, msg, 2*60 *1000);
+        }
       }
     } catch (Exception e) {
       log.error("退款队列异常: {}", e.getMessage());

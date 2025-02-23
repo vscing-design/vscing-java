@@ -58,20 +58,29 @@ public class NotifyController {
 
   @PostMapping("/baiduCreate")
   @Operation(summary = "百度下单异步通知")
-  public ResponseEntity<Object> baiduCreate(HttpServletRequest request) {
-    boolean res = notifyService.queryBaiduOrder(request);
-    if (res) {
+  public ResponseEntity<Object> baiduCreate(@RequestParam(value="userId") Long userId,
+                                            @RequestParam(value="orderId") Long orderId,
+                                            @RequestParam(value="tpOrderId") String tpOrderId,
+                                            @RequestParam(value="totalMoney") int totalMoney,
+                                            @RequestParam(value="status") int status,
+                                            @RequestParam(value = "rsaSign") String rsaSign) {
+    boolean res = notifyService.queryBaiduOrder(userId, orderId, tpOrderId, totalMoney, status, rsaSign);
+    if (!res) {
       // 查询订单接口，获取订单状态
-      return new ResponseEntity<>(HttpStatus.OK);
+      log.error("百度小程序回调查询失败: {}", tpOrderId);
     }
-    HashMap<String, String> errorResponse = new HashMap<>(2);
-    errorResponse.put("code","FAIL");
-    errorResponse.put("message","失败");
-    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    HashMap<String, Object> response = new HashMap<>(2);
+    response.put("errno", 0);
+    response.put("msg", "success");
+    // data数据
+    HashMap<String, Object> data = new HashMap<>(2);
+    data.put("isConsumed", 2);
+    response.put("data", data);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PostMapping("/baiduRefundReview")
-  @Operation(summary = "百度下单退款审核")
+  @Operation(summary = "百度退款审核")
   public ResponseEntity<Object> baiduRefundReview(@RequestParam(value="refundPayMoney") int refundPayMoney) {
     HashMap<String, Object> response = new HashMap<>(2);
     response.put("errno", 0);
@@ -88,9 +97,20 @@ public class NotifyController {
   }
 
   @PostMapping("/baiduRefund")
-  @Operation(summary = "百度下单退款通知")
-  public ResponseEntity<Object> baiduRefund(HttpServletRequest request) {
-    return null;
+  @Operation(summary = "百度退款通知")
+  public ResponseEntity<Object> baiduRefund(@RequestParam(value="tpOrderId") String tpOrderId,
+                                            @RequestParam(value="refundStatus") int refundStatus,
+                                            @RequestParam(value = "rsaSign") String rsaSign) {
+
+    boolean res = notifyService.queryBaiduRefund(tpOrderId, refundStatus, rsaSign);
+    log.error("百度小程序退款通知查询: tpOrderId: {}, res: {}", tpOrderId, res);
+    HashMap<String, Object> response = new HashMap<>(2);
+    response.put("errno", 0);
+    response.put("msg", "success");
+    // data数据
+    HashMap<String, Object> data = new HashMap<>(0);
+    response.put("data", data);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
 }

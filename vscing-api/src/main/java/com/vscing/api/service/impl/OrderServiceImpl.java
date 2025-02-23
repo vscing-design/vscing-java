@@ -360,6 +360,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     try {
+      // 百度小程序默认1分
+      if(platform == AppletTypeEnum.BAIDU.getCode()) {
+        totalPrice = new BigDecimal(1);
+      }
       // 发起支付
       AppletService appletService = appletServiceFactory.getAppletService(orderApiCreatedDto.getPlatform());
       Map<String, Object> paymentData = new HashMap<>(3);
@@ -426,13 +430,16 @@ public class OrderServiceImpl implements OrderService {
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
       // 百度支付参数
       BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
-      baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
-      baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
-      baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
-      baiduOrderInfoVo.setTotalAmount(String.valueOf(totalPrice.multiply(BigDecimal.valueOf(100))));
-      baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + orderSn);
-      baiduOrderInfoVo.setTpOrderId(orderSn);
-      baiduOrderInfoVo.setSignFieldsRange("1");
+      if(platform == AppletTypeEnum.BAIDU.getCode()) {
+        baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
+        baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
+        baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
+        baiduOrderInfoVo.setTotalAmount(String.valueOf(totalPrice.multiply(BigDecimal.valueOf(100))));
+        baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + orderSn);
+        baiduOrderInfoVo.setTpOrderId(orderSn);
+        baiduOrderInfoVo.setSignFieldsRange("1");
+        orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
+      }
 
       return orderApiPaymentVo;
     } catch (Exception e) {
@@ -492,10 +499,7 @@ public class OrderServiceImpl implements OrderService {
     }
     // 删除订单
     int rowsAffected = orderMapper.softDeleteById(id, 0L);
-    if (rowsAffected <= 0) {
-      return false;
-    }
-    return true;
+    return rowsAffected > 0;
   }
 
   @Override
@@ -510,10 +514,7 @@ public class OrderServiceImpl implements OrderService {
     order.setId(id);
     order.setStatus(5);
     int rowsAffected = orderMapper.update(order);
-    if (rowsAffected <= 0) {
-      return false;
-    }
-    return true;
+    return rowsAffected > 0;
   }
 
   @Override
@@ -525,12 +526,15 @@ public class OrderServiceImpl implements OrderService {
     }
     // 下发支付参数
     OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-    // 处理微信参数
-    if(AppletServiceFactory.WECHAT.equals(order.getPlatform())) {
+    // 处理支付宝参数
+    if(order.getPlatform() == AppletTypeEnum.ALIPAY.getCode()) {
+      orderApiPaymentVo.setTradeNo(order.getTradeNo());
+      // 处理微信参数
+    } else if (order.getPlatform() == AppletTypeEnum.WECHAT.getCode()) {
       // 查询用户的openid
       UserAuth userAuth = userAuthMapper.findOpenid(userId, 1);
       // 再次支付
-      AppletService appletService = appletServiceFactory.getAppletService("wechat");
+      AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.WECHAT.getApplet());
       Map<String, Object> paymentData = new HashMap<>(3);
       paymentData.put("outTradeNo", order.getOrderSn());
       paymentData.put("totalAmount", order.getTotalPrice());
@@ -541,10 +545,24 @@ public class OrderServiceImpl implements OrderService {
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("packageStr", ""));
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("signType", ""));
       orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("paySign", ""));
-    }
-    // 处理支付宝参数
-    if(AppletServiceFactory.ALIPAY.equals(order.getPlatform())) {
-      orderApiPaymentVo.setTradeNo(order.getTradeNo());
+      // 处理百度参数
+    } else if (order.getPlatform() == AppletTypeEnum.BAIDU.getCode()) {
+      // 再次支付
+      AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.BAIDU.getApplet());
+      Map<String, Object> paymentData = new HashMap<>(2);
+      paymentData.put("outTradeNo", order.getOrderSn());
+      paymentData.put("totalAmount", order.getTotalPrice());
+      Map<String, String> paymentRes = appletService.getPayment(paymentData);
+      // 百度支付参数
+      BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
+      baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
+      baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
+      baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
+      baiduOrderInfoVo.setTotalAmount(String.valueOf(order.getTotalPrice().multiply(BigDecimal.valueOf(100))));
+      baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + order.getOrderSn());
+      baiduOrderInfoVo.setTpOrderId(order.getOrderSn());
+      baiduOrderInfoVo.setSignFieldsRange("1");
+      orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
     }
     return orderApiPaymentVo;
   }
@@ -570,7 +588,7 @@ public class OrderServiceImpl implements OrderService {
       }
       return true;
     } catch (Exception e) {
-      log.error("评分：{}", e);
+      log.error("评分异常", e);
     }
     return false;
   }
