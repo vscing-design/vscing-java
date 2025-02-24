@@ -209,13 +209,8 @@ public class AppletServiceImpl implements AppletService {
     @Override
     public Object signValidation(Map<String, String> params) {
         try {
-            Map<String, Object> checkParams = new HashMap<>(5);
-            checkParams.put("appKey", appletProperties.getPaymentAppKey());
-            checkParams.put("dealId", appletProperties.getDealId());
-            checkParams.put("tpOrderId", params.get("tpOrderId"));
-            checkParams.put("totalAmount", params.get("totalAmount"));
-            checkParams.put("rsaSign", params.get("rsaSign"));
-            return RSASign.checkSign(checkParams, appletProperties.getPublicKey());
+            Map<String, Object> checkParams = new HashMap<>(params);
+            return RSASign.checkSign(checkParams, appletProperties.getBaiduPublicKey());
         } catch (Exception e) {
             log.error("百度签名验证失败: {}", e.getMessage());
         }
@@ -314,9 +309,9 @@ public class AppletServiceImpl implements AppletService {
             // accessToken
             param.setAccessToken(accessToken);
             // 设置商户订单号
-            param.setTpOrderID(queryData.get("outTradeNo"));
+            param.setTpOrderID(queryData.get("tpOrderId"));
             // 百度订单userId
-            param.setUserID(Long.parseLong(queryData.get("baiduUserId")));
+            param.setUserID(Long.parseLong(queryData.get("userId")));
             // 百度收银台的支付服务 appKey
             param.setPmAppKey(appletProperties.getPaymentAppKey());
             // 发起请求

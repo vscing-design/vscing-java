@@ -1,5 +1,6 @@
 package com.vscing.api.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.api.service.NotifyService;
@@ -11,6 +12,8 @@ import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
+import com.vscing.model.dto.BaiduCreateNotifyDto;
+import com.vscing.model.dto.BaiduRefundNotifyDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
@@ -30,13 +33,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * NotifyServiceImpl
@@ -166,35 +170,36 @@ public class NotifyServiceImpl implements NotifyService {
   }
 
   @Override
-  public boolean queryBaiduOrder(Long userId, Long orderId, String tpOrderId, int totalMoney, int status, String rsaSign) {
+  public boolean queryBaiduOrder(BaiduCreateNotifyDto baiduCreateNotifyDto) {
     try {
-      log.info("百度下单异步通知请求参数集合: userId: {}, orderId: {}, tpOrderId: {}, totalMoney: {}, status: {}, rsaSign: {}",
-          userId, orderId, tpOrderId, totalMoney, status, rsaSign);
+      log.info("百度下单异步通知请求参数集合: {}", baiduCreateNotifyDto);
       // 支付类
       AppletService appletService = appletServiceFactory.getAppletService("baidu");
-      // 签名认证
-      Map<String, String> params = new HashMap<>(3);
-      params.put("tpOrderId", tpOrderId);
-      params.put("totalAmount", String.valueOf(totalMoney));
-      params.put("rsaSign", rsaSign);
+      // 签名认证参数
+      Map<String, Object> objectMap = BeanUtil.beanToMap(baiduCreateNotifyDto);
+      Map<String, String> stringMap = new TreeMap<>(Comparator.naturalOrder());
+      for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+        String key = entry.getKey();
+        stringMap.put(key, entry.getValue().toString());
+      }
       // 验签
-      boolean signVerified = (boolean) appletService.signValidation(params);
+      boolean signVerified = (boolean) appletService.signValidation(stringMap);
       if (!signVerified) {
         throw new ServiceException("百度订单验证签名未通过");
       }
       // 查询百度订单
-      boolean res = appletService.queryOrder(params);
+      boolean res = appletService.queryOrder(stringMap);
       if (!res) {
         throw new ServiceException("百度订单支付未成功");
       }
       // 修改订单
-      int rowsAffected = orderMapper.updateBaiduOrder(tpOrderId, String.valueOf(orderId), userId);
+      int rowsAffected = orderMapper.updateBaiduOrder(baiduCreateNotifyDto.getTpOrderId(), String.valueOf(baiduCreateNotifyDto.getOrderId()), baiduCreateNotifyDto.getUserId());
       if (rowsAffected <= 0) {
         throw new ServiceException("修改百度订单状态失败");
       }
       // 异步出票
-      log.info("提交百度异步出票任务，订单号: {}", tpOrderId);
-      ticketOrder(tpOrderId);
+      log.info("提交百度异步出票任务，订单号: {}", baiduCreateNotifyDto.getTpOrderId());
+      ticketOrder(baiduCreateNotifyDto.getTpOrderId());
       // 返回结果
       return true;
     } catch (Exception e) {
@@ -204,33 +209,31 @@ public class NotifyServiceImpl implements NotifyService {
   }
 
   @Override
-  public boolean queryBaiduRefund(String tpOrderId, int status, String rsaSign) {
+  public boolean queryBaiduRefund(BaiduRefundNotifyDto baiduRefundNotifyDto) {
     try {
-      log.info("百度退款异步通知请求参数集合: tpOrderId: {}, status: {}, rsaSign: {}",
-        tpOrderId, status, rsaSign);
+      log.info("百度退款异步通知请求参数集合: {}", baiduRefundNotifyDto);
       // 查询订单信息
-      Order order = orderMapper.selectByOrderSn(tpOrderId);
+      Order order = orderMapper.selectByOrderSn(baiduRefundNotifyDto.getTpOrderId());
       if(order == null) {
         throw new ServiceException("订单数据不存在");
       }
       // 获取支付句柄
       String appletType = AppletTypeEnum.findByCode(order.getPlatform());
       AppletService appletService = appletServiceFactory.getAppletService(appletType);
-      // 组装参数
-      BigDecimal totalAmount = order.getTotalPrice();
-      totalAmount = totalAmount.multiply(BigDecimal.valueOf(100));
-      Map<String, String> queryData = new HashMap<>(5);
-      queryData.put("outTradeNo", order.getTradeNo());
-      queryData.put("tradeNo", order.getOrderSn());
-      queryData.put("refundNo", order.getRefundNo());
-      queryData.put("totalAmount", totalAmount.toString());
-      queryData.put("baiduUserId", order.getBaiduUserId().toString());
+      // 签名认证参数
+      Map<String, Object> objectMap = BeanUtil.beanToMap(baiduRefundNotifyDto);
+      Map<String, String> queryData = new TreeMap<>(Comparator.naturalOrder());
+      for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+        String key = entry.getKey();
+        queryData.put(key, entry.getValue().toString());
+      }
       // 验签
       boolean signVerified = (boolean) appletService.signValidation(queryData);
       if (!signVerified) {
         throw new ServiceException("百度订单验证签名未通过");
       }
       // 发送退款请求
+      queryData.put("refundNo", order.getRefundNo());
       boolean res = appletService.queryRefund(queryData);
       log.info("百度退款订单查询结果: {}", res);
       // 处理退款结果

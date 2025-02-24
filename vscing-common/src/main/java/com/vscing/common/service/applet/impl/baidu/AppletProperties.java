@@ -48,10 +48,15 @@ public class AppletProperties {
   /**
    * 平台公钥
    */
+  private String baiduPublicKey;
+
+  /**
+   * 开发者公钥
+   */
   private String publicKey;
 
   /**
-   * 平台私钥
+   * 开发者私钥
    */
   private String privateKey;
 

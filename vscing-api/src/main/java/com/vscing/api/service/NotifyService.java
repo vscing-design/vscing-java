@@ -1,5 +1,7 @@
 package com.vscing.api.service;
 
+import com.vscing.model.dto.BaiduCreateNotifyDto;
+import com.vscing.model.dto.BaiduRefundNotifyDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -23,12 +25,12 @@ public interface NotifyService {
   /**
    * 查询百度订单是否成功
    */
-  boolean queryBaiduOrder(Long userId, Long orderId, String tpOrderId, int totalMoney, int status, String rsaSign);
+  boolean queryBaiduOrder(BaiduCreateNotifyDto baiduCreateNotifyDto);
 
   /**
    * 查询百度退款订单是否成功
    */
-  boolean queryBaiduRefund(String tpOrderId, int status, String rsaSign);
+  boolean queryBaiduRefund(BaiduRefundNotifyDto baiduRefundNotifyDto);
 
   /**
    * 出票

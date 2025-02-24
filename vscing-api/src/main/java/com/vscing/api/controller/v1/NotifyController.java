@@ -1,6 +1,8 @@
 package com.vscing.api.controller.v1;
 
 import com.vscing.api.service.NotifyService;
+import com.vscing.model.dto.BaiduCreateNotifyDto;
+import com.vscing.model.dto.BaiduRefundNotifyDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,16 +60,11 @@ public class NotifyController {
 
   @PostMapping("/baiduCreate")
   @Operation(summary = "百度下单异步通知")
-  public ResponseEntity<Object> baiduCreate(@RequestParam(value="userId") Long userId,
-                                            @RequestParam(value="orderId") Long orderId,
-                                            @RequestParam(value="tpOrderId") String tpOrderId,
-                                            @RequestParam(value="totalMoney") int totalMoney,
-                                            @RequestParam(value="status") int status,
-                                            @RequestParam(value = "rsaSign") String rsaSign) {
-    boolean res = notifyService.queryBaiduOrder(userId, orderId, tpOrderId, totalMoney, status, rsaSign);
+  public ResponseEntity<Object> baiduCreate(BaiduCreateNotifyDto baiduCreateNotifyDto) {
+    boolean res = notifyService.queryBaiduOrder(baiduCreateNotifyDto);
     if (!res) {
       // 查询订单接口，获取订单状态
-      log.error("百度小程序回调查询失败: {}", tpOrderId);
+      log.error("百度小程序回调查询失败: {}", baiduCreateNotifyDto.getTpOrderId());
     }
     HashMap<String, Object> response = new HashMap<>(2);
     response.put("errno", 0);
@@ -98,12 +95,9 @@ public class NotifyController {
 
   @PostMapping("/baiduRefund")
   @Operation(summary = "百度退款通知")
-  public ResponseEntity<Object> baiduRefund(@RequestParam(value="tpOrderId") String tpOrderId,
-                                            @RequestParam(value="refundStatus") int refundStatus,
-                                            @RequestParam(value = "rsaSign") String rsaSign) {
+  public ResponseEntity<Object> baiduRefund(BaiduRefundNotifyDto baiduRefundNotifyDto) {
 
-    boolean res = notifyService.queryBaiduRefund(tpOrderId, refundStatus, rsaSign);
-    log.error("百度小程序退款通知查询: tpOrderId: {}, res: {}", tpOrderId, res);
+    boolean res = notifyService.queryBaiduRefund(baiduRefundNotifyDto);
     HashMap<String, Object> response = new HashMap<>(2);
     response.put("errno", 0);
     response.put("msg", "success");
