@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!--  https://docs.spring.io/spring-boot/maven-plugin/using.html 不使用spring-boot-starter-parent  -->
-<!--    <parent>-->
-<!--        <groupId>org.springframework.boot</groupId>-->
-<!--        <artifactId>spring-boot-starter-parent</artifactId>-->
-<!--        <version>3.3.4</version>-->
-<!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
-<!--    </parent>-->
+    <!--    <parent>-->
+    <!--        <groupId>org.springframework.boot</groupId>-->
+    <!--        <artifactId>spring-boot-starter-parent</artifactId>-->
+    <!--        <version>3.3.4</version>-->
+    <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
+    <!--    </parent>-->
 
     <groupId>com.vscing</groupId>
     <artifactId>vscing</artifactId>
@@ -53,7 +53,7 @@
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <knife4j-openapi3-jakarta-spring-boot-starter.version>4.5.0</knife4j-openapi3-jakarta-spring-boot-starter.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
-        <hutool.version>5.8.9</hutool.version>
+        <hutool.version>5.8.24</hutool.version>
         <hutool-extra.version>5.8.35</hutool-extra.version>
         <pinyin4j.version>2.5.0</pinyin4j.version>
         <lombok.version>1.18.36</lombok.version>
@@ -80,11 +80,11 @@
                 <scope>import</scope>
             </dependency>
             <!-- MyBatis 生成器 -->
-<!--            <dependency>-->
-<!--                <groupId>org.mybatis.generator</groupId>-->
-<!--                <artifactId>mybatis-generator</artifactId>-->
-<!--                <version>${mybatis-generator.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.mybatis.generator</groupId>-->
+            <!--                <artifactId>mybatis-generator</artifactId>-->
+            <!--                <version>${mybatis-generator.version}</version>-->
+            <!--            </dependency>-->
             <!-- MyBatis-->
             <dependency>
                 <groupId>org.mybatis</groupId>
@@ -125,6 +125,11 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>logging-interceptor</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
             <!-- json库 -->
@@ -188,11 +193,17 @@
                 <version>${spring-boot.version}</version>
             </dependency>
             <!--  数据库版本控制 -->
-<!--            <dependency>-->
-<!--                <groupId>org.flywaydb</groupId>-->
-<!--                <artifactId>flyway-core</artifactId>-->
-<!--                <version>https://documentation.red-gate.com/flyway/getting-started-with-flyway/quickstart-guides/quickstart-maven</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.flywaydb</groupId>-->
+            <!--                <artifactId>flyway-core</artifactId>-->
+            <!--                <version>https://documentation.red-gate.com/flyway/getting-started-with-flyway/quickstart-guides/quickstart-maven</version>-->
+            <!--            </dependency>-->
+            <!--  数据库连接池 -->
+            <!--            <dependency>-->
+            <!--                <groupId>com.alibaba</groupId>-->
+            <!--                <artifactId>druid</artifactId>-->
+            <!--                <version>1.2.22</version>-->
+            <!--            </dependency>-->
             <!--  类型转换 -->
             <dependency>
                 <groupId>io.github.linpeilie</groupId>
@@ -200,23 +211,23 @@
                 <version>${mapstruct-plus.version}</version>
             </dependency>
             <!-- Hibernate Validator -->
-<!--            <dependency>-->
-<!--                <groupId>org.hibernate.validator</groupId>-->
-<!--                <artifactId>hibernate-validator</artifactId>-->
-<!--                <version>${hibernate.validator.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.hibernate.validator</groupId>-->
+            <!--                <artifactId>hibernate-validator</artifactId>-->
+            <!--                <version>${hibernate.validator.version}</version>-->
+            <!--            </dependency>-->
             <!-- Hibernate Validator CDI Integration (if using CDI) -->
-<!--            <dependency>-->
-<!--                <groupId>org.hibernate.validator</groupId>-->
-<!--                <artifactId>hibernate-validator-cdi</artifactId>-->
-<!--                <version>${hibernate.validator.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.hibernate.validator</groupId>-->
+            <!--                <artifactId>hibernate-validator-cdi</artifactId>-->
+            <!--                <version>${hibernate.validator.version}</version>-->
+            <!--            </dependency>-->
             <!-- Jakarta Validation API -->
-<!--            <dependency>-->
-<!--                <groupId>jakarta.validation</groupId>-->
-<!--                <artifactId>jakarta.validation-api</artifactId>-->
-<!--                <version>${jakarta.validation.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>jakarta.validation</groupId>-->
+            <!--                <artifactId>jakarta.validation-api</artifactId>-->
+            <!--                <version>${jakarta.validation.version}</version>-->
+            <!--            </dependency>-->
             <!--  支付宝小程序sdk -->
             <dependency>
                 <groupId>com.alipay.sdk</groupId>
@@ -329,11 +340,11 @@
                         <target>${java.version}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <annotationProcessorPaths>
-<!--                            <path>-->
-<!--                                <groupId>com.github.therapi</groupId>-->
-<!--                                <artifactId>therapi-runtime-javadoc-scribe</artifactId>-->
-<!--                                <version>${therapi-javadoc.version}</version>-->
-<!--                            </path>-->
+                            <!--                            <path>-->
+                            <!--                                <groupId>com.github.therapi</groupId>-->
+                            <!--                                <artifactId>therapi-runtime-javadoc-scribe</artifactId>-->
+                            <!--                                <version>${therapi-javadoc.version}</version>-->
+                            <!--                            </path>-->
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
@@ -356,9 +367,9 @@
                             </path>
                         </annotationProcessorPaths>
                         <!-- 以下二选一 -->
-<!--                        <compilerArgs>-->
-<!--                            <arg>-parameters</arg>-->
-<!--                        </compilerArgs>-->
+                        <!--                        <compilerArgs>-->
+                        <!--                            <arg>-parameters</arg>-->
+                        <!--                        </compilerArgs>-->
                         <parameters>true</parameters>
                     </configuration>
                 </plugin>

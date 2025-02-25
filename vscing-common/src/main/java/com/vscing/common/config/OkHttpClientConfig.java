@@ -3,6 +3,7 @@ package com.vscing.common.config;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,16 +36,19 @@ public class OkHttpClientConfig {
 
   @Bean
   public OkHttpClient okHttpClient() {
-    log.info("Initializing OkHttpClient with the following properties: " +
-            "connectTimeout={}, readTimeout={}, writeTimeout={}, maxIdleConnections={}, keepAliveDuration={}",
-        connectTimeout, readTimeout, writeTimeout, maxIdleConnections, keepAliveDuration);
+
+    // 创建 HttpLoggingInterceptor 并设置日志级别为 BODY
+    HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(log::info);
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
     return new OkHttpClient.Builder()
-        .retryOnConnectionFailure(false)
+        // 启用连接失败时的自动重试
+        .retryOnConnectionFailure(true)
         .connectionPool(pool())
         .connectTimeout(connectTimeout, TimeUnit.SECONDS)
         .readTimeout(readTimeout, TimeUnit.SECONDS)
         .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
         .build();
   }
 
