@@ -96,7 +96,6 @@ public class NotifyController {
   @PostMapping("/baiduRefund")
   @Operation(summary = "百度退款通知")
   public ResponseEntity<Object> baiduRefund(BaiduRefundNotifyDto baiduRefundNotifyDto) {
-
     boolean res = notifyService.queryBaiduRefund(baiduRefundNotifyDto);
     HashMap<String, Object> response = new HashMap<>(2);
     response.put("errno", 0);

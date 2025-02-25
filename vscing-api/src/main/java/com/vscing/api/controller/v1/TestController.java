@@ -113,4 +113,12 @@ public class TestController {
         return CommonResult.success(appletService.getPayment(paymentData));
     }
 
+    @GetMapping("/baidu")
+    @Operation(summary = "测试百度")
+    public CommonResult<Object> baidu() {
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893920153807257600", 10 * 1000);
+        AppletService appletService = appletServiceFactory.getAppletService("baidu");
+        return CommonResult.success(true);
+    }
+
 }
