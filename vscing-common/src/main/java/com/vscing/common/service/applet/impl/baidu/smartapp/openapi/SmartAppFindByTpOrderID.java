@@ -1,6 +1,8 @@
 package com.vscing.common.service.applet.impl.baidu.smartapp.openapi;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.URI;
@@ -42,9 +44,26 @@ public class SmartAppFindByTpOrderID {
             throw new FindByTpOrderIDException("StatusCode not 200!");
         }
 
-        Gson gson = new Gson();
-        FindByTpOrderIDResponse res =
-            gson.<FindByTpOrderIDResponse>fromJson(response.body().toString(), FindByTpOrderIDResponse.class);
-        return res;
+        String jsonResponse = response.body().toString();
+
+        try {
+            // 解析整个 JSON 响应
+            JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
+            JsonObject dataObject = jsonObject.getAsJsonObject("data");
+
+            // 将 bizInfo 字段设置为空字符串
+            dataObject.addProperty("bizInfo", "");
+
+            // 将整个 JSON 对象转回字符串
+            jsonResponse = jsonObject.toString();
+
+            Gson gson = new Gson();
+            FindByTpOrderIDResponse res =
+                gson.<FindByTpOrderIDResponse>fromJson(jsonResponse, FindByTpOrderIDResponse.class);
+            return res;
+
+        } catch (Exception e) {
+            throw new FindByTpOrderIDException("bizInfo error!");
+        }
     }
 }

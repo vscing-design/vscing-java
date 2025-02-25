@@ -15,18 +15,18 @@ public class FindByTpOrderIDResponsedata {
     }
 
     @SerializedName("appKey")
-    private long appKey;
+    private String appKey;
 
-    public long getAppKey() {
+    public String getAppKey() {
         return this.appKey;
     }
 
-    public void setAppKey(long appKey) {
+    public void setAppKey(String appKey) {
         this.appKey = appKey;
     }
 
     @SerializedName("bizInfo")
-    private String bizInfo;
+    private String bizInfo; // 保持为 String 类型
 
     public String getBizInfo() {
         return this.bizInfo;
@@ -70,13 +70,13 @@ public class FindByTpOrderIDResponsedata {
     }
 
     @SerializedName("openId")
-    private long openId;
+    private String openId;
 
-    public long getOpenID() {
+    public String getOpenID() {
         return this.openId;
     }
 
-    public void setOpenID(long openId) {
+    public void setOpenID(String openId) {
         this.openId = openId;
     }
 
