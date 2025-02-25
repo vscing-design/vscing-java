@@ -11,7 +11,6 @@ import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
-import com.vscing.mq.config.RabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +56,7 @@ public class TestController {
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
 
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893507872288112640", 1000);
+//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893507872288112640", 1000);
         // 查询订单信息
         Order order = orderMapper.selectByOrderSn("HY202502231147112967");
         if(order == null) {
@@ -116,7 +115,7 @@ public class TestController {
     @GetMapping("/baidu")
     @Operation(summary = "测试百度")
     public CommonResult<Object> baidu() {
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893920153807257600", 10 * 1000);
+//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893920153807257600", 10 * 1000);
         AppletService appletService = appletServiceFactory.getAppletService("baidu");
         return CommonResult.success(true);
     }

@@ -564,6 +564,7 @@ public class OrderServiceImpl implements OrderService {
       baiduOrderInfoVo.setSignFieldsRange("1");
       orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
     }
+    log.info("orderApiPaymentVo: {}", orderApiPaymentVo);
     return orderApiPaymentVo;
   }
 
