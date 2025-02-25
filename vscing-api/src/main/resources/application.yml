@@ -17,6 +17,7 @@ logging:
     org.springdoc: DEBUG
     com.github.xiaoymin: DEBUG
 #    com.vscing.model.mapper: DEBUG
+  config: classpath:logback-spring.xml
 springdoc:
   api-docs:
     path: /v3/api-docs
