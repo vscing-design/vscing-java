@@ -540,11 +540,11 @@ public class OrderServiceImpl implements OrderService {
       paymentData.put("totalAmount", order.getTotalPrice());
       paymentData.put("openid", userAuth.getOpenid());
       Map<String, String> paymentRes = appletService.getPayment(paymentData);
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("timeStamp", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("nonceStr", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("packageStr", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("signType", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("paySign", ""));
+      orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
+      orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
+      orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
+      orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
+      orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
       // 处理百度参数
     } else if (order.getPlatform() == AppletTypeEnum.BAIDU.getCode()) {
       // 再次支付
