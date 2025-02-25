@@ -29,7 +29,7 @@
 
     <!-- 查询用户列表 -->
     <select id="getList" resultType="com.vscing.model.vo.UserListVo">
-        SELECT u.*, COUNT(o.id) as order_num FROM <include refid="tableName" /> u
+        SELECT u.id, u.source, u.username, u.phone, u.star, u.created_at, COUNT(o.id) as order_num FROM <include refid="tableName" /> u
         LEFT JOIN <include refid="orderTableName" /> o ON u.id = o.user_id
         <where>
             u.deleted_at IS NULL
@@ -40,7 +40,7 @@
                 AND u.`source` = #{source}
             </if>
         </where>
-        GROUP BY u.*
+        GROUP BY u.id, u.source, u.username, u.phone, u.star, u.created_at
         order by u.created_at desc
     </select>
 
