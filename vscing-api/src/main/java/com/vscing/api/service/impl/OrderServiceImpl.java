@@ -558,7 +558,11 @@ public class OrderServiceImpl implements OrderService {
       baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
       baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
       baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
-      baiduOrderInfoVo.setTotalAmount(String.valueOf(order.getTotalPrice().multiply(BigDecimal.valueOf(100))));
+      // 计算总价乘以100
+      BigDecimal totalPrice = order.getTotalPrice().multiply(BigDecimal.valueOf(100));
+      // 去掉小数点后多余的0，将结果转换为字符串
+      String totalAmount = totalPrice.stripTrailingZeros().toPlainString();
+      baiduOrderInfoVo.setTotalAmount(totalAmount);
       baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + order.getOrderSn());
       baiduOrderInfoVo.setTpOrderId(order.getOrderSn());
       baiduOrderInfoVo.setSignFieldsRange("1");
