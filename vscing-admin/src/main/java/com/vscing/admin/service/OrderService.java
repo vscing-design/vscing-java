@@ -64,7 +64,7 @@ public interface OrderService {
   boolean ticketOrder(Long id, Long by);
 
   /**
-   * 同步三方订单列表
+   * 同步三方订单列表 作废了
    */
   boolean supplierOrder(HttpOrder httpOrder);
 

@@ -11,6 +11,8 @@ import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.OrderService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
+import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
@@ -25,6 +27,8 @@ import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.entity.User;
+import com.vscing.model.enums.AppletTypeEnum;
+import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
 import com.vscing.model.mapper.OrderDetailMapper;
@@ -33,6 +37,7 @@ import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
 import com.vscing.model.utils.PricingUtil;
@@ -49,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,10 +69,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
-  private static final List<Integer> SUCCESS_CODES = Arrays.asList(200, -530, 9999, 9008, 9011);
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
+
+  @Autowired
+  private AppletServiceFactory appletServiceFactory;
 
   @Autowired
   private RedisService redisService;
@@ -150,10 +156,7 @@ public class OrderServiceImpl implements OrderService {
     order.setStatus(5);
     order.setUpdatedBy(by);
     int rowsAffected = orderMapper.update(order);
-    if (rowsAffected <= 0) {
-      return false;
-    }
-    return true;
+    return rowsAffected > 0;
   }
 
   @Override
@@ -163,16 +166,32 @@ public class OrderServiceImpl implements OrderService {
     if (orderInfo == null || orderInfo.getStatus() >= 6) {
       return false;
     }
+    // 获取支付句柄
+    String appletType = AppletTypeEnum.findByCode(orderInfo.getPlatform());
+    AppletService appletService = appletServiceFactory.getAppletService(appletType);
     // 修改订单状态
     Order order = new Order();
     order.setId(id);
     order.setStatus(6);
     order.setUpdatedBy(by);
-    int rowsAffected = orderMapper.update(order);
-    if (rowsAffected <= 0) {
-      return false;
+    // 组装参数
+    Map<String, Object> refundData = new HashMap<>(4);
+    refundData.put("outTradeNo", order.getOrderSn());
+    refundData.put("tradeNo", order.getTradeNo());
+    refundData.put("refundNo", order.getRefundNo());
+    refundData.put("totalAmount", order.getTotalPrice());
+    refundData.put("baiduUserId", order.getBaiduUserId());
+    // 发送退款请求
+    boolean res = appletService.refundOrder(refundData);
+    log.info("退款结果: {}", res);
+    // 处理退款结果
+    if (res) {
+      order.setStatus(7);
+    } else {
+      order.setStatus(8);
     }
-    return true;
+    int rowsAffected = orderMapper.update(order);
+    return rowsAffected > 0;
   }
 
   @Override
@@ -340,8 +359,6 @@ public class OrderServiceImpl implements OrderService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
-      // 发送mq消息
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 10 * 60 * 1000);
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
     }
@@ -469,8 +486,6 @@ public class OrderServiceImpl implements OrderService {
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
     }
-
-
     return true;
   }
 
@@ -520,9 +535,6 @@ public class OrderServiceImpl implements OrderService {
       SupplierService supplierService = supplierServiceFactory.getSupplierService("jfshou");
       // 发送请求并获取响应
       String responseBody = supplierService.sendRequest("/order/preferential/submit", params);
-
-      log.info("responseBody: {}", responseBody);
-
       // 将 JSON 字符串解析为 JsonNode 对象
       ObjectMapper objectMapper = new ObjectMapper();
       Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
@@ -532,16 +544,19 @@ public class OrderServiceImpl implements OrderService {
       updateOrder.setResponseBody(responseBody);
       // 调用保存
       orderMapper.update(updateOrder);
-      // 发送mq异步处理
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, order.getId().toString(), 3*60 *1000);
-      // 调用三方成功
-      if(SUCCESS_CODES.contains(code)) {
-        log.error("调用三方下单写入数据：", order.getOrderSn());
+      // 判断出票是否异常
+      if(!JfshouOrderSubmitResponseCodeEnum.isErrorCode(code)) {
+        // 发送mq异步处理 同步出票信息
+        SyncCodeMq syncCodeMq = new SyncCodeMq();
+        syncCodeMq.setOrderId(order.getId());
+        syncCodeMq.setNum(1);
+        String msg = JsonUtils.toJsonString(syncCodeMq);
+        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
         return true;
       }
       throw new ServiceException(message);
     } catch (Exception e) {
-      log.error("调用三方下单异常：{}", e);
+      log.error("调用三方下单失败", e);
     }
     return false;
   }
