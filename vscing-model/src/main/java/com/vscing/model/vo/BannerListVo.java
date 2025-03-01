@@ -1,19 +1,18 @@
-package com.vscing.model.entity;
+package com.vscing.model.vo;
 
-import com.vscing.model.domain.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 /**
- * Banner
+ * BannerListVo
  *
  * @author vscing
- * @date 2025/1/23 23:33
+ * @date 2025/3/1 16:38
  */
-@Getter
-@Setter
-public class Banner extends BaseEntity {
+@Data
+public class BannerListVo {
 
   @Schema(description = "主键ID")
   private Long id;
@@ -29,5 +28,11 @@ public class Banner extends BaseEntity {
 
   @Schema(description = "banner排序")
   private Integer sort;
+
+  @Schema(description = "创建时间")
+  private LocalDateTime createdAt;
+
+  @Schema(description = "更新时间")
+  private LocalDateTime updatedAt;
 
 }

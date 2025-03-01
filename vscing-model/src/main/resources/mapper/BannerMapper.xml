@@ -8,7 +8,8 @@
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="movie_id" property="movieId" jdbcType="BIGINT" />
         <result column="img" property="img" jdbcType="VARCHAR" />
-        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="sort" property="sort" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -21,8 +22,10 @@
     <sql id="tableName">
         vscing_banner
     </sql>
+    <sql id="movieTableName">
+        vscing_movie
+    </sql>
 
-    <!-- 查询banner -->
     <select id="selectAllList" resultMap="BaseResultMap">
         SELECT *
         FROM <include refid="tableName" />
@@ -30,5 +33,51 @@
             status = 1 AND deleted_at IS NULL
         </where>
     </select>
+
+    <select id="getList" resultType="com.vscing.model.vo.BannerListVo">
+        SELECT b.*, m.name as movieName FROM <include refid="tableName" /> b
+        LEFT JOIN <include refid="movieTableName" /> m ON b.movie_id = m.id
+        <where>
+            <if test="movieName != null">
+                AND m.name LIKE CONCAT('%', #{movieName}, '%')
+            </if>
+            AND b.status = 1 AND b.deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Banner">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="movieId != null">movie_id,</if>
+            <if test="img != null">img,</if>
+            <if test="status != null">status,</if>
+            <if test="sort != null">sort,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
+            <if test="img != null">#{img, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="sort != null">#{sort, jdbcType=TINYINT},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Banner">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="movieId != null">movie_id = #{movieId, jdbcType=BIGINT},</if>
+            <if test="img != null">img = #{img, jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="sort != null">sort = #{sort, jdbcType=TINYINT},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
 
 </mapper>

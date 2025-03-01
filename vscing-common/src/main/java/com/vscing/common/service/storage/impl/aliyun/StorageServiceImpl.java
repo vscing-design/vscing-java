@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -63,50 +64,34 @@ public class StorageServiceImpl implements StorageService {
   }
 
   @Override
-  public String put(String key, InputStream inputStream) {
+  public String put(String key, InputStream inputStream) throws IOException {
+    String url = "";
     try {
       // 创建PutObjectRequest对象。
       PutObjectRequest putObjectRequest = new PutObjectRequest(storageProperties.getBucketName(), key, inputStream);
       // 创建PutObject请求。
-      PutObjectResult result = ossClient.putObject(putObjectRequest);
+      ossClient.putObject(putObjectRequest);
+      return storageProperties.getDomain() + "/" + key;
     } catch (OSSException oe) {
-      System.out.println("Caught an OSSException, which means your request made it to OSS, "
-          + "but was rejected with an error response for some reason.");
-      System.out.println("Error Message:" + oe.getErrorMessage());
-      System.out.println("Error Code:" + oe.getErrorCode());
-      System.out.println("Request ID:" + oe.getRequestId());
-      System.out.println("Host ID:" + oe.getHostId());
+      throw new IOException(oe.getMessage());
     } catch (ClientException ce) {
-      System.out.println("Caught an ClientException, which means the client encountered "
-          + "a serious internal problem while trying to communicate with OSS, "
-          + "such as not being able to access the network.");
-      System.out.println("Error Message:" + ce.getMessage());
+      throw new IOException(ce.getMessage());
     } finally {
       if (ossClient != null) {
         ossClient.shutdown();
       }
     }
-
-    return "";
   }
 
   @Override
-  public void delete(String key) {
+  public void delete(String key) throws IOException {
     try {
       // 删除文件或目录。如果要删除目录，目录必须为空。
       ossClient.deleteObject(storageProperties.getBucketName(), key);
     } catch (OSSException oe) {
-      System.out.println("Caught an OSSException, which means your request made it to OSS, "
-          + "but was rejected with an error response for some reason.");
-      System.out.println("Error Message:" + oe.getErrorMessage());
-      System.out.println("Error Code:" + oe.getErrorCode());
-      System.out.println("Request ID:" + oe.getRequestId());
-      System.out.println("Host ID:" + oe.getHostId());
+      throw new IOException(oe.getMessage());
     } catch (ClientException ce) {
-      System.out.println("Caught an ClientException, which means the client encountered "
-          + "a serious internal problem while trying to communicate with OSS, "
-          + "such as not being able to access the network.");
-      System.out.println("Error Message:" + ce.getMessage());
+      throw new IOException(ce.getMessage());
     } finally {
       if (ossClient != null) {
         ossClient.shutdown();
