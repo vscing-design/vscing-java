@@ -123,6 +123,7 @@
         SELECT
         `order`.*,
         `user`.username AS username,
+        `user`.phone AS userPhone,
         supplier.name AS supplierName,
         cinema.name AS cinemaName,
         cinema.province_id AS provinceId,
