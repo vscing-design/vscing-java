@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component("aliyunStorageProperties")
-@ConfigurationProperties(prefix = "aliyun-storage")
+@ConfigurationProperties(prefix = "aliyun-oss")
 public class StorageProperties {
 
   /**
