@@ -22,6 +22,7 @@
         <result column="grade" property="grade" jdbcType="VARCHAR" />
         <result column="like" property="like" jdbcType="INTEGER" />
         <result column="publish_status" property="publishStatus" jdbcType="VARCHAR" />
+        <result column="top" property="top" jdbcType="INTEGER" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -46,17 +47,6 @@
         </where>
     </select>
 
-    <!-- 查询小程序端电影前10海报列表 -->
-    <select id="selectBanners" resultType="com.vscing.model.vo.MovieBannersVo">
-        SELECT id, `name`, poster_url FROM <include refid="tableName" />
-        <where>
-            poster_url IS NOT NULL
-            AND deleted_at IS NULL
-        </where>
-        ORDER BY publish_date DESC, grade DESC
-        LIMIT 10
-    </select>
-
     <!-- 查询管理端电影列表 -->
     <select id="getList" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
@@ -64,6 +54,16 @@
             deleted_at IS NULL
             <if test="name != null">
                 AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="publishStatus != null and publishStatus != ''">
+                <choose>
+                    <when test="publishStatus == 'HOT'">
+                        AND publish_date <![CDATA[ <= ]]> CURDATE()
+                    </when>
+                    <when test="publishStatus == 'WAIT'">
+                        AND publish_date <![CDATA[ > ]]> CURDATE()
+                    </when>
+                </choose>
             </if>
         </where>
     </select>
@@ -128,7 +128,7 @@
     <update id="update" parameterType="com.vscing.model.entity.Movie">
         UPDATE <include refid="tableName" />
         <set>
-            <if test="publishStatus != null">publish_status = #{publishStatus,jdbcType=TINYINT},</if>
+            <if test="publishStatus != null">publish_status = #{publishStatus,jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
@@ -145,8 +145,8 @@
     <!-- 批量插入或更新信息 -->
     <insert id="batchUpsert" parameterType="java.util.List">
         INSERT INTO <include refid="tableName" /> (
-            id, supplier_id, tp_movie_id, `name`, duration, publish_date, director, `cast`, intro, version_type,
-            `language`, movie_type, poster_url, plot_url, grade, `like`, publish_status
+        id, supplier_id, tp_movie_id, `name`, duration, publish_date, director, `cast`, intro, version_type,
+        `language`, movie_type, poster_url, plot_url, grade, `like`, publish_status
         ) VALUES
         <foreach collection="list" item="record" separator=",">
             (
@@ -170,5 +170,20 @@
         `like` = VALUES(`like`),
         publish_status = VALUES(publish_status)
     </insert>
+
+    <!-- 删除之前置顶 -->
+    <update id="deletedTop" parameterType="int">
+        UPDATE <include refid="tableName" /> SET top = 0 WHERE top = #{top, jdbcType=TINYINT}
+    </update>
+
+    <!-- 编辑置顶 -->
+    <update id="updatedTop" parameterType="com.vscing.model.entity.Movie">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="top != null">top = #{top, jdbcType=TINYINT},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
 
 </mapper>

@@ -4,7 +4,6 @@ import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.MovieListDto;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.vo.MovieApiVo;
-import com.vscing.model.vo.MovieBannersVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -20,28 +19,53 @@ import java.util.List;
 @Mapper
 public interface MovieMapper {
 
+  /**
+   * 管理端三方同步
+  */
   @Select("SELECT id FROM vscing_movie WHERE tp_movie_id = #{tpMovieId}")
   Movie findByTpMovieId(@Param("tpMovieId") Long tpMovieId);
 
-  List<MovieBannersVo> selectBanners();
+  /**
+   * 管理端三方同步批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
+   */
+  int batchUpsert(@Param("list") List<Movie> list);
 
+  /**
+   * 管理端三方同步
+   */
+  Movie selectByTpMovieId(long tpMovieId);
+
+  /**
+   * 管理端查询影片列表
+  */
   List<Movie> getList(MovieListDto record);
 
+  /**
+   * 管理端删除之前置顶
+   * @param top 置顶
+   */
+  int deletedTop(@Param("top") Integer top);
+
+  /**
+   * 管理端编辑置顶
+   * @param record 入参
+   */
+  int updatedTop(Movie record);
+
+  /**
+   * 小程序端查询列表
+  */
   List<MovieApiVo> getApiList(MovieApiListDto record);
 
+  /**
+   * 公用查询影片详情
+  */
   Movie selectById(long id);
-
-  Movie selectByTpMovieId(long tpMovieId);
 
   int insert(Movie record);
 
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(Movie record);
-
-  /**
-   * 批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
-  */
-  int batchUpsert(@Param("list") List<Movie> list);
   
 }
