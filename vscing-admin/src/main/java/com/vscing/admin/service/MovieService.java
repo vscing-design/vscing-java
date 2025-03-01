@@ -1,6 +1,7 @@
 package com.vscing.admin.service;
 
 import com.vscing.model.dto.MovieListDto;
+import com.vscing.model.dto.MovieTopDto;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.entity.MovieProducer;
 
@@ -29,6 +30,6 @@ public interface MovieService {
   /**
    * 置顶
    */
-  boolean updatedTop(Movie data);
+  boolean updatedTop(MovieTopDto data);
 
 }

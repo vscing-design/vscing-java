@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.MovieService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.model.dto.MovieListDto;
+import com.vscing.model.dto.MovieTopDto;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.entity.MovieProducer;
 import com.vscing.model.mapper.MovieMapper;
@@ -63,10 +64,10 @@ public class MovieServiceImpl implements MovieService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-  public boolean updatedTop(Movie data) {
+  public boolean updatedTop(MovieTopDto data) {
     try {
       int rowsAffected;
-      movieMapper.deletedTop(data.getTop());
+      movieMapper.deletedTop(data);
       rowsAffected = movieMapper.updatedTop(data);
       if (rowsAffected <= 0) {
         throw new ServiceException("置顶失败");

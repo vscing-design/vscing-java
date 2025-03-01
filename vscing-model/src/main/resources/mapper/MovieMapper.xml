@@ -172,12 +172,26 @@
     </insert>
 
     <!-- 删除之前置顶 -->
-    <update id="deletedTop" parameterType="int">
-        UPDATE <include refid="tableName" /> SET top = 0 WHERE top = #{top, jdbcType=TINYINT}
+    <update id="deletedTop" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET top = 0
+        <where>
+            top = #{top, jdbcType=TINYINT}
+            <if test="publishStatus != null and publishStatus != ''">
+                <choose>
+                    <when test="publishStatus == 'HOT'">
+                        AND publish_date <![CDATA[ <= ]]> CURDATE()
+                    </when>
+                    <when test="publishStatus == 'WAIT'">
+                        AND publish_date <![CDATA[ > ]]> CURDATE()
+                    </when>
+                </choose>
+            </if>
+        </where>
     </update>
 
     <!-- 编辑置顶 -->
-    <update id="updatedTop" parameterType="com.vscing.model.entity.Movie">
+    <update id="updatedTop" parameterType="map">
         UPDATE <include refid="tableName" />
         <set>
             <if test="top != null">top = #{top, jdbcType=TINYINT},</if>

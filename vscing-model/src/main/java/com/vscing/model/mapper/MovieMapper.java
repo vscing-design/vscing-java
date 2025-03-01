@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.MovieListDto;
+import com.vscing.model.dto.MovieTopDto;
 import com.vscing.model.entity.Movie;
 import com.vscing.model.vo.MovieApiVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -44,13 +45,13 @@ public interface MovieMapper {
    * 管理端删除之前置顶
    * @param top 置顶
    */
-  int deletedTop(@Param("top") Integer top);
+  int deletedTop(MovieTopDto record);
 
   /**
    * 管理端编辑置顶
    * @param record 入参
    */
-  int updatedTop(Movie record);
+  int updatedTop(MovieTopDto record);
 
   /**
    * 小程序端查询列表

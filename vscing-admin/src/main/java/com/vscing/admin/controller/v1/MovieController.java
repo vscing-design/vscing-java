@@ -5,6 +5,7 @@ import com.vscing.admin.service.MovieService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MovieListDto;
+import com.vscing.model.dto.MovieTopDto;
 import com.vscing.model.entity.Movie;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,7 +50,7 @@ public class MovieController {
 
   @PutMapping("/top")
   @Operation(summary = "置顶")
-  public CommonResult<Object> updatedTop(@Validated @RequestBody Movie movie,
+  public CommonResult<Object> updatedTop(@Validated @RequestBody MovieTopDto movieTopDto,
                                    BindingResult bindingResult,
                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
     if (bindingResult.hasErrors()) {
@@ -57,15 +58,15 @@ public class MovieController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
-    if (movie.getId() == null || movie.getTop() == null) {
-      return CommonResult.validateFailed("参数错误");
+    if (movieTopDto.getId() == null || movieTopDto.getTop() == null) {
+      return CommonResult.validateFailed("参数ID错误");
     }
     if(userInfo != null) {
       // 操作人ID
-      movie.setUpdatedBy(userInfo.getUserId());
+      movieTopDto.setUpdatedBy(userInfo.getUserId());
     }
     try {
-      boolean result = movieService.updatedTop(movie);
+      boolean result = movieService.updatedTop(movieTopDto);
       if (result) {
         return CommonResult.success("编辑成功");
       } else {
