@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.UserEarnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.UserEarn">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="with_order_id" property="withOrderId" jdbcType="BIGINT" />
+        <result column="with_user_id" property="withUserId" jdbcType="BIGINT" />
+        <result column="earn_amount" property="earnAmount" jdbcType="DECIMAL" />
+        <result column="platform" property="platform" jdbcType="TINYINT" />
+        <result column="earn_type" property="earnType" jdbcType="TINYINT" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_user_earn
+    </sql>
+    <sql id="userTableName">
+        vscing_user
+    </sql>
+    <sql id="orderTableName">
+        vscing_order
+    </sql>
+
+    <select id="getList" resultType="com.vscing.model.vo.UserEarnListVo">
+        SELECT ue.id, ue.user_id, ue.with_order_id, ue.with_user_id, ue.earn_type, ue.platform, ue.earn_amount, ue.status, ue.updated_at,
+               u.phone, uw.phone as withUserPhone, o.order_sn as withOrderSn, o.created_at as withOrderCreatedAt
+        FROM <include refid="tableName" /> ue
+        LEFT JOIN <include refid="userTableName" /> u ON ue.user_id = u.id
+        LEFT JOIN <include refid="userTableName" /> uw ON ue.with_user_id = uw.id
+        LEFT JOIN <include refid="orderTableName" /> o ON ue.with_order_id = o.id
+        <where>
+            <if test="earnType != null and earnType != 0">
+                ue.earn_type = #{earnType}
+            </if>
+            <if test="phone != null">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="withUserPhone != null">
+                AND uw.phone LIKE CONCAT('%', #{withUserPhone}, '%')
+            </if>
+            <if test="withOrderSn != null">
+                AND o.order_sn LIKE CONCAT('%', #{withOrderSn}, '%')
+            </if>
+            ue.deleted_at IS NULL
+        </where>
+    </select>
+
+</mapper>
