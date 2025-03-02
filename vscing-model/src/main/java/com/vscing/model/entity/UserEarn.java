@@ -2,7 +2,8 @@ package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -12,7 +13,8 @@ import java.math.BigDecimal;
  * @author vscing
  * @date 2025/3/2 16:30
  */
-@Data
+@Getter
+@Setter
 public class UserEarn extends BaseEntity {
 
   @Schema(description = "主键ID")

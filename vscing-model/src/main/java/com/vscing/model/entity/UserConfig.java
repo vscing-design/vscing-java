@@ -2,7 +2,8 @@ package com.vscing.model.entity;
 
 import com.vscing.model.domain.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * UserConfig
@@ -10,7 +11,8 @@ import lombok.Data;
  * @author vscing
  * @date 2025/3/2 22:02
  */
-@Data
+@Getter
+@Setter
 public class UserConfig extends BaseEntity {
 
   @Schema(description = "主键ID")
