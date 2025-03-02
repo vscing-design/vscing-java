@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.UserWithdrawMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.UserWithdraw">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="platform" property="platform" jdbcType="TINYINT" />
+        <result column="withdraw_amount" property="withdrawAmount" jdbcType="DECIMAL" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="reject_reason" property="rejectReason" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_user_withdraw
+    </sql>
+    <sql id="userTableName">
+        vscing_user
+    </sql>
+
+    <!-- 管理后台佣金提现列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT uw.id, uw.status, u.phone, uw.withdraw_amount, uw.created_at, uw.platform, uw.reject_reason
+        FROM <include refid="tableName" /> uw
+        INNER JOIN <include refid="userTableName" /> u ON u.id = uw.user_id
+        <where>
+            <if test="phone != null">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null and status != 0">
+                AND uw.status = #{status}
+            </if>
+            <if test="platform != null and platform != 0">
+                AND uw.platform = #{platform}
+            </if>
+            AND uw.deleted_at IS NULL
+        </where>
+        order by uw.status asc, uw.created_at desc
+    </select>
+
+    <!-- 管理后台佣金提现详情 -->
+    <select id="getUserWithdrawAmount" resultType="com.vscing.model.vo.UserWithdrawAmountVo">
+        SELECT status, SUM(withdraw_amount) AS withdrawAmount
+        FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+        </where>
+        GROUP BY status
+    </select>
+
+    <!-- 管理后台佣金提现审核 -->
+    <update id="approve" parameterType="map">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="rejectReason != null">reject_reason = #{rejectReason, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>
