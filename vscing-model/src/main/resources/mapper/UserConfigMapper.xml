@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.UserConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.UserConfig">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="key" property="key" jdbcType="VARCHAR" />
+        <result column="value" property="value" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_user_config
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="selectAllList" resultMap="BaseResultMap">
+        SELECT id, `title`, `key`, `value`
+        FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 批量插入或更新信息 -->
+    <insert id="batchUpsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" /> (id, `value`) VALUES
+        <foreach collection="list" item="record" separator=",">
+            ( #{record.id}, #{record.value} )
+        </foreach> ON DUPLICATE KEY UPDATE
+        `value` = VALUES(`value`)
+    </insert>
+
+</mapper>

@@ -1,33 +1,21 @@
-package com.vscing.model.entity;
+package com.vscing.model.vo;
 
-import com.vscing.model.domain.BaseEntity;
-import com.vscing.model.vo.UserConfigPricingRuleVo;
-import io.github.linpeilie.annotations.AutoMapper;
-import io.github.linpeilie.annotations.AutoMappers;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
 /**
- * PricingRule
+ * UserConfigPricingRuleVo
  *
  * @author vscing
- * @date 2024/12/29 23:22
+ * @date 2025/3/2 22:30
  */
-@Getter
-@Setter
-@AutoMappers({
-    @AutoMapper(target = UserConfigPricingRuleVo.class),
-})
-public class PricingRule extends BaseEntity {
+@Data
+public class UserConfigPricingRuleVo {
 
   @Schema(description = "ID")
   private Long id;
-
-  @Schema(description = "供应商ID")
-  private Long supplierId;
 
   @Schema(description = "差价下限(NULL 表示无下限)")
   private BigDecimal minDiff;
@@ -43,5 +31,8 @@ public class PricingRule extends BaseEntity {
 
   @Schema(description = "加价金额")
   private BigDecimal markupAmount;
+
+  @Schema(description = "加价金额")
+  private BigDecimal earnAmount;
 
 }
