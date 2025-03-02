@@ -7,6 +7,7 @@ import com.vscing.common.service.RedisService;
 import com.vscing.model.dto.UserListDto;
 import com.vscing.model.entity.User;
 import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.vo.UserAmountVo;
 import com.vscing.model.vo.UserListVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,11 @@ public class UserServiceImpl implements UserService {
     public List<UserListVo> getList(UserListDto data, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
         return userMapper.getList(data);
+    }
+
+    @Override
+    public UserAmountVo getUserAmount(UserListDto data) {
+        return userMapper.getUserAmount(data);
     }
 
     @Override

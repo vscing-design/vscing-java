@@ -4,6 +4,7 @@ import com.vscing.admin.service.UserService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.UserListDto;
+import com.vscing.model.vo.UserAmountVo;
 import com.vscing.model.vo.UserListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,4 +34,11 @@ public class UserController {
         List<UserListVo> list = userService.getList(queryParam, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(list));
     }
+
+    @GetMapping("/amount")
+    @Operation(summary = "金额统计")
+    public CommonResult<UserAmountVo> amount(@ParameterObject UserListDto queryParam) {
+        return CommonResult.success(userService.getUserAmount(queryParam));
+    }
+
 }

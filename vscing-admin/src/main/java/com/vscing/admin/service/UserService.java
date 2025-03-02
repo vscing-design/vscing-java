@@ -2,6 +2,7 @@ package com.vscing.admin.service;
 
 import com.vscing.model.dto.UserListDto;
 import com.vscing.model.entity.User;
+import com.vscing.model.vo.UserAmountVo;
 import com.vscing.model.vo.UserListVo;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public interface UserService {
      * 列表
      */
     List<UserListVo> getList(UserListDto data, Integer pageSize, Integer pageNum);
+
+    UserAmountVo getUserAmount(UserListDto data);
 
     /**
      * 详情
