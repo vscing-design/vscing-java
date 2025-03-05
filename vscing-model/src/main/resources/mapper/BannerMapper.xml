@@ -38,6 +38,9 @@
         SELECT b.*, m.name as movieName FROM <include refid="tableName" /> b
         LEFT JOIN <include refid="movieTableName" /> m ON b.movie_id = m.id
         <where>
+            <if test="status != null and status != 0">
+                AND b.status = #{status}
+            </if>
             <if test="movieName != null">
                 AND m.name LIKE CONCAT('%', #{movieName}, '%')
             </if>

@@ -66,6 +66,7 @@
                 </choose>
             </if>
         </where>
+        ORDER BY top DESC, created_at DESC
     </select>
 
     <!-- 根据 ID 查询 -->

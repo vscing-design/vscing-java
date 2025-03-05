@@ -15,4 +15,7 @@ public class BannerListDto {
   @Schema(description = "影片名称")
   private String movieName;
 
+  @Schema(description = "banner图状态 0 全部 1 上架 2 下架")
+  private Integer status;
+
 }
