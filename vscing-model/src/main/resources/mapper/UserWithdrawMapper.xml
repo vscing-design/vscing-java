@@ -28,8 +28,8 @@
     </sql>
 
     <!-- 管理后台佣金提现列表 -->
-    <select id="getList" resultMap="BaseResultMap">
-        SELECT uw.id, uw.status, u.phone, uw.withdraw_amount, uw.created_at, uw.platform, uw.reject_reason
+    <select id="getList" resultType="com.vscing.model.vo.UserWithdrawListVo">
+        SELECT uw.id, uw.status, u.phone, uw.withdraw_amount, uw.created_at, uw.platform, uw.reject_reason, uw.updated_at
         FROM <include refid="tableName" /> uw
         INNER JOIN <include refid="userTableName" /> u ON u.id = uw.user_id
         <where>

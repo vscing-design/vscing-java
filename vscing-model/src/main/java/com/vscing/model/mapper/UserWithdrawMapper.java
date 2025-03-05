@@ -2,8 +2,8 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
-import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.vo.UserWithdrawAmountVo;
+import com.vscing.model.vo.UserWithdrawListVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public interface UserWithdrawMapper {
   /**
    * 管理后台佣金提现列表
    */
-  List<UserWithdraw> getList(UserWithdrawListDto record);
+  List<UserWithdrawListVo> getList(UserWithdrawListDto record);
 
   /**
    * 管理后台佣金提现列表总数

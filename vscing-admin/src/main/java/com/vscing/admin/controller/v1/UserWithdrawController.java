@@ -8,6 +8,7 @@ import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
 import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.vo.UserWithdrawAmountVo;
+import com.vscing.model.vo.UserWithdrawListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +43,10 @@ public class UserWithdrawController {
 
   @GetMapping
   @Operation(summary = "列表")
-  public CommonResult<CommonPage<UserWithdraw>> lists(@ParameterObject UserWithdrawListDto queryParam,
-                                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                    @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
-    List<UserWithdraw> list = userWithdrawService.getList(queryParam, pageSize, pageNum);
+  public CommonResult<CommonPage<UserWithdrawListVo>> lists(@ParameterObject UserWithdrawListDto queryParam,
+                                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+    List<UserWithdrawListVo> list = userWithdrawService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }
 
@@ -59,7 +60,7 @@ public class UserWithdrawController {
   @Operation(summary = "审核")
   public CommonResult<Object> approve(@Validated @RequestBody UserWithdrawApproveDto userWithdrawApprove,
                                       BindingResult bindingResult,
-                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
+                                      @AuthenticationPrincipal AdminUserDetails userInfo) {
     // 获取第一个错误信息，如果需要所有错误信息
     if (bindingResult.hasErrors()) {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
