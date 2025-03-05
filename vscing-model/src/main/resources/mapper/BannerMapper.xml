@@ -41,7 +41,7 @@
             <if test="movieName != null">
                 AND m.name LIKE CONCAT('%', #{movieName}, '%')
             </if>
-            AND b.status = 1 AND b.deleted_at IS NULL
+            AND b.deleted_at IS NULL
         </where>
     </select>
 

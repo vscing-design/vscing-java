@@ -20,6 +20,9 @@ public class BannerListVo {
   @Schema(description = "影片ID")
   private Long movieId;
 
+  @Schema(description = "影片名称")
+  private String movieName;
+
   @Schema(description = "banner图url")
   private String img;
 
