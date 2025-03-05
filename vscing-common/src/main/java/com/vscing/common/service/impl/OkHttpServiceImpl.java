@@ -1,13 +1,7 @@
 package com.vscing.common.service.impl;
 
 import com.vscing.common.service.OkHttpService;
-import okhttp3.FormBody;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +44,11 @@ public class OkHttpServiceImpl implements OkHttpService {
       if (!response.isSuccessful()) {
         throw new IOException("Unexpected code " + response);
       }
-      return response.body().string();
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Response body is null");
+      }
+      return responseBody.string();
     }
   }
 
@@ -74,7 +72,11 @@ public class OkHttpServiceImpl implements OkHttpService {
       if (!response.isSuccessful()) {
         throw new IOException("Unexpected code " + response);
       }
-      return response.body().string();
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Response body is null");
+      }
+      return responseBody.string();
     }
   }
 
@@ -105,7 +107,35 @@ public class OkHttpServiceImpl implements OkHttpService {
       if (!response.isSuccessful()) {
         throw new IOException("Unexpected code " + response);
       }
-      return response.body().string();
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Response body is null");
+      }
+      return responseBody.string();
+    }
+  }
+
+  /**
+   * 发送 POST 请求（JSON 体）
+   */
+  @Override
+  public Response doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException {
+    RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
+    Request.Builder requestBuilder = new Request.Builder()
+        .url(url)
+        .post(body);
+
+    if (headers != null) {
+      for (Map.Entry<String, String> entry : headers.entrySet()) {
+        requestBuilder.addHeader(entry.getKey(), entry.getValue());
+      }
+    }
+
+    try (Response response = okHttpClient.newCall(requestBuilder.build()).execute()) {
+      if (!response.isSuccessful()) {
+        throw new IOException("Unexpected code " + response);
+      }
+      return response;
     }
   }
 

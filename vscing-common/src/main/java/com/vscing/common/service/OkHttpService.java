@@ -1,5 +1,7 @@
 package com.vscing.common.service;
 
+import okhttp3.Response;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -13,7 +15,7 @@ public interface OkHttpService {
 
   /**
    * 发送 GET 请求
-  */
+   */
   public String doGet(String url, Map<String, String> params, Map<String, String> headers) throws IOException;
 
   /**
@@ -25,5 +27,10 @@ public interface OkHttpService {
    * 发送 POST 请求（表单数据）
    */
   public String doPostForm(String url, Map<String, String> formData, Map<String, String> headers) throws IOException;
+
+  /**
+   * 发送 POST 请求（JSON 体）
+   */
+  public Response doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException;
 
 }
