@@ -10,10 +10,13 @@ import java.util.List;
 public interface UserService {
 
     /**
-     * 列表
+     * 管理端列表
      */
     List<UserListVo> getList(UserListDto data, Integer pageSize, Integer pageNum);
 
+    /**
+     * 管理端统计金额
+     */
     UserAmountVo getUserAmount(UserListDto data);
 
     /**

@@ -21,7 +21,7 @@ public interface UserService {
 
   /**
    * 用户信息
-  */
+   */
   UserDetailVo self(long id);
 
   /**
@@ -31,17 +31,17 @@ public interface UserService {
 
   /**
    * 小程序用户登陆
-  */
+   */
   String login(UserLoginDto userLogin, HttpServletRequest request);
 
   /**
    * 用户手机号
-  */
+   */
   String userPhone(UserLoginDto userLogin, UserDetailVo userData, String authToken);
 
   /**
    * 退出登陆
-  */
+   */
   boolean logout(UserDetailVo user, String authToken);
 
   /**

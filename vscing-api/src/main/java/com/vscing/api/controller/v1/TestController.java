@@ -2,17 +2,13 @@ package com.vscing.api.controller.v1;
 
 import com.vscing.api.service.TestService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.service.InviteCodeService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
-import com.vscing.model.entity.Order;
-import com.vscing.model.entity.UserAuth;
-import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.request.ShowSeatRequest;
-import com.vscing.model.vo.BaiduOrderInfoVo;
-import com.vscing.model.vo.OrderApiPaymentVo;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.service.RabbitMQService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +46,9 @@ public class TestController {
     private RedisService redisService;
 
     @Autowired
+    private InviteCodeService inviteCodeService;
+
+    @Autowired
     private AppletServiceFactory appletServiceFactory;
 
     @Autowired
@@ -62,49 +61,53 @@ public class TestController {
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
 
+        String inviteCode = inviteCodeService.idToInviteCode(1894419529721880576L);
+        log.info("inviteCode: {}", inviteCode);
+        Long id = inviteCodeService.inviteCodeToId(inviteCode);
+        log.info("id: {}", id);
 
-        Order order = orderMapper.selectById(1894419529721880576L);
-        // 下发支付参数
-        OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-        // 处理支付宝参数
-        if(order.getPlatform() == AppletTypeEnum.ALIPAY.getCode()) {
-            orderApiPaymentVo.setTradeNo(order.getTradeNo());
-            // 处理微信参数
-        } else if (order.getPlatform() == AppletTypeEnum.WECHAT.getCode()) {
-            // 查询用户的openid
-            UserAuth userAuth = userAuthMapper.findOpenid(1883117511135916032L, 1);
-            // 再次支付
-            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.WECHAT.getApplet());
-            Map<String, Object> paymentData = new HashMap<>(3);
-            paymentData.put("outTradeNo", order.getOrderSn());
-            paymentData.put("totalAmount", order.getTotalPrice());
-            paymentData.put("openid", userAuth.getOpenid());
-            Map<String, String> paymentRes = appletService.getPayment(paymentData);
-            orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
-            orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
-            orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
-            orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
-            orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
-            // 处理百度参数
-        } else if (order.getPlatform() == AppletTypeEnum.BAIDU.getCode()) {
-            // 再次支付
-            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.BAIDU.getApplet());
-            Map<String, Object> paymentData = new HashMap<>(2);
-            paymentData.put("outTradeNo", order.getOrderSn());
-            paymentData.put("totalAmount", order.getTotalPrice());
-            Map<String, String> paymentRes = appletService.getPayment(paymentData);
-            // 百度支付参数
-            BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
-            baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
-            baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
-            baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
-            baiduOrderInfoVo.setTotalAmount(String.valueOf(order.getTotalPrice().multiply(BigDecimal.valueOf(100))));
-            baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + order.getOrderSn());
-            baiduOrderInfoVo.setTpOrderId(order.getOrderSn());
-            baiduOrderInfoVo.setSignFieldsRange("1");
-            orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
-        }
-        log.info("orderApiPaymentVo: {}", orderApiPaymentVo);
+//        Order order = orderMapper.selectById(1894419529721880576L);
+//        // 下发支付参数
+//        OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
+//        // 处理支付宝参数
+//        if(order.getPlatform() == AppletTypeEnum.ALIPAY.getCode()) {
+//            orderApiPaymentVo.setTradeNo(order.getTradeNo());
+//            // 处理微信参数
+//        } else if (order.getPlatform() == AppletTypeEnum.WECHAT.getCode()) {
+//            // 查询用户的openid
+//            UserAuth userAuth = userAuthMapper.findOpenid(1883117511135916032L, 1);
+//            // 再次支付
+//            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.WECHAT.getApplet());
+//            Map<String, Object> paymentData = new HashMap<>(3);
+//            paymentData.put("outTradeNo", order.getOrderSn());
+//            paymentData.put("totalAmount", order.getTotalPrice());
+//            paymentData.put("openid", userAuth.getOpenid());
+//            Map<String, String> paymentRes = appletService.getPayment(paymentData);
+//            orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
+//            orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
+//            orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
+//            orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
+//            orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
+//            // 处理百度参数
+//        } else if (order.getPlatform() == AppletTypeEnum.BAIDU.getCode()) {
+//            // 再次支付
+//            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.BAIDU.getApplet());
+//            Map<String, Object> paymentData = new HashMap<>(2);
+//            paymentData.put("outTradeNo", order.getOrderSn());
+//            paymentData.put("totalAmount", order.getTotalPrice());
+//            Map<String, String> paymentRes = appletService.getPayment(paymentData);
+//            // 百度支付参数
+//            BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
+//            baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
+//            baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
+//            baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
+//            baiduOrderInfoVo.setTotalAmount(String.valueOf(order.getTotalPrice().multiply(BigDecimal.valueOf(100))));
+//            baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + order.getOrderSn());
+//            baiduOrderInfoVo.setTpOrderId(order.getOrderSn());
+//            baiduOrderInfoVo.setSignFieldsRange("1");
+//            orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
+//        }
+//        log.info("orderApiPaymentVo: {}", orderApiPaymentVo);
 
 //        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893507872288112640", 1000);
         // 查询订单信息
