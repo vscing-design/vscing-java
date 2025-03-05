@@ -1,6 +1,5 @@
 package com.vscing.common.service.storage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,14 +10,6 @@ import java.io.InputStream;
  * @date 2025/1/12 19:58
  */
 public interface StorageService {
-
-    /**
-     * 上传文件
-     * @param key 文件oss的路径、不包含bucketName
-     * @param file 文件资源
-     * @return 公共url
-     */
-    String put(String key, File file);
 
     /**
      * 上传文件

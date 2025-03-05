@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -20,11 +19,6 @@ public class StorageServiceImpl implements StorageService {
 
   @Autowired
   private StorageProperties storageProperties;
-
-  @Override
-  public String put(String key, File file) {
-    return "";
-  }
 
   @Override
   public String put(String key, InputStream inputStream) {
