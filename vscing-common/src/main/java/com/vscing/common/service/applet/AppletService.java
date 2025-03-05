@@ -47,4 +47,16 @@ public interface AppletService {
    */
   boolean queryRefund(Map<String, String> queryData);
 
+  /**
+   * 获取小程序二维码
+   */
+  String getQrcode(Map<String, Object> queryData);
+
+  /**
+   * 小程序转账
+   * 发起转账。需要参数：批次单号、金额、openid、回调地址、备注等等信息。
+   * 返回微信、支付宝那边的单号
+   */
+  Object transferOrder(Map<String, Object> transferData);
+
 }

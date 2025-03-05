@@ -9,17 +9,20 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.diagnosis.DiagnosisUtils;
+import com.alipay.api.domain.AlipayOpenAppQrcodeCreateModel;
 import com.alipay.api.domain.AlipayTradeCreateModel;
 import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayOpenAppQrcodeCreateRequest;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayTradeCreateRequest;
 import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayOpenAppQrcodeCreateResponse;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayTradeCreateResponse;
 import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
@@ -397,6 +400,56 @@ public class AppletServiceImpl implements AppletService {
       log.error("支付宝查询退款订单方法异常: {}", e.getMessage());
       throw new HttpException("支付宝查询退款订单方法异常: " + e.getMessage(), e);
     }
+  }
+
+  @Override
+  public String getQrcode(Map<String, Object> queryData) {
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipayOpenAppQrcodeCreateRequest request = new AlipayOpenAppQrcodeCreateRequest();
+      AlipayOpenAppQrcodeCreateModel model = new AlipayOpenAppQrcodeCreateModel();
+      // 设置跳转小程序的页面路径
+      model.setUrlParam(queryData.get("url").toString());
+      // 设置小程序的启动参数
+      model.setQueryParam("x=" + queryData.get("id").toString());
+      // 设置码描述
+      model.setDescribe("邀请码");
+      request.setBizModel(model);
+      // 调用接口
+      AlipayOpenAppQrcodeCreateResponse response = alipayClient.certificateExecute(request);
+      log.info("支付宝获取小程序二维码调用结果: {}" , response.getBody());
+      if (response.isSuccess()) {
+        // 将响应字符串解析为 JSON 对象
+        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(response.getBody());
+        jsonNode = jsonNode.path("alipay_open_app_qrcode_create_response");
+        if (!jsonNode.isMissingNode()) {
+          // 获取 小程序码
+          String qrcode = jsonNode.path("qr_code_url").asText(null);
+          if (qrcode != null && !qrcode.isEmpty()) {
+            return qrcode;
+          } else {
+            throw new RuntimeException("支付宝获取小程序二维码未获取到有效的 qr_code_url");
+          }
+        } else {
+          throw new RuntimeException("支付宝获取小程序二维码未获取到有效的 alipay_open_app_qrcode_create_response");
+        }
+      } else {
+        // sdk版本是"4.38.0.ALL"及以上,可以参考下面的示例获取诊断链接
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝获取小程序二维码接口失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public Object transferOrder(Map<String, Object> transferData) {
+    // 接口文档： https://opendocs.alipay.com/open/62987723_alipay.fund.trans.uni.transfer?scene=ca56bca529e64125a2786703c6192d41&pathHash=66064890
+    return null;
   }
 
 }

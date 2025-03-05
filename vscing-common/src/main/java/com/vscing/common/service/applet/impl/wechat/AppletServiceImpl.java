@@ -30,6 +30,8 @@ import com.wechat.pay.java.service.refund.model.QueryByOutRefundNoRequest;
 import com.wechat.pay.java.service.refund.model.Refund;
 import com.wechat.pay.java.service.refund.model.Status;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +40,10 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * AppletServiceImpl
@@ -221,7 +225,7 @@ public class AppletServiceImpl implements AppletService {
       );
       // 发送 GET 请求并获取响应
       String response = okHttpService.doGet(WECHAT_BASH_URL + "/sns/jscode2session", params, null);
-      log.info("微信获取openidAPI调用结果: " , response);
+      log.info("微信获取openidAPI调用结果: {}" , response);
       // 将响应字符串解析为 JSON 对象
       ObjectMapper objectMapper = JsonUtils.getObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(response);
@@ -249,7 +253,7 @@ public class AppletServiceImpl implements AppletService {
       );
       // 发送 POST 请求并获取响应
       String response = okHttpService.doPostJson(WECHAT_BASH_URL + "/wxa/business/getuserphonenumber?access_token=" + token, JsonUtils.toJsonString(params), null);
-      log.info("微信获取手机号调用结果: " , response);
+      log.info("微信获取手机号调用结果: {}" , response);
       // 将响应字符串解析为 JSON 对象
       ObjectMapper objectMapper = JsonUtils.getObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(response);
@@ -336,8 +340,7 @@ public class AppletServiceImpl implements AppletService {
           .body(params.get("requestBody"))
           .build();
       // 以支付通知回调为例，验签、解密并转换成 Transaction
-      Transaction transaction = parser.parse(requestParam, Transaction.class);
-      return transaction;
+      return parser.parse(requestParam, Transaction.class);
     } catch (ValidationException e) {
       log.error("微信签名验证失败: {}", e.getMessage());
     }
@@ -410,6 +413,46 @@ public class AppletServiceImpl implements AppletService {
       log.error("微信查询退款订单方法异常: {}", e.getMessage());
       throw new RuntimeException("微信查询退款订单方法异常: " + e.getMessage(), e);
     }
+  }
+
+  @Override
+  public String getQrcode(Map<String, Object> queryData) {
+    try {
+      // 获取token
+      String token = getToken();
+      // 组装请求参数
+      Map<String, Object> params = Map.of(
+          "access_token", token,
+          "page", queryData.get("url").toString(),
+          "scene", "x=" + queryData.get("scene").toString()
+      );
+      // 发送 POST 请求并获取响应
+      Response response = okHttpService.doPostResponse(WECHAT_BASH_URL + "/wxa/getwxacodeunlimit?access_token=" + token, JsonUtils.toJsonString(params), null);
+      log.info("微信获取小程序二维码调用结果: {}" , response);
+      // 读取响应体字节数组
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Response body is null");
+      }
+      byte[] responseBodyBytes = responseBody.bytes();
+      // 获取Content-Type
+      String contentType = Objects.requireNonNull(response.header("Content-Type")).toLowerCase();
+      // 判断是否为图片类型
+      boolean isImage = contentType.startsWith("image/");
+      if (isImage) {
+        return Base64.getEncoder().encodeToString(responseBodyBytes);
+      }
+      throw new HttpException("微信获取小程序二维码方法异常：" + responseBody.string());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public Object transferOrder(Map<String, Object> transferData) {
+    // 前置条件 https://pay.weixin.qq.com/doc/v3/merchant/4012065126
+    // 接口文档 https://pay.weixin.qq.com/doc/v3/merchant/4012716434
+    return null;
   }
 
 }

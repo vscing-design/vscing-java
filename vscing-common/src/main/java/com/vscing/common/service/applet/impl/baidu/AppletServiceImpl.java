@@ -11,6 +11,7 @@ import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.FindByTpOrde
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.FindOrderRefundRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetAccessTokenRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetSessionKeyV2Request;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.GetUnlimitedQrCodeRequest;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.RSASign;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppApplyOrderRefund;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppDataDecrypt;
@@ -18,6 +19,7 @@ import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppFind
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppFindOrderRefund;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetAccessToken;
 import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetSessionKeyV2;
+import com.vscing.common.service.applet.impl.baidu.smartapp.openapi.SmartAppGetUnlimitedQrCode;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -339,5 +341,40 @@ public class AppletServiceImpl implements AppletService {
             log.error("", e);
         }
         return false;
+    }
+
+    @Override
+    public String getQrcode(Map<String, Object> queryData) {
+        try {
+            // 获取token
+            String accessToken = getToken();
+            // 参数
+            GetUnlimitedQrCodeRequest param  = new GetUnlimitedQrCodeRequest();
+            // accessToken
+            param.setAccessToken(accessToken);
+            param.setPath(queryData.get("url").toString() + "?x=" + queryData.get("id").toString());
+            // 发起请求
+            String response = new Gson().toJson(SmartAppGetUnlimitedQrCode.getUnlimitedQrCode(param));
+            // 将响应字符串解析为 JSON 对象
+            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response);
+            // 检查是否有错误信息
+            if (jsonNode.has("errno") && jsonNode.get("errno").asInt() != 0) {
+                throw new HttpException("百度获取小程序二维码失败: " + jsonNode.toPrettyString());
+            }
+            jsonNode = jsonNode.path("data");
+            if (!jsonNode.isMissingNode()) {
+                return jsonNode.path("base64_str").asText(null);
+            }  else {
+                throw new RuntimeException("百度获取小程序二维码未获取到有效的 data");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Object transferOrder(Map<String, Object> transferData) {
+        throw new RuntimeException("百度小程序不支持提现");
     }
 }
