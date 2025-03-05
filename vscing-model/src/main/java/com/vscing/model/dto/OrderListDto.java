@@ -24,6 +24,9 @@ public class OrderListDto {
   @Schema(description = "下单用户")
   private String username;
 
+  @Schema(description = "用户注册手机号")
+  private String userPhone;
+
   @Schema(description = "下单手机号")
   private String phone;
 

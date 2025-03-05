@@ -100,15 +100,18 @@
             <if test="username != null and username.trim().length() > 0">
                 AND `user`.username LIKE CONCAT('%', #{username}, '%')
             </if>
+            <if test="userPhone != null and userPhone.trim().length() > 0">
+                AND `user`.phone LIKE CONCAT('%', #{userPhone}, '%')
+            </if>
         </where>
     </sql>
 
     <!-- 根据 ID 查询 -->
     <select id="getOrderPrice" resultType="com.vscing.model.vo.OrderPriceVo">
         SELECT
-            SUM(`order`.total_price) as totalPrice,
-            SUM(`order`.official_price) as officialPrice,
-            SUM(`order`.settlement_price) as settlementPrice
+        SUM(`order`.total_price) as totalPrice,
+        SUM(`order`.official_price) as officialPrice,
+        SUM(`order`.settlement_price) as settlementPrice
         FROM <include refid="tableName" /> `order`
         LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
         LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
@@ -417,16 +420,16 @@
     <!-- 检查是否存在已被占用的座位 -->
     <select id="checkOrderShowSeat" resultType="java.lang.Boolean">
         SELECT EXISTS (
-            SELECT 1
-            FROM <include refid="orderDetailTableName" /> od
-            JOIN <include refid="tableName" /> o ON od.order_id = o.id
-            WHERE o.status IN (1, 2, 3, 4)
-            AND o.show_id = #{showId}
-            AND od.tp_seat_id IN
-            <foreach item="seatId" index="index" collection="seatIds"
-                     open="(" separator="," close=")">
-                #{seatId}
-            </foreach>
+        SELECT 1
+        FROM <include refid="orderDetailTableName" /> od
+        JOIN <include refid="tableName" /> o ON od.order_id = o.id
+        WHERE o.status IN (1, 2, 3, 4)
+        AND o.show_id = #{showId}
+        AND od.tp_seat_id IN
+        <foreach item="seatId" index="index" collection="seatIds"
+                 open="(" separator="," close=")">
+            #{seatId}
+        </foreach>
         ) as existsOccupied
     </select>
 

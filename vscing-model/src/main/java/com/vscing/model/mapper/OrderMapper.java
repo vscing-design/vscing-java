@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author vscing (vscing@foxmail.com)
  * @date 2024-10-15 23:55:01
-*/
+ */
 @Mapper
 public interface OrderMapper {
 
@@ -52,5 +52,5 @@ public interface OrderMapper {
   List<Order> getPendingTicketOrders();
 
   boolean checkOrderShowSeat(@Param("showId") Long showId, @Param("seatIds") List<String> seatIds);
-  
+
 }
