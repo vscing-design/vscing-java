@@ -136,7 +136,7 @@ public class UserController {
 
   @PostMapping("/self")
   @Operation(summary = "用户详细信息")
-  public CommonResult<UserDetailVo> phone(@AuthenticationPrincipal UserDetails userInfo) {
+  public CommonResult<UserDetailVo> self(@AuthenticationPrincipal UserDetails userInfo) {
     if(userInfo == null) {
       return CommonResult.failed("上下文异常");
     }

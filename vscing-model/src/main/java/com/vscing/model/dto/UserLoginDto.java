@@ -24,4 +24,7 @@ public class UserLoginDto {
       "！！！注意：百度获取手机号时候先调用checkSession方法判断是否过期，如果过期需要先调用登陆接口后再调用获取手机号接口")
   private String code;
 
+  @Schema(description = "uuid 邀请人用户ID")
+  private String uuid;
+
 }
