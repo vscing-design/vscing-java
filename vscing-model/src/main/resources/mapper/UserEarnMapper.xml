@@ -32,6 +32,7 @@
         vscing_order
     </sql>
 
+    <!-- 管理后台推广费用明细 -->
     <select id="getList" resultType="com.vscing.model.vo.UserEarnListVo">
         SELECT ue.id, ue.user_id, ue.with_order_id, ue.with_user_id, ue.earn_type, ue.platform, ue.earn_amount, ue.status, ue.updated_at,
         u.phone, uw.phone as withUserPhone, o.order_sn as withOrderSn, o.created_at as withOrderCreatedAt
@@ -54,6 +55,30 @@
             </if>
             AND ue.deleted_at IS NULL
         </where>
+    </select>
+
+    <!-- 用户收益明细列表 -->
+    <select id="selectApiList" resultType="com.vscing.model.vo.UserEarnApiListVo">
+        SELECT ue.id, ue.platform, ue.earn_type, ue.earn_amount, ue.status, ue.updated_at,
+        uw.phone as withPhone, o.purchase_quantity as withQuantity
+        FROM <include refid="tableName" /> ue
+        LEFT JOIN <include refid="userTableName" /> uw ON ue.with_user_id = uw.id
+        LEFT JOIN <include refid="orderTableName" /> o ON ue.with_order_id = o.id
+        <where>
+            ue.user_id = #{userId} AND ue.status = 2 AND ue.deleted_at IS NULL
+        </where>
+        order by ue.updated_at desc, ue.created_at desc
+    </select>
+
+    <!-- 用户邀请列表 -->
+    <select id="selectApiInvite" resultType="com.vscing.model.vo.UserEarnApiInviteVo">
+        SELECT ue.id, ue.updated_at, uw.username as withUsername, uw.phone as withPhone
+        FROM <include refid="tableName" /> ue
+        LEFT JOIN <include refid="userTableName" /> uw ON ue.with_user_id = uw.id
+        <where>
+            ue.user_id = #{userId} AND ue.status = 2 AND ue.earn_type = 1 AND ue.deleted_at IS NULL
+        </where>
+        order by ue.updated_at desc, ue.created_at desc
     </select>
 
 </mapper>
