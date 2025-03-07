@@ -68,4 +68,39 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 用户佣金提现列表查询 -->
+    <select id="selectApiList" resultType="com.vscing.model.vo.UserWithdrawApiListVo">
+        SELECT id, status, reject_reason, withdraw_amount, platform, created_at, updated_at
+        FROM <include refid="tableName" />
+        <where>
+            user_id = #{userId}
+            <if test="record.status != null and record.status != 0">
+                AND status = #{record.status}
+            </if>
+            <if test="record.platform != null and record.platform != 0">
+                AND platform = #{record.platform}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+        order by updated_at desc, created_at desc
+    </select>
+
+    <!-- 用户提现佣金 -->
+    <insert id="insertInitiateWithdraw" parameterType="com.vscing.model.entity.UserWithdraw">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="platform != null">platform,</if>
+            <if test="withdrawAmount != null">withdraw_amount</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
+            <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
+            <if test="withdrawAmount != null">#{withdrawAmount, jdbcType=DECIMAL}</if>
+        </trim>
+    </insert>
+
 </mapper>

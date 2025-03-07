@@ -1,10 +1,14 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.UserWithdrawApiListDto;
 import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
+import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.vo.UserWithdrawAmountVo;
+import com.vscing.model.vo.UserWithdrawApiListVo;
 import com.vscing.model.vo.UserWithdrawListVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -31,5 +35,18 @@ public interface UserWithdrawMapper {
    * 管理后台佣金提现审核
    */
   int approve(UserWithdrawApproveDto record);
+
+  /**
+   * 用户佣金提现列表查询
+   * @param userId 用户ID
+   * @param record 筛选参数
+   */
+  List<UserWithdrawApiListVo> selectApiList(@Param("userId") long userId, @Param("record") UserWithdrawApiListDto record);
+
+  /**
+   * 用户发起提现
+   * @param record 入参
+   */
+  int insertInitiateWithdraw(UserWithdraw record);
 
 }
