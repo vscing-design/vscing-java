@@ -413,7 +413,7 @@ public class AppletServiceImpl implements AppletService {
       // 设置跳转小程序的页面路径
       model.setUrlParam(queryData.get("url").toString());
       // 设置小程序的启动参数
-      model.setQueryParam("x=" + queryData.get("id").toString());
+      model.setQueryParam(queryData.get("query").toString());
       // 设置码描述
       model.setDescribe("邀请码");
       request.setBizModel(model);

@@ -352,7 +352,7 @@ public class AppletServiceImpl implements AppletService {
             GetUnlimitedQrCodeRequest param  = new GetUnlimitedQrCodeRequest();
             // accessToken
             param.setAccessToken(accessToken);
-            param.setPath(queryData.get("url").toString() + "?x=" + queryData.get("id").toString());
+            param.setPath(queryData.get("url").toString() + "?" + queryData.get("query").toString());
             // 发起请求
             String response = new Gson().toJson(SmartAppGetUnlimitedQrCode.getUnlimitedQrCode(param));
             // 将响应字符串解析为 JSON 对象

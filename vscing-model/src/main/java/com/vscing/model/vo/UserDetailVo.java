@@ -39,6 +39,9 @@ public class UserDetailVo {
   @Schema(description = "累计佣金")
   private BigDecimal totalAmount;
 
+  @Schema(description = "分享二维码")
+  private String inviteQrcode;
+
   @Schema(description = "帐号启用状态：1->启用 2->禁用")
   private Integer status;
 

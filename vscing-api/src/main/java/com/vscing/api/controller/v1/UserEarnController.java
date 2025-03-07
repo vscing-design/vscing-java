@@ -56,8 +56,4 @@ public class UserEarnController {
     return CommonResult.success(CommonPage.restPage(list));
   }
 
-  // 推广二维码
-
-  // 邀请新人的mq、出票的mq
-
 }

@@ -424,7 +424,7 @@ public class AppletServiceImpl implements AppletService {
       Map<String, Object> params = Map.of(
           "access_token", token,
           "page", queryData.get("url").toString(),
-          "scene", "x=" + queryData.get("scene").toString()
+          "scene", queryData.get("query").toString()
       );
       // 发送 POST 请求并获取响应
       Response response = okHttpService.doPostResponse(WECHAT_BASH_URL + "/wxa/getwxacodeunlimit?access_token=" + token, JsonUtils.toJsonString(params), null);

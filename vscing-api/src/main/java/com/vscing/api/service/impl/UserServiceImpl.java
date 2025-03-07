@@ -17,6 +17,7 @@ import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
+import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.entity.User;
 import com.vscing.model.entity.UserAuth;
@@ -35,6 +36,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UserService
@@ -197,6 +200,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public String userPhone(UserLoginDto userLogin, UserDetailVo oldUserData, String authToken) {
     try {
       AppletService appletService = appletServiceFactory.getAppletService(userLogin.getPlatform());
@@ -205,12 +209,17 @@ public class UserServiceImpl implements UserService {
 
       if (newUserData != null && !newUserData.getId().equals(oldUserData.getId())) {
         // 如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id
-        boolean res = this.changeUser(newUserData.getId(), oldUserData.getId());
-        if(res) {
-          this.logout(oldUserData, authToken);
-        } else {
-          throw new ServiceException("如果手机号存在并且不是当前用户，删除已存在用户id，更新用户三方授权表用户id 失败");
+        // 删除旧用户信息
+        int rowsAffected = userMapper.softDeleteById(oldUserData.getId(), oldUserData.getId());
+        if (rowsAffected <= 0) {
+          throw new ServiceException("删除用户失败");
         }
+        // 修改用户授权表的userId
+        rowsAffected = userAuthMapper.updateUserId(newUserData.getId(), oldUserData.getId());
+        if (rowsAffected <= 0) {
+          throw new ServiceException("用户授权修改新用户ID失败");
+        }
+        this.logout(oldUserData, authToken);
       } else if (newUserData == null) {
         // 如果手机号用户不存在
         User updateUser = new User();
@@ -225,25 +234,21 @@ public class UserServiceImpl implements UserService {
       return phone;
     } catch (Exception e) {
       log.error("用户授权手机号异常：", e);
-      return null;
+      throw new ServiceException(e.getMessage());
     }
   }
 
-  @Transactional(rollbackFor = Exception.class)
-  public boolean changeUser(Long newUserId, Long oldUserId) {
+  @Override
+  public String inviteQrcode(UserInviteQrcodeDto userInviteQrcode, UserDetailVo user) {
     try {
-      // 删除旧用户信息
-      int rowsAffected = userMapper.softDeleteById(oldUserId, oldUserId);
-      if (rowsAffected <= 0) {
-        throw new ServiceException("删除用户失败");
-      }
-      // 修改用户授权表的userId
-      rowsAffected = userAuthMapper.updateUserId(newUserId, oldUserId);
-      if (rowsAffected <= 0) {
-        throw new ServiceException("用户授权修改新用户ID失败");
-      }
-      return true;
+      AppletService appletService = appletServiceFactory.getAppletService(userInviteQrcode.getPlatform());
+      Long userId = user.getId();
+      Map<String, Object> queryData = new HashMap<>(2);
+      queryData.put("url", "/pages/home/index/index");
+      queryData.put("query", "promotionId=" + userId.toString());
+      return appletService.getQrcode(queryData);
     } catch (Exception e) {
+      log.error("生成推广二维码异常：", e);
       throw new ServiceException(e.getMessage());
     }
   }

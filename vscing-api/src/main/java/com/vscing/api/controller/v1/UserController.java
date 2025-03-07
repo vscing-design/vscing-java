@@ -3,6 +3,7 @@ package com.vscing.api.controller.v1;
 import com.vscing.api.po.UserDetails;
 import com.vscing.api.service.UserService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
@@ -102,13 +103,18 @@ public class UserController {
     if(authHeader == null || !authHeader.startsWith(this.tokenHead)) {
       return CommonResult.failed("token不存在");
     }
-    String authToken = authHeader.substring(this.tokenHead.length());
-    // 授权手机号
-    String phone = userService.userPhone(userLogin, userData, authToken);
-    if (phone != null && !phone.isEmpty()) {
-      return CommonResult.success("授权成功", phone);
-    } else {
-      return CommonResult.failed("授权失败");
+    try {
+      String authToken = authHeader.substring(this.tokenHead.length());
+      // 授权手机号
+      String phone = userService.userPhone(userLogin, userData, authToken);
+      if (phone != null && !phone.isEmpty()) {
+        return CommonResult.success("授权成功", phone);
+      } else {
+        return CommonResult.failed("授权失败");
+      }
+    } catch (Exception e) {
+      log.error("授权手机号失败", e);
+      return CommonResult.failed("请求错误");
     }
   }
 
@@ -123,6 +129,35 @@ public class UserController {
       return CommonResult.failed("用户不存在");
     }
     return CommonResult.success(userData);
+  }
+
+  @PostMapping("/inviteQrcode")
+  @Operation(summary = "推广二维码")
+  public CommonResult<String> inviteQrcode(@Validated @RequestBody UserInviteQrcodeDto userInviteQrcodeDto,
+                                           BindingResult bindingResult,
+                                           @AuthenticationPrincipal UserDetails userInfo) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    if(userInfo == null) {
+      return CommonResult.failed("上下文异常");
+    }
+    UserDetailVo userData = userInfo.getUser();
+    if (userData == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    try {
+      String inviteQrcode = userData.getInviteQrcode();
+      if (inviteQrcode == null) {
+        inviteQrcode = userService.inviteQrcode(userInviteQrcodeDto, userData);
+      }
+      return CommonResult.success(inviteQrcode);
+    } catch (Exception e) {
+      log.error("获取二维码失败", e);
+      return CommonResult.failed("请求错误");
+    }
   }
 
   @GetMapping("/location")
