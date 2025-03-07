@@ -3,6 +3,7 @@ package com.vscing.model.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -28,6 +29,15 @@ public class UserDetailVo {
 
   @Schema(description = "用户手机号")
   private String phone;
+
+  @Schema(description = "待提现金额")
+  private BigDecimal pendingAmount;
+
+  @Schema(description = "已提现金额")
+  private BigDecimal withdrawnAmount;
+
+  @Schema(description = "累计佣金")
+  private BigDecimal totalAmount;
 
   @Schema(description = "帐号启用状态：1->启用 2->禁用")
   private Integer status;

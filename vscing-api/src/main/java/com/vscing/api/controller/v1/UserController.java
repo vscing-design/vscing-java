@@ -112,6 +112,25 @@ public class UserController {
     }
   }
 
+  @PostMapping("/self")
+  @Operation(summary = "用户详细信息")
+  public CommonResult<UserDetailVo> self(@AuthenticationPrincipal UserDetails userInfo) {
+    if(userInfo == null) {
+      return CommonResult.failed("上下文异常");
+    }
+    UserDetailVo userData = userInfo.getUser();
+    if (userData == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    return CommonResult.success(userData);
+  }
+
+  @GetMapping("/location")
+  @Operation(summary = "用户当前经纬度获取")
+  public CommonResult<UserApiLocationVo> location(HttpServletRequest request) {
+    return CommonResult.success(userService.getLocation(request));
+  }
+
   @GetMapping("/logout")
   @Operation(summary = "用户登出")
   public CommonResult<Object> login(HttpServletRequest request, @AuthenticationPrincipal UserDetails userInfo) {
@@ -132,25 +151,6 @@ public class UserController {
     } else {
       return CommonResult.failed("登出失败");
     }
-  }
-
-  @PostMapping("/self")
-  @Operation(summary = "用户详细信息")
-  public CommonResult<UserDetailVo> self(@AuthenticationPrincipal UserDetails userInfo) {
-    if(userInfo == null) {
-      return CommonResult.failed("上下文异常");
-    }
-    UserDetailVo userData = userInfo.getUser();
-    if (userData == null) {
-      return CommonResult.failed("用户不存在");
-    }
-    return CommonResult.success(userData);
-  }
-
-  @GetMapping("/location")
-  @Operation(summary = "用户当前经纬度获取")
-  public CommonResult<UserApiLocationVo> location(HttpServletRequest request) {
-    return CommonResult.success(userService.getLocation(request));
   }
 
 }
