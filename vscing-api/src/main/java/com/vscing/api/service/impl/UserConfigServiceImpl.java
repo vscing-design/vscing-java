@@ -1,7 +1,7 @@
-package com.vscing.admin.service.impl;
+package com.vscing.api.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.vscing.admin.service.UserConfigService;
+import com.vscing.api.service.UserConfigService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
@@ -40,8 +40,8 @@ public class UserConfigServiceImpl implements UserConfigService {
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
 
-  // 缓存配置数据
-  private Map<String, String> getConfig() {
+  @Override
+  public Map<String, String> getConfig() {
     Map<String, String> config = new HashMap<>(2);
     String json = (String) redisService.get(USER_CONFIG_LIST);
     if(json == null) {
@@ -52,22 +52,6 @@ public class UserConfigServiceImpl implements UserConfigService {
       return JsonUtils.parseObject(json, new TypeReference<Map<String, String>>() {});
     }
     return config;
-  }
-
-  @Override
-  public List<UserConfig> selectAllList() {
-    return userConfigMapper.selectAllList();
-  }
-
-  @Override
-  public boolean batchUpsert(List<UserConfig> list) {
-    if(list != null && list.size() > 0) {
-      int rowsAffected = userConfigMapper.batchUpsert(list);
-      redisService.del(USER_CONFIG_LIST);
-      getConfig();
-      return rowsAffected > 0;
-    }
-    return true;
   }
 
   @Override

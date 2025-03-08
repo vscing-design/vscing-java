@@ -3,10 +3,14 @@ package com.vscing.api.controller.v1;
 import com.vscing.api.po.UserDetails;
 import com.vscing.api.service.UserService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
+import com.vscing.model.mq.InviteMq;
 import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
+import com.vscing.mq.config.FanoutRabbitMQConfig;
+import com.vscing.mq.service.RabbitMQService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +49,9 @@ public class UserController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private RabbitMQService rabbitMQService;
 
   @PostMapping("/testLogin")
   @Operation(summary = "测试小程序用户登录")
@@ -108,6 +115,12 @@ public class UserController {
       // 授权手机号
       String phone = userService.userPhone(userLogin, userData, authToken);
       if (phone != null && !phone.isEmpty()) {
+        // 发送mq异步处理 同步出票信息
+        InviteMq inviteMq = new InviteMq();
+        inviteMq.setUserId(userData.getId());
+        inviteMq.setInviteUserId(Long.valueOf(userLogin.getUuid()));
+        String msg = JsonUtils.toJsonString(inviteMq);
+        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.INVITE_QUEUE, msg);
         return CommonResult.success("授权成功", phone);
       } else {
         return CommonResult.failed("授权失败");

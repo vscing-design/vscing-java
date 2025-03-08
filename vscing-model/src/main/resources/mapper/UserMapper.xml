@@ -6,6 +6,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.User">
         <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="first_user_id" property="firstUserId" jdbcType="BIGINT" />
         <result column="source" property="source" jdbcType="TINYINT" />
         <result column="username" property="username" jdbcType="VARCHAR" />
         <result column="password" property="password" jdbcType="VARCHAR" />
@@ -116,7 +117,7 @@
         </trim>
     </insert>
 
-    <!-- 更新信息 -->
+    <!-- 更新手机号信息 -->
     <update id="updatePhone" parameterType="com.vscing.model.entity.User">
         UPDATE <include refid="tableName" />
         <set>
@@ -132,6 +133,31 @@
         SET deleted_at = NOW(),
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 更新用户上级 -->
+    <update id="updateFirstUserId" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET first_user_id = #{firstUserId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 增加用户余额、累计佣金 -->
+    <update id="updateIncreaseAmount" parameterType="com.vscing.model.entity.User">
+        UPDATE <include refid="tableName" />
+        SET pending_amount = pending_amount + #{amount, jdbcType=DECIMAL},
+        total_amount = total_amount + #{amount, jdbcType=DECIMAL}
+        WHERE id = #{id, jdbcType=BIGINT}
+        AND pending_amount >= 0 -- 确保余额不会变成负数
+    </update>
+
+    <!-- 减少用户余额、增加提现金额 -->
+    <update id="updateReduceAmount" parameterType="com.vscing.model.entity.User">
+        UPDATE <include refid="tableName" />
+        SET pending_amount = pending_amount - #{amount, jdbcType=DECIMAL},
+        withdrawn_amount = withdrawn_amount + #{amount, jdbcType=DECIMAL}
+        WHERE id = #{id, jdbcType=BIGINT}
+        AND pending_amount >= #{amount, jdbcType=DECIMAL} -- 确保余额足够
     </update>
 
 </mapper>

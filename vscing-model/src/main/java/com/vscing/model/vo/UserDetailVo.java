@@ -18,6 +18,9 @@ public class UserDetailVo {
   @Schema(description = "主键ID")
   private Long id;
 
+  @Schema(description = "上级用户ID")
+  private Long firstUserId;
+
   @Schema(description = "用户名称")
   private String username;
 

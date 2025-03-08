@@ -6,6 +6,7 @@ import cn.hutool.http.HttpException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.api.po.impl.UserDetailsImpl;
+import com.vscing.api.service.UserConfigService;
 import com.vscing.api.service.UserService;
 import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.auth.util.JwtTokenUtil;
@@ -17,6 +18,7 @@ import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
+import com.vscing.common.utils.StringUtils;
 import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.entity.User;
@@ -24,6 +26,7 @@ import com.vscing.model.entity.UserAuth;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.mq.InviteMq;
 import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +70,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private RedisService redisService;
+
+  @Autowired
+  private UserConfigService userConfigService;
 
   @Autowired
   private AppletServiceFactory appletServiceFactory;
@@ -234,6 +241,37 @@ public class UserServiceImpl implements UserService {
       return phone;
     } catch (Exception e) {
       log.error("用户授权手机号异常：", e);
+      throw new ServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public boolean userInvite(InviteMq inviteMq) {
+    try {
+      // 判断是否存在邀请人
+      User user = userMapper.selectById(inviteMq.getUserId());
+      if (user == null || user.getFirstUserId() != null) {
+        throw new ServiceException("用户已存在邀请人");
+      }
+      int rowsAffected;
+      rowsAffected = userMapper.updateFirstUserId(inviteMq.getUserId(), inviteMq.getInviteUserId());
+      if (rowsAffected <= 0) {
+        throw new ServiceException("更新用户邀请人失败");
+      }
+      Map<String, String> config = userConfigService.getConfig();
+      String inviteAmountStr = config.get("invite_amount");
+      if (inviteAmountStr == null || StringUtils.isEmpty(inviteAmountStr)) {
+        throw new ServiceException("获取佣金失败");
+      }
+      BigDecimal inviteAmount = new BigDecimal(inviteAmountStr);
+      rowsAffected = userMapper.updateIncreaseAmount(inviteMq.getInviteUserId(), inviteAmount);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("更新用户邀请人佣金失败");
+      }
+      return true;
+    } catch (Exception e) {
+      log.error("用户邀请异常：", e);
       throw new ServiceException(e.getMessage());
     }
   }

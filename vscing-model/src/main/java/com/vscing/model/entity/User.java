@@ -24,6 +24,9 @@ public class User extends BaseEntity {
     @Schema(description = "主键ID")
     private Long id;
 
+    @Schema(description = "上级用户ID")
+    private Long firstUserId;
+
     @Schema(description = "来源 1 微信小程序 2 支付宝小程序 3 百度小程序")
     private Integer source;
 

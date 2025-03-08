@@ -7,6 +7,7 @@ import com.vscing.model.vo.UserListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,8 +33,29 @@ public interface UserMapper {
 
     int insert(User record);
 
+    /**
+     * 更新手机号
+    */
     int updatePhone(User record);
 
+    /**
+     * 更新用户上级
+    */
+    int updateFirstUserId(@Param("id") long id, @Param("firstUserId") long firstUserId);
+
+    /**
+     * 增加用户余额、累计佣金
+     */
+    int updateIncreaseAmount(@Param("id") long id, @Param("amount") BigDecimal amount);
+
+    /**
+     * 减少用户余额、增加提现金额
+     */
+    int updateReduceAmount(@Param("id") long id, @Param("amount") BigDecimal amount);
+
+    /**
+     * 软删除用户
+    */
     int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
 }
