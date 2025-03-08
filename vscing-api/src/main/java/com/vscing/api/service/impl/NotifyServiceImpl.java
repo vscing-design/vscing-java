@@ -24,7 +24,7 @@ import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mq.SyncCodeMq;
-import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.config.DelayRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import com.wechat.pay.java.service.payments.model.Transaction;
 import jakarta.servlet.http.HttpServletRequest;
@@ -284,7 +284,7 @@ public class NotifyServiceImpl implements NotifyService {
       // 黑名单测试
       if("15901799236".equals(order.getPhone())) {
         // 发送mq异步处理 退款
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
         throw new ServiceException("测试退款手机号");
       }
       // 将 List 转换为 JSON 字符串
@@ -314,7 +314,7 @@ public class NotifyServiceImpl implements NotifyService {
       // 判断出票是否异常
       if(JfshouOrderSubmitResponseCodeEnum.isErrorCode(code)) {
         // 发送mq异步处理 退款
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
         throw new ServiceException(message);
       } else {
         // 发送mq异步处理 同步出票信息
@@ -322,7 +322,7 @@ public class NotifyServiceImpl implements NotifyService {
         syncCodeMq.setOrderId(order.getId());
         syncCodeMq.setNum(1);
         String msg = JsonUtils.toJsonString(syncCodeMq);
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
       }
     } catch (Exception e) {
       log.error("调用三方下单异常：{}", e);

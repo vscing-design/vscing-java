@@ -13,4 +13,9 @@ public interface RabbitMQService {
   */
   void sendDelayedMessage(String routingKey, Object message, int delayMilliseconds);
 
+  /**
+   * 发送订阅队列
+   */
+  void sendFanoutMessage(String routingKey, Object message);
+
 }

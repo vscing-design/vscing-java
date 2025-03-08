@@ -44,7 +44,7 @@ import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.OrderDetailVo;
 import com.vscing.model.vo.OrderPriceVo;
 import com.vscing.model.vo.OrderVo;
-import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.config.DelayRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -551,7 +551,7 @@ public class OrderServiceImpl implements OrderService {
         syncCodeMq.setOrderId(order.getId());
         syncCodeMq.setNum(1);
         String msg = JsonUtils.toJsonString(syncCodeMq);
-        rabbitMQService.sendDelayedMessage(RabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
         return true;
       }
       throw new ServiceException(message);

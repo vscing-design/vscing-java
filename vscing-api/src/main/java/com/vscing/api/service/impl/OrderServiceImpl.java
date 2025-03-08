@@ -46,7 +46,7 @@ import com.vscing.model.vo.OrderApiPaymentVo;
 import com.vscing.model.vo.OrderApiSeatListVo;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.model.vo.SeatVo;
-import com.vscing.mq.config.RabbitMQConfig;
+import com.vscing.mq.config.DelayRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -419,7 +419,7 @@ public class OrderServiceImpl implements OrderService {
         }
       }
       // 发送mq消息
-      rabbitMQService.sendDelayedMessage(RabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15 * 60 * 1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15 * 60 * 1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
       orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
