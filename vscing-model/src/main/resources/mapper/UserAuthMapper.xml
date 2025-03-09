@@ -47,7 +47,7 @@
 
     <!-- 根据 openid、userId 查询用户openid -->
     <select id="findOpenid" resultMap="BaseResultMap">
-        SELECT openid FROM <include refid="tableName" />
+        SELECT id, openid, invite_qrcode FROM <include refid="tableName" />
         <where>
             <if test="userId != null">
                 AND user_id = #{userId}
