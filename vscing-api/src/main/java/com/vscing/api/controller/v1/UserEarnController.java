@@ -46,6 +46,13 @@ public class UserEarnController {
     return CommonResult.success(CommonPage.restPage(list));
   }
 
+  @GetMapping("/inviteNotice")
+  @Operation(summary = "邀请通知列表")
+  public CommonResult<CommonPage<UserEarnApiInviteVo>> inviteNotice() {
+    List<UserEarnApiInviteVo> list = null;
+    return CommonResult.success(CommonPage.restPage(list));
+  }
+
   @GetMapping("/invite")
   @Operation(summary = "邀请列表")
   public CommonResult<CommonPage<UserEarnApiInviteVo>> invite(@ParameterObject UserEarnApiInviteDto queryParam,

@@ -364,6 +364,10 @@ public class AppletServiceImpl implements AppletService {
             }
             jsonNode = jsonNode.path("data");
             if (!jsonNode.isMissingNode()) {
+                String base64Str = jsonNode.path("base64_str").asText(null);
+                if (base64Str == null || base64Str.isEmpty()) {
+                    return jsonNode.path("url").asText(null);
+                }
                 return jsonNode.path("base64_str").asText(null);
             }  else {
                 throw new RuntimeException("百度获取小程序二维码未获取到有效的 data");

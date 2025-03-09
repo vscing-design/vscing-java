@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService {
       AppletService appletService = appletServiceFactory.getAppletService(userInviteQrcode.getPlatform());
       Long userId = user.getId();
       Map<String, Object> queryData = new HashMap<>(2);
-      queryData.put("url", "/pages/home/index/index");
+      queryData.put("url", "pages/home/index/index");
       queryData.put("query", "promotionId=" + userId.toString());
       return appletService.getQrcode(queryData);
     } catch (Exception e) {

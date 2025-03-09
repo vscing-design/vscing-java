@@ -119,7 +119,7 @@ public class OkHttpServiceImpl implements OkHttpService {
    * 发送 POST 请求（JSON 体）
    */
   @Override
-  public Response doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException {
+  public byte[] doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException {
     RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
     Request.Builder requestBuilder = new Request.Builder()
         .url(url)
@@ -135,7 +135,15 @@ public class OkHttpServiceImpl implements OkHttpService {
       if (!response.isSuccessful()) {
         throw new IOException("Unexpected code " + response);
       }
-      return response;
+      // 读取响应体字节数组
+      ResponseBody responseBody = response.body();
+      if (responseBody == null) {
+        throw new IOException("Response body is null");
+      }
+      byte[] responseBodyBytes = responseBody.bytes();
+      // 确保响应体被关闭
+      responseBody.close();
+      return responseBodyBytes;
     }
   }
 

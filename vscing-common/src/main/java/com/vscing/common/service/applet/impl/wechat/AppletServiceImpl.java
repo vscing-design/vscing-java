@@ -30,20 +30,18 @@ import com.wechat.pay.java.service.refund.model.QueryByOutRefundNoRequest;
 import com.wechat.pay.java.service.refund.model.Refund;
 import com.wechat.pay.java.service.refund.model.Status;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * AppletServiceImpl
@@ -422,27 +420,21 @@ public class AppletServiceImpl implements AppletService {
       String token = getToken();
       // 组装请求参数
       Map<String, Object> params = Map.of(
-          "access_token", token,
           "page", queryData.get("url").toString(),
           "scene", queryData.get("query").toString()
       );
       // 发送 POST 请求并获取响应
-      Response response = okHttpService.doPostResponse(WECHAT_BASH_URL + "/wxa/getwxacodeunlimit?access_token=" + token, JsonUtils.toJsonString(params), null);
-      log.info("微信获取小程序二维码调用结果: {}" , response);
-      // 读取响应体字节数组
-      ResponseBody responseBody = response.body();
-      if (responseBody == null) {
-        throw new IOException("Response body is null");
+      byte[] responseBodyBytes = okHttpService.doPostResponse(WECHAT_BASH_URL + "/wxa/getwxacodeunlimit?access_token=" + token, JsonUtils.toJsonString(params), null);
+      // 解析 JSON 并检查是否有错误信息
+      String jsonResponse = new String(responseBodyBytes, StandardCharsets.UTF_8);
+      log.info("微信获取小程序二维码调用结果: {}" , jsonResponse);
+      JsonNode jsonNode = JsonUtils.parseObject(jsonResponse, JsonNode.class);
+      if (jsonNode != null && jsonNode.has("errcode")) {
+        int errcode = jsonNode.get("errcode").asInt();
+        String errmsg = jsonNode.get("errmsg").asText();
+        throw new HttpException("微信获取小程序二维码方法异常：错误码：" + errcode + " 错误信息：" + errmsg);
       }
-      byte[] responseBodyBytes = responseBody.bytes();
-      // 获取Content-Type
-      String contentType = Objects.requireNonNull(response.header("Content-Type")).toLowerCase();
-      // 判断是否为图片类型
-      boolean isImage = contentType.startsWith("image/");
-      if (isImage) {
-        return Base64.getEncoder().encodeToString(responseBodyBytes);
-      }
-      throw new HttpException("微信获取小程序二维码方法异常：" + responseBody.string());
+      return Base64.getEncoder().encodeToString(responseBodyBytes);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

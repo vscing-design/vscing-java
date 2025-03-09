@@ -1,7 +1,5 @@
 package com.vscing.common.service;
 
-import okhttp3.Response;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -31,6 +29,6 @@ public interface OkHttpService {
   /**
    * 发送 POST 请求（JSON 体）
    */
-  public Response doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException;
+  public byte[] doPostResponse(String url, String jsonBody, Map<String, String> headers) throws IOException;
 
 }

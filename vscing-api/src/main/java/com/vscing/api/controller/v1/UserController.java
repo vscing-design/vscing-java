@@ -115,12 +115,14 @@ public class UserController {
       // 授权手机号
       String phone = userService.userPhone(userLogin, userData, authToken);
       if (phone != null && !phone.isEmpty()) {
-        // 发送mq异步处理 同步出票信息
-        InviteMq inviteMq = new InviteMq();
-        inviteMq.setUserId(userData.getId());
-        inviteMq.setInviteUserId(Long.valueOf(userLogin.getUuid()));
-        String msg = JsonUtils.toJsonString(inviteMq);
-        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.INVITE_QUEUE, msg);
+        if (userLogin.getUuid() != null && !userLogin.getUuid().isEmpty()) {
+          // 发送mq异步处理 同步出票信息
+          InviteMq inviteMq = new InviteMq();
+          inviteMq.setUserId(userData.getId());
+          inviteMq.setInviteUserId(Long.valueOf(userLogin.getUuid()));
+          String msg = JsonUtils.toJsonString(inviteMq);
+          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.INVITE_QUEUE, msg);
+        }
         return CommonResult.success("授权成功", phone);
       } else {
         return CommonResult.failed("授权失败");
@@ -162,11 +164,9 @@ public class UserController {
       return CommonResult.failed("用户不存在");
     }
     try {
-      String inviteQrcode = userData.getInviteQrcode();
-      if (inviteQrcode == null) {
-        inviteQrcode = userService.inviteQrcode(userInviteQrcodeDto, userData);
-      }
-      return CommonResult.success(inviteQrcode);
+      String inviteQrcode = userService.inviteQrcode(userInviteQrcodeDto, userData);
+      // data:image/png;base64,
+      return CommonResult.success("获取成功", inviteQrcode);
     } catch (Exception e) {
       log.error("获取二维码失败", e);
       return CommonResult.failed("请求错误");

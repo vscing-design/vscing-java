@@ -74,12 +74,6 @@
         FROM <include refid="tableName" />
         <where>
             user_id = #{userId}
-            <if test="record.status != null and record.status != 0">
-                AND status = #{record.status}
-            </if>
-            <if test="record.platform != null and record.platform != 0">
-                AND platform = #{record.platform}
-            </if>
             AND deleted_at IS NULL
         </where>
         order by updated_at desc, created_at desc
