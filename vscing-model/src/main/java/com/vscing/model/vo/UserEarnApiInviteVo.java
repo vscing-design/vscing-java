@@ -18,7 +18,7 @@ public class UserEarnApiInviteVo {
   private Long id;
 
   @Schema(description = "关联用户名称")
-  private Long withUsername;
+  private String withUsername;
 
   @Schema(description = "关联用户手机号")
   private String withPhone;

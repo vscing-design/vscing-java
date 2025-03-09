@@ -19,7 +19,7 @@ public class UserEarnApiListVo {
   private Long id;
 
   @Schema(description = "关联数量")
-  private Long withQuantity;
+  private Integer withQuantity;
 
   @Schema(description = "关联用户手机号")
   private String withPhone;
