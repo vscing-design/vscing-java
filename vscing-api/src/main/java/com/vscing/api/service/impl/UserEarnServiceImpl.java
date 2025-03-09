@@ -5,6 +5,7 @@ import com.vscing.api.service.UserEarnService;
 import com.vscing.model.dto.UserEarnApiInviteDto;
 import com.vscing.model.dto.UserEarnApiListDto;
 import com.vscing.model.mapper.UserEarnMapper;
+import com.vscing.model.vo.UserEarnApiInviteNoticeVo;
 import com.vscing.model.vo.UserEarnApiInviteVo;
 import com.vscing.model.vo.UserEarnApiListVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,4 +53,10 @@ public class UserEarnServiceImpl implements UserEarnService {
     });
     return list;
   }
+
+  @Override
+  public List<UserEarnApiInviteNoticeVo> getApiInviteNotice() {
+    return userEarnMapper.selectApiInviteNotice();
+  }
+
 }

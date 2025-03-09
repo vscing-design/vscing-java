@@ -32,6 +32,9 @@ public class UserAuth extends BaseEntity {
   @Schema(description = "openid")
   private String openid;
 
+  @Schema(description = "分享二维码")
+  private String inviteQrcode;
+
   @Schema(description = "最后登陆IP")
   private String lastIp;
 

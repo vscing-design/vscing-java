@@ -351,12 +351,21 @@ public class UserServiceImpl implements UserService {
   @Override
   public String inviteQrcode(UserInviteQrcodeDto userInviteQrcode, UserDetailVo user) {
     try {
+      int platform = AppletTypeEnum.findByApplet(userInviteQrcode.getPlatform());
+      UserAuth userAuth = userAuthMapper.findOpenid(user.getId(), platform);
+      if(userAuth != null && userAuth.getInviteQrcode() != null) {
+        return userAuth.getInviteQrcode();
+      }
       AppletService appletService = appletServiceFactory.getAppletService(userInviteQrcode.getPlatform());
       Long userId = user.getId();
       Map<String, Object> queryData = new HashMap<>(2);
       queryData.put("url", "pages/home/index/index");
       queryData.put("query", "promotionId=" + userId.toString());
-      return appletService.getQrcode(queryData);
+      String qrcode = appletService.getQrcode(queryData);
+      if(userAuth != null) {
+        userAuthMapper.updateInviteQrcode(userAuth.getId(), qrcode);
+      }
+      return qrcode;
     } catch (Exception e) {
       log.error("生成推广二维码异常：", e);
       throw new ServiceException(e.getMessage());

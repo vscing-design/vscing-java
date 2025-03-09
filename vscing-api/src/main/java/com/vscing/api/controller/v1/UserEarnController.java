@@ -6,6 +6,7 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.UserEarnApiInviteDto;
 import com.vscing.model.dto.UserEarnApiListDto;
+import com.vscing.model.vo.UserEarnApiInviteNoticeVo;
 import com.vscing.model.vo.UserEarnApiInviteVo;
 import com.vscing.model.vo.UserEarnApiListVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,9 +49,9 @@ public class UserEarnController {
 
   @GetMapping("/inviteNotice")
   @Operation(summary = "邀请通知列表")
-  public CommonResult<CommonPage<UserEarnApiInviteVo>> inviteNotice() {
-    List<UserEarnApiInviteVo> list = null;
-    return CommonResult.success(CommonPage.restPage(list));
+  public CommonResult<List<UserEarnApiInviteNoticeVo>> inviteNotice() {
+    List<UserEarnApiInviteNoticeVo> list = userEarnService.getApiInviteNotice();
+    return CommonResult.success(list);
   }
 
   @GetMapping("/invite")

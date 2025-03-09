@@ -428,13 +428,22 @@ public class AppletServiceImpl implements AppletService {
       // 解析 JSON 并检查是否有错误信息
       String jsonResponse = new String(responseBodyBytes, StandardCharsets.UTF_8);
       log.info("微信获取小程序二维码调用结果: {}" , jsonResponse);
-      JsonNode jsonNode = JsonUtils.parseObject(jsonResponse, JsonNode.class);
-      if (jsonNode != null && jsonNode.has("errcode")) {
-        int errcode = jsonNode.get("errcode").asInt();
-        String errmsg = jsonNode.get("errmsg").asText();
-        throw new HttpException("微信获取小程序二维码方法异常：错误码：" + errcode + " 错误信息：" + errmsg);
+      int errcode = 0;
+      String errmsg = "";
+      try {
+        JsonNode jsonNode = JsonUtils.parseObject(jsonResponse, JsonNode.class);
+        if (jsonNode != null && jsonNode.has("errcode")) {
+          errcode = jsonNode.get("errcode").asInt(0);
+          errmsg = jsonNode.get("errmsg").asText("");
+        }
+      } catch (Exception e) {
+        log.error("微信获取小程序二维码方法异常: {}", e.getMessage());
       }
-      return Base64.getEncoder().encodeToString(responseBodyBytes);
+      if(errcode > 0) {
+        throw new HttpException("微信获取小程序二维码方法异常：错误码：" + errcode + " 错误信息：" + errmsg);
+      } else {
+        return Base64.getEncoder().encodeToString(responseBodyBytes);
+      }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

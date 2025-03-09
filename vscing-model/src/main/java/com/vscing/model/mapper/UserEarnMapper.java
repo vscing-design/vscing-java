@@ -4,6 +4,7 @@ import com.vscing.model.dto.UserEarnApiInviteDto;
 import com.vscing.model.dto.UserEarnApiListDto;
 import com.vscing.model.dto.UserEarnListDto;
 import com.vscing.model.entity.UserEarn;
+import com.vscing.model.vo.UserEarnApiInviteNoticeVo;
 import com.vscing.model.vo.UserEarnApiInviteVo;
 import com.vscing.model.vo.UserEarnApiListVo;
 import com.vscing.model.vo.UserEarnListVo;
@@ -44,5 +45,10 @@ public interface UserEarnMapper {
    * 插入收益记录
   */
   int insert(UserEarn record);
+
+  /**
+   * 邀请列表通知
+  */
+  List<UserEarnApiInviteNoticeVo> selectApiInviteNotice();
 
 }

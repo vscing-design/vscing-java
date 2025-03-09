@@ -29,4 +29,9 @@ public interface UserAuthMapper {
 
   UserAuth findOpenid(@Param("userId") Long userId, @Param("platform") Integer platform);
 
+  /**
+   * 更新用户分享二维码
+  */
+  int updateInviteQrcode(@Param("id") Long id, @Param("inviteQrcode") String inviteQrcode);
+
 }

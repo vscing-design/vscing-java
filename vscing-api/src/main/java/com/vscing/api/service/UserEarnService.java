@@ -2,6 +2,7 @@ package com.vscing.api.service;
 
 import com.vscing.model.dto.UserEarnApiInviteDto;
 import com.vscing.model.dto.UserEarnApiListDto;
+import com.vscing.model.vo.UserEarnApiInviteNoticeVo;
 import com.vscing.model.vo.UserEarnApiInviteVo;
 import com.vscing.model.vo.UserEarnApiListVo;
 
@@ -24,5 +25,10 @@ public interface UserEarnService {
    * 用户邀请列表
    */
   List<UserEarnApiInviteVo> getApiInvite(Long userId, UserEarnApiInviteDto queryParam, Integer pageSize, Integer pageNum);
+
+  /**
+   * 用户邀请通知
+   */
+  List<UserEarnApiInviteNoticeVo> getApiInviteNotice();
 
 }

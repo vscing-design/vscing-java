@@ -54,9 +54,6 @@ public class User extends BaseEntity {
     @Schema(description = "累计佣金")
     private BigDecimal totalAmount;
 
-    @Schema(description = "分享二维码")
-    private String inviteQrcode;
-
     @Schema(description = "用户星级")
     private Integer star;
 
