@@ -22,7 +22,7 @@ public class UserEarnApiListVo {
   private Long withQuantity;
 
   @Schema(description = "关联用户手机号")
-  private Long withPhone;
+  private String withPhone;
 
   @Schema(description = "平台 1 微信小程序 2 支付宝小程序 3 百度小程序")
   private Integer platform;

@@ -24,15 +24,32 @@ public class UserEarnServiceImpl implements UserEarnService {
   @Autowired
   private UserEarnMapper userEarnMapper;
 
+  private String maskMiddleDigits(String phoneNumber) {
+    if (phoneNumber == null || phoneNumber.length() != 11) {
+      throw new IllegalArgumentException("无效的手机号码");
+    }
+    // 确保手机号长度为11位
+    return phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7);
+  }
+
   @Override
   public List<UserEarnApiListVo> getApilist(Long userId, UserEarnApiListDto queryParam, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
-    return userEarnMapper.selectApiList(userId, queryParam);
+    List<UserEarnApiListVo> list = userEarnMapper.selectApiList(userId, queryParam);
+    list.forEach(item -> {
+      item.setWithQuantity(item.getWithQuantity() == null ? 0 : item.getWithQuantity());
+      item.setWithPhone(item.getWithPhone() == null ? "" : maskMiddleDigits(item.getWithPhone()));
+    });
+    return list;
   }
 
   @Override
   public List<UserEarnApiInviteVo> getApiInvite(Long userId, UserEarnApiInviteDto queryParam, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
-    return userEarnMapper.selectApiInvite(userId, queryParam);
+    List<UserEarnApiInviteVo> list = userEarnMapper.selectApiInvite(userId, queryParam);
+    list.forEach(item -> {
+      item.setWithPhone(item.getWithPhone() == null ? "" : maskMiddleDigits(item.getWithPhone()));
+    });
+    return list;
   }
 }

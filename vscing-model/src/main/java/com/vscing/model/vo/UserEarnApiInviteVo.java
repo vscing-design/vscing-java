@@ -21,7 +21,7 @@ public class UserEarnApiInviteVo {
   private Long withUsername;
 
   @Schema(description = "关联用户手机号")
-  private Long withPhone;
+  private String withPhone;
 
   @Schema(description = "更新时间")
   private LocalDateTime updatedAt;
