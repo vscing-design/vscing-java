@@ -6,6 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vscing.common.service.OkHttpService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
+import com.vscing.common.service.applet.impl.wechat.extend.InitiateBillTransferRequest;
+import com.vscing.common.service.applet.impl.wechat.extend.InitiateBillTransferResponse;
+import com.vscing.common.service.applet.impl.wechat.extend.TransferBillsService;
+import com.vscing.common.service.applet.impl.wechat.extend.TransferSceneReportInfo;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
 import com.wechat.pay.java.core.Config;
@@ -39,8 +43,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -453,7 +459,38 @@ public class AppletServiceImpl implements AppletService {
   public Object transferOrder(Map<String, Object> transferData) {
     // 前置条件 https://pay.weixin.qq.com/doc/v3/merchant/4012065126
     // 接口文档 https://pay.weixin.qq.com/doc/v3/merchant/4012716434
-    return null;
+    // https://github.com/wechatpay-apiv3/wechatpay-java/blob/main/service/src/example/java/com/wechat/pay/java/service/transferbatch/TransferBatchServiceExample.java
+    try {
+      TransferBillsService service = new TransferBillsService.Builder().config(getConfig()).build();
+      // 创建请求
+      InitiateBillTransferRequest request = new InitiateBillTransferRequest();
+      // 商户转账单号
+      request.setOutBillNo(transferData.get("outBillNo").toString());
+      // 用户openid
+      request.setOpenid(transferData.get("openid").toString());
+      // 转账金额
+      request.setTransferAmount(Integer.parseInt(transferData.get("amount").toString()));
+      // 转账备注
+      request.setTransferRemark(transferData.get("remark").toString());
+      // 通知地址
+      request.setNotifyUrl(transferData.get("notifyUrl").toString());
+      // 转账场景报备信息
+      List<TransferSceneReportInfo> transferSceneReportInfos = new ArrayList<>();
+      TransferSceneReportInfo transferSceneReportInfo = new TransferSceneReportInfo();
+      transferSceneReportInfo.setInfoType("奖励说明");
+      transferSceneReportInfo.setInfoContent("佣金报酬");
+      transferSceneReportInfos.add(transferSceneReportInfo);
+      request.setTransferSceneReportInfos(transferSceneReportInfos);
+      // 转账场景ID
+      request.setTransferSceneId("1005");
+      // 调用接口
+      InitiateBillTransferResponse initiateBillTransferResponse = service.initiateBillTransfer(request);
+      log.info("微信查询退款订单调用结果: {}", initiateBillTransferResponse.getState());
+      return initiateBillTransferResponse.getState();
+    } catch (Exception e) {
+      log.error("微信查询退款订单方法异常: {}", e.getMessage());
+      throw new RuntimeException("微信查询退款订单方法异常: " + e.getMessage(), e);
+    }
   }
 
 }
