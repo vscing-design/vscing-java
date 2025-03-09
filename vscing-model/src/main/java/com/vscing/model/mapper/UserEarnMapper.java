@@ -3,6 +3,7 @@ package com.vscing.model.mapper;
 import com.vscing.model.dto.UserEarnApiInviteDto;
 import com.vscing.model.dto.UserEarnApiListDto;
 import com.vscing.model.dto.UserEarnListDto;
+import com.vscing.model.entity.UserEarn;
 import com.vscing.model.vo.UserEarnApiInviteVo;
 import com.vscing.model.vo.UserEarnApiListVo;
 import com.vscing.model.vo.UserEarnListVo;
@@ -38,5 +39,10 @@ public interface UserEarnMapper {
    * @param record 筛选参数
    */
   List<UserEarnApiInviteVo> selectApiInvite(@Param("userId") long userId, @Param("record") UserEarnApiInviteDto record);
+
+  /**
+   * 插入收益记录
+  */
+  int insert(UserEarn record);
 
 }

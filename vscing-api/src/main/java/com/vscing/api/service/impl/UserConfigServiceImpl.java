@@ -2,9 +2,11 @@ package com.vscing.api.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.vscing.api.service.UserConfigService;
+import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
+import com.vscing.common.utils.StringUtils;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.entity.PricingRule;
 import com.vscing.model.entity.UserConfig;
@@ -58,16 +60,21 @@ public class UserConfigServiceImpl implements UserConfigService {
   public List<UserConfigPricingRuleVo> pricingRule() {
     // 佣金比例
     String commissionRateStr = getConfig().get("commissionRate");
+    if (commissionRateStr == null || StringUtils.isEmpty(commissionRateStr)) {
+      throw new ServiceException("获取比例失败");
+    }
     BigDecimal commissionRate = new BigDecimal(commissionRateStr);
     // 判断commissionRate是否大于0
     if(commissionRate.compareTo(BigDecimal.ZERO) > 0) {
       // 如果大于0，则除以100
       commissionRate = commissionRate.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    } else {
+      commissionRate = BigDecimal.ZERO;
     }
     // 查询规则表
     List<PricingRule> pricingRuleList = pricingRuleMapper.getList(new PricingRuleListDto());
     List<UserConfigPricingRuleVo> userConfigPricingRuleVoList =MapstructUtils.convert(pricingRuleList, UserConfigPricingRuleVo.class);
-    if (userConfigPricingRuleVoList != null && userConfigPricingRuleVoList.size() > 0) {
+    if (userConfigPricingRuleVoList != null && !userConfigPricingRuleVoList.isEmpty()) {
       // 遍历列表并更新b属性
       for (UserConfigPricingRuleVo vo : userConfigPricingRuleVoList) {
         BigDecimal markupAmount = vo.getMarkupAmount();

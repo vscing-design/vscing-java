@@ -81,4 +81,29 @@
         order by ue.updated_at desc, ue.created_at desc
     </select>
 
+    <!-- 新增邀请 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.UserEarn">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="withUserId != null">with_user_id,</if>
+            <if test="withOrderId != null">with_order_id,</if>
+            <if test="platform != null">platform,</if>
+            <if test="earnAmount != null">earn_amount,</if>
+            <if test="earnType != null">earn_type</if>
+            <if test="status != null">status,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
+            <if test="withUserId != null">#{withUserId, jdbcType=BIGINT},</if>
+            <if test="withOrderId != null">#{withOrderId, jdbcType=BIGINT},</if>
+            <if test="platform != null">#{platform, jdbcType=TINYINT},</if>
+            <if test="earnAmount != null">#{earnAmount, jdbcType=DECIMAL},</if>
+            <if test="earnType != null">#{earnType, jdbcType=TINYINT},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+        </trim>
+    </insert>
 </mapper>

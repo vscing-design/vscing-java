@@ -4,6 +4,7 @@ import com.vscing.auth.service.VscingUserDetails;
 import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
 import com.vscing.model.mq.InviteMq;
+import com.vscing.model.mq.RebateMq;
 import com.vscing.model.vo.UserApiLocationVo;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,8 +44,13 @@ public interface UserService {
 
   /**
    * 用户邀请
+   */
+  void userInvite(InviteMq inviteMq);
+
+  /**
+   * 邀请用户消费
   */
-  boolean userInvite(InviteMq inviteMq);
+  void userRebate(RebateMq rebateMq);
 
   /**
    * 用户推广二维码

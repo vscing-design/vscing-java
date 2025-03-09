@@ -1,6 +1,7 @@
 package com.vscing.model.utils;
 
 import com.vscing.model.entity.PricingRule;
+import com.vscing.model.vo.UserConfigPricingRuleVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,23 +17,49 @@ import java.util.TreeMap;
  */
 public class PricingUtil {
 
+  /**
+   * checkDifference 判断差值是否满足条件
+  */
   public static boolean checkDifference(BigDecimal diff, BigDecimal boundary, Integer operator) {
-    switch (operator) {
-      case 1:
+    return !switch (operator) {
+      case 1 ->
         // >=
-        return diff.compareTo(boundary) >= 0;
-      case 2:
+          diff.compareTo(boundary) >= 0;
+      case 2 ->
         // >
-        return diff.compareTo(boundary) > 0;
-      case 3:
+          diff.compareTo(boundary) > 0;
+      case 3 ->
         // <=
-        return diff.compareTo(boundary) <= 0;
-      case 4:
+          diff.compareTo(boundary) <= 0;
+      case 4 ->
         // <
-        return diff.compareTo(boundary) < 0;
-      default:
-        throw new IllegalArgumentException("未知的运算符类型");
-    }
+          diff.compareTo(boundary) < 0;
+      default -> throw new IllegalArgumentException("未知的运算符类型");
+    };
+  }
+
+  /**
+   * @author vscing (vscing@foxmail.com)
+   * @date 2025-03-09 15:34:28
+  */
+  public static BigDecimal calculateEarnAmount(BigDecimal officialPrice, BigDecimal salePrice, List<UserConfigPricingRuleVo> rules) {
+    BigDecimal difference = officialPrice.subtract(salePrice);
+
+    // 查找匹配的规则
+    Optional<UserConfigPricingRuleVo> matchingRule = rules.stream()
+        .filter(rule -> {
+          BigDecimal minDiff = rule.getMinDiff();
+          BigDecimal maxDiff = rule.getMaxDiff();
+
+          if (rule.getMinOperator() > 0 && minDiff != null && checkDifference(difference, minDiff, rule.getMinOperator())) {
+            return false;
+          }
+          return rule.getMaxOperator() <= 0 || maxDiff == null || !checkDifference(difference, maxDiff, rule.getMaxOperator());
+        })
+        .findFirst();
+
+    // 如果没有匹配的规则，默认返回售价
+    return matchingRule.map(UserConfigPricingRuleVo::getEarnAmount).orElse(BigDecimal.ZERO);
   }
 
   /**
@@ -52,22 +79,15 @@ public class PricingUtil {
           BigDecimal minDiff = rule.getMinDiff();
           BigDecimal maxDiff = rule.getMaxDiff();
 
-          if (rule.getMinOperator() > 0 && minDiff != null && !checkDifference(difference, minDiff, rule.getMinOperator())) {
+          if (rule.getMinOperator() > 0 && minDiff != null && checkDifference(difference, minDiff, rule.getMinOperator())) {
             return false;
           }
-          if (rule.getMaxOperator() > 0 && maxDiff != null && !checkDifference(difference, maxDiff, rule.getMaxOperator())) {
-            return false;
-          }
-          return true;
+          return rule.getMaxOperator() <= 0 || maxDiff == null || !checkDifference(difference, maxDiff, rule.getMaxOperator());
         })
         .findFirst();
 
-    if (matchingRule.isPresent()) {
-      return salePrice.add(matchingRule.get().getMarkupAmount());
-    } else {
-      // 如果没有匹配的规则，默认返回售价
-      return salePrice;
-    }
+    // 如果没有匹配的规则，默认返回售价
+    return matchingRule.map(pricingRule -> salePrice.add(pricingRule.getMarkupAmount())).orElse(salePrice);
   }
 
   /**
@@ -92,7 +112,7 @@ public class PricingUtil {
     // 构建结果字符串
     StringBuilder result = new StringBuilder();
     for (Map.Entry<BigDecimal, Integer> entry : priceCounts.entrySet()) {
-      if (result.length() > 0) {
+      if (!result.isEmpty()) {
         result.append(", ");
       }
       result.append(entry.getKey()).append("*").append(entry.getValue());

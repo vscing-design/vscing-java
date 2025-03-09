@@ -32,7 +32,7 @@ public class UserConfigPricingRuleVo {
   @Schema(description = "加价金额")
   private BigDecimal markupAmount;
 
-  @Schema(description = "加价金额")
+  @Schema(description = "返利金额")
   private BigDecimal earnAmount;
 
 }

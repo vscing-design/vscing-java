@@ -21,13 +21,20 @@ import com.vscing.common.utils.RequestUtil;
 import com.vscing.common.utils.StringUtils;
 import com.vscing.model.dto.UserInviteQrcodeDto;
 import com.vscing.model.dto.UserLoginDto;
+import com.vscing.model.entity.Order;
 import com.vscing.model.entity.User;
 import com.vscing.model.entity.UserAuth;
+import com.vscing.model.entity.UserEarn;
 import com.vscing.model.enums.AppletTypeEnum;
+import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.UserAuthMapper;
+import com.vscing.model.mapper.UserEarnMapper;
 import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.mq.InviteMq;
+import com.vscing.model.mq.RebateMq;
+import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.UserApiLocationVo;
+import com.vscing.model.vo.UserConfigPricingRuleVo;
 import com.vscing.model.vo.UserDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +48,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * UserService
@@ -66,6 +75,9 @@ public class UserServiceImpl implements UserService {
   private UserMapper userMapper;
 
   @Autowired
+  private OrderMapper orderMapper;
+
+  @Autowired
   private UserAuthMapper userAuthMapper;
 
   @Autowired
@@ -79,6 +91,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private OkHttpService okHttpService;
+
+  @Autowired
+  private UserEarnMapper userEarnMapper;
 
   @Override
   public VscingUserDetails userInfo(long id) {
@@ -247,7 +262,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  public boolean userInvite(InviteMq inviteMq) {
+  public void userInvite(InviteMq inviteMq) {
     try {
       // 判断是否存在邀请人
       User user = userMapper.selectById(inviteMq.getUserId());
@@ -269,9 +284,66 @@ public class UserServiceImpl implements UserService {
       if (rowsAffected <= 0) {
         throw new ServiceException("更新用户邀请人佣金失败");
       }
-      return true;
+      UserEarn userEarn = new UserEarn();
+      userEarn.setId(IdUtil.getSnowflakeNextId());
+      userEarn.setUserId(inviteMq.getInviteUserId());
+      userEarn.setWithUserId(inviteMq.getUserId());
+      userEarn.setEarnAmount(inviteAmount);
+      userEarn.setEarnType(1);
+      userEarn.setStatus(2);
+      rowsAffected = userEarnMapper.insert(userEarn);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("新增用户邀请人佣金记录失败");
+      }
     } catch (Exception e) {
       log.error("用户邀请异常：", e);
+      throw new ServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void userRebate(RebateMq rebateMq) {
+    try {
+      // 判断是否存在用户
+      User user = userMapper.selectById(rebateMq.getUserId());
+      if (user == null || user.getFirstUserId() == null) {
+        throw new ServiceException("用户不存在");
+      }
+      // 判断是否存在订单
+      Order order = orderMapper.selectById(rebateMq.getOrderId());
+      if (order == null) {
+        throw new ServiceException("订单不存在");
+      }
+      // 判断订单状态
+      if (order.getStatus() != 4 || !Objects.equals(order.getUserId(), rebateMq.getUserId())) {
+        throw new ServiceException("订单状态异常");
+      }
+      // 获取每张票的返利金额
+      List<UserConfigPricingRuleVo> rules = userConfigService.pricingRule();
+      BigDecimal rebateAmount = PricingUtil.calculateEarnAmount(order.getOfficialPrice(), order.getSettlementPrice(), rules);
+      // 获取总共的返利金额
+      rebateAmount = rebateAmount.multiply(new BigDecimal(order.getPurchaseQuantity()));
+      int rowsAffected;
+      rowsAffected = userMapper.updateIncreaseAmount(user.getFirstUserId(), rebateAmount);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("更新用户订单返利佣金失败");
+      }
+      UserEarn userEarn = new UserEarn();
+      userEarn.setId(IdUtil.getSnowflakeNextId());
+      userEarn.setUserId(user.getFirstUserId());
+      userEarn.setWithUserId(user.getId());
+      userEarn.setWithOrderId(order.getId());
+      userEarn.setEarnAmount(rebateAmount);
+      userEarn.setEarnType(2);
+      userEarn.setStatus(2);
+      rowsAffected = userEarnMapper.insert(userEarn);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("新增用户订单返利佣金记录失败");
+      }
+
+    } catch (Exception e) {
+      log.error("订单返利异常：", e);
       throw new ServiceException(e.getMessage());
     }
   }
@@ -289,13 +361,6 @@ public class UserServiceImpl implements UserService {
       log.error("生成推广二维码异常：", e);
       throw new ServiceException(e.getMessage());
     }
-  }
-
-  @Override
-  public boolean logout(UserDetailVo user, String authToken) {
-    // 删除缓存
-    String redisKey = cachePrefix + user.getId() + ":" + authToken;
-    return redisService.del(redisKey);
   }
 
   @Override
@@ -340,6 +405,13 @@ public class UserServiceImpl implements UserService {
     }
 
     return userApiLocationVo;
+  }
+
+  @Override
+  public boolean logout(UserDetailVo user, String authToken) {
+    // 删除缓存
+    String redisKey = cachePrefix + user.getId() + ":" + authToken;
+    return redisService.del(redisKey);
   }
 
 }

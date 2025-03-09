@@ -5,6 +5,7 @@ import com.vscing.api.service.UserService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
 import com.vscing.model.mq.InviteMq;
+import com.vscing.model.mq.RebateMq;
 import com.vscing.mq.config.FanoutRabbitMQConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -41,11 +42,11 @@ public class FanoutMessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("邀请新人队列消息: {}", msg);
       if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息格式错误");
+        throw new Exception("消息体错误");
       }
       InviteMq inviteMq = JsonUtils.parseObject(msg, InviteMq.class);
       if(inviteMq == null) {
-        throw new Exception("消息格式错误");
+        throw new Exception("解析消息体错误");
       }
       log.error("邀请新人队列消息 userId: {}, inviteUserId: {}", inviteMq.getUserId(), inviteMq.getInviteUserId());
       userService.userInvite(inviteMq);
@@ -68,8 +69,14 @@ public class FanoutMessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("订单返利队列消息: {}", msg);
       if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息格式错误");
+        throw new Exception("消息体错误");
       }
+      RebateMq rebateMq = JsonUtils.parseObject(msg, RebateMq.class);
+      if(rebateMq == null) {
+        throw new Exception("解析消息体错误");
+      }
+      log.error("邀请新人队列消息 userId: {}, orderId: {}", rebateMq.getUserId(), rebateMq.getOrderId());
+      userService.userRebate(rebateMq);
     } catch (Exception e) {
       log.error("订单返利队列消息处理失败: {}", e.getMessage());
     } finally {

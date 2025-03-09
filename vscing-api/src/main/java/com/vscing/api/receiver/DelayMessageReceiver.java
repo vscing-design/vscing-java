@@ -86,9 +86,12 @@ public class DelayMessageReceiver {
       // 处理同步场次码消息
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("同步场次码延迟队列消息: {}", msg);
+      if(StringUtils.isEmpty(msg)) {
+        throw new Exception("消息体错误");
+      }
       SyncCodeMq syncCodeMq = JsonUtils.parseObject(msg, SyncCodeMq.class);
       if(syncCodeMq == null) {
-        throw new Exception("消息格式错误");
+        throw new Exception("解析消息体错误");
       }
       log.error("同步场次码延迟队列消息 orderId: {}, num: {}", syncCodeMq.getOrderId(), syncCodeMq.getNum());
       // 查询订单信息
@@ -147,7 +150,7 @@ public class DelayMessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("取消订单延迟队列消息: {}", msg);
       if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息格式错误");
+        throw new Exception("消息体错误");
       }
       long orderId = Long.parseLong(msg);
       log.error("取消订单延迟队列消息 orderId: {}", orderId);
@@ -182,7 +185,7 @@ public class DelayMessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("发起退款延迟队列: {}", msg);
       if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息格式错误");
+        throw new Exception("消息体错误");
       }
       long orderId = Long.parseLong(msg);
       log.error("发起退款延迟队列 orderId: {}", orderId);
@@ -249,7 +252,7 @@ public class DelayMessageReceiver {
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
       log.error("退款订单查询延迟队列: {}", msg);
       if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息格式错误");
+        throw new Exception("消息体错误");
       }
       long orderId = Long.parseLong(msg);
       log.error("退款订单查询延迟队列 orderId: {}", orderId);
