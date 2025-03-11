@@ -75,7 +75,7 @@ public class FanoutMessageReceiver {
       if(rebateMq == null) {
         throw new Exception("解析消息体错误");
       }
-      log.error("邀请新人队列消息 userId: {}, orderId: {}", rebateMq.getUserId(), rebateMq.getOrderId());
+      log.error("订单返利队列消息 userId: {}, orderId: {}", rebateMq.getUserId(), rebateMq.getOrderId());
       userService.userRebate(rebateMq);
     } catch (Exception e) {
       log.error("订单返利队列消息处理失败: {}", e.getMessage());
