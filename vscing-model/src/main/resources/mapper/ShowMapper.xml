@@ -203,7 +203,7 @@
             m.cast,
             m.publish_status,
             m.grade
-        ORDER BY m.grade DESC, m.like DESC, m.publish_date DESC
+        ORDER BY m.top DESC, m.grade DESC, m.like DESC, m.publish_date DESC
     </select>
 
     <!-- 根据CinemaApiListDto查询全部列表 -->

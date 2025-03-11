@@ -32,6 +32,7 @@
         <where>
             status = 1 AND deleted_at IS NULL
         </where>
+        ORDER BY sort ASC, created_at DESC
     </select>
 
     <select id="getList" resultType="com.vscing.model.vo.BannerListVo">

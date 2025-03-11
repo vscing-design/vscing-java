@@ -275,7 +275,7 @@ public class UserServiceImpl implements UserService {
         throw new ServiceException("更新用户邀请人失败");
       }
       Map<String, String> config = userConfigService.getConfig();
-      String inviteAmountStr = config.get("invite_amount");
+      String inviteAmountStr = config.get("inviteRewardAmount");
       if (inviteAmountStr == null || StringUtils.isEmpty(inviteAmountStr)) {
         throw new ServiceException("获取佣金失败");
       }

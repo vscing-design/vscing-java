@@ -116,12 +116,13 @@ public class UserController {
       String phone = userService.userPhone(userLogin, userData, authToken);
       if (phone != null && !phone.isEmpty()) {
         if (userLogin.getUuid() != null && !userLogin.getUuid().isEmpty()) {
-          // 发送mq异步处理 同步出票信息
+          log.info("uuid: {}", userLogin.getUuid());
+          // 发送mq异步处理
           InviteMq inviteMq = new InviteMq();
           inviteMq.setUserId(userData.getId());
           inviteMq.setInviteUserId(Long.valueOf(userLogin.getUuid()));
           String msg = JsonUtils.toJsonString(inviteMq);
-          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.INVITE_QUEUE, msg);
+          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.INVITE_ROUTING_KEY, msg);
         }
         return CommonResult.success("授权成功", phone);
       } else {

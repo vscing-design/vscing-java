@@ -36,6 +36,7 @@ import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserAuthMapper;
+import com.vscing.model.mq.RebateMq;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.utils.PricingUtil;
 import com.vscing.model.vo.BaiduOrderInfoVo;
@@ -47,6 +48,7 @@ import com.vscing.model.vo.OrderApiSeatListVo;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.model.vo.SeatVo;
 import com.vscing.mq.config.DelayRabbitMQConfig;
+import com.vscing.mq.config.FanoutRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -623,6 +625,13 @@ public class OrderServiceImpl implements OrderService {
       rowsAffected = orderMapper.update(updateOrder);
       if (rowsAffected <= 0) {
         throw new ServiceException("改变订单状态失败");
+      } else {
+        // 发送mq异步处理
+        RebateMq rebateMq = new RebateMq();
+        rebateMq.setUserId(order.getUserId());
+        rebateMq.setOrderId(order.getId());
+        String msg = JsonUtils.toJsonString(rebateMq);
+        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.REBATE_ROUTING_KEY, msg);
       }
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
