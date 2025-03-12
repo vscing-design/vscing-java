@@ -37,6 +37,12 @@ public class FanoutRabbitMQConfig {
     public static final String REBATE_ROUTING_KEY = "rebate_routing_key";
 
     /**
+     * 转账相关配置
+     */
+    public static final String TRANSFER_QUEUE = "transfer_queue";
+    public static final String TRANSFER_ROUTING_KEY = "transfer_routing_key";
+
+    /**
      * 延迟交换机
      */
     @Bean
@@ -74,6 +80,22 @@ public class FanoutRabbitMQConfig {
     @Bean
     public Binding rebateBinding(Queue rebateQueue) {
         return BindingBuilder.bind(rebateQueue).to(fanoutExchange()).with(REBATE_ROUTING_KEY);
+    }
+
+    /**
+     * 转账队列
+     */
+    @Bean
+    public Queue transferQueue() {
+        return QueueBuilder.durable(TRANSFER_QUEUE).build();
+    }
+
+    /**
+     * 绑定转账队列到延迟交换机
+     */
+    @Bean
+    public Binding transferBinding(Queue rebateQueue) {
+        return BindingBuilder.bind(rebateQueue).to(fanoutExchange()).with(TRANSFER_ROUTING_KEY);
     }
 
 }

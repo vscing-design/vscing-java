@@ -10,6 +10,7 @@
         <result column="platform" property="platform" jdbcType="TINYINT" />
         <result column="withdraw_amount" property="withdrawAmount" jdbcType="DECIMAL" />
         <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="withdraw_status" property="withdrawStatus" jdbcType="TINYINT" />
         <result column="reject_reason" property="rejectReason" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
@@ -26,6 +27,11 @@
     <sql id="userTableName">
         vscing_user
     </sql>
+
+    <!-- 管理后台佣金提现列表 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
 
     <!-- 管理后台佣金提现列表 -->
     <select id="getList" resultType="com.vscing.model.vo.UserWithdrawListVo">
@@ -62,6 +68,7 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="withdrawStatus != null">withdraw_status = #{withdrawStatus, jdbcType=TINYINT},</if>
             <if test="rejectReason != null">reject_reason = #{rejectReason, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>

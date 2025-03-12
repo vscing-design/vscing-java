@@ -22,6 +22,11 @@ import java.util.List;
 public interface UserWithdrawMapper {
 
   /**
+   * 管理后台佣金提现详情
+  */
+  UserWithdraw selectById(Long id);
+
+  /**
    * 管理后台佣金提现列表
    */
   List<UserWithdrawListVo> getList(UserWithdrawListDto record);

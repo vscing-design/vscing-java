@@ -6,7 +6,6 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
-import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.vo.UserWithdrawAmountVo;
 import com.vscing.model.vo.UserWithdrawListVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,12 +72,8 @@ public class UserWithdrawController {
     }
     userWithdrawApprove.setUpdatedBy(by);
     try {
-      boolean res = userWithdrawService.approve(userWithdrawApprove);
-      if (res) {
-        return CommonResult.success("审核成功");
-      } else {
-        return CommonResult.failed("审核失败");
-      }
+      userWithdrawService.approve(userWithdrawApprove);
+      return CommonResult.success("审核成功");
     } catch (Exception e) {
       log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");

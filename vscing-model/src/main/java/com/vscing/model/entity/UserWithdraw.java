@@ -35,4 +35,7 @@ public class UserWithdraw extends BaseEntity {
   @Schema(description = "审核不通过原因")
   private String rejectReason;
 
+  @Schema(description = "打款状态 1 打款中 2 打款成功 3 打款失败")
+  private Integer withdrawStatus;
+
 }

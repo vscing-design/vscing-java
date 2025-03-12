@@ -29,7 +29,6 @@ public interface UserService {
      */
     long created(User user);
 
-
     /**
      * 删除
      */
