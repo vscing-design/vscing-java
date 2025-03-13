@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,8 +50,6 @@ import java.util.TreeMap;
 @Slf4j
 @Service
 public class NotifyServiceImpl implements NotifyService {
-
-  private static final List<Integer> SUCCESS_CODES = Arrays.asList(200, -530, 9999, 9008, 9011);
 
   @Autowired
   private SupplierServiceFactory supplierServiceFactory;
@@ -111,12 +108,12 @@ public class NotifyServiceImpl implements NotifyService {
         throw new ServiceException("修改支付宝订单状态失败");
       }
       // 异步出票
-      log.info("提交异步出票任务，订单号: {}", orderSn);
+      log.info("提交异步出票任务订单号: {}", orderSn);
       ticketOrder(orderSn);
       // 返回结果
       return true;
     } catch (Exception e) {
-      log.error("支付宝回调异常: {}", e);
+      log.error("支付宝回调异常", e);
       return false;
     }
   }
@@ -164,7 +161,7 @@ public class NotifyServiceImpl implements NotifyService {
       // 返回结果
       return true;
     } catch (Exception e) {
-      log.error("微信回调异常: {}", e);
+      log.error("微信回调异常", e);
       return false;
     }
   }
@@ -325,7 +322,7 @@ public class NotifyServiceImpl implements NotifyService {
         rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
       }
     } catch (Exception e) {
-      log.error("调用三方下单异常：{}", e);
+      log.error("调用三方下单异常", e);
     }
   }
 

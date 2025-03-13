@@ -471,9 +471,9 @@ public class AppletServiceImpl implements AppletService {
       // 转账金额
       request.setTransferAmount(Integer.parseInt(transferData.get("amount").toString()));
       // 转账备注
-      request.setTransferRemark(transferData.get("remark").toString());
+      request.setTransferRemark("用户提现");
       // 通知地址
-      request.setNotifyUrl(transferData.get("notifyUrl").toString());
+      request.setNotifyUrl("https://sys-api.hiyaflix.cn/v1/notify/wechatTransfer");
       // 转账场景报备信息
       List<TransferSceneReportInfo> transferSceneReportInfos = new ArrayList<>();
       TransferSceneReportInfo transferSceneReportInfo = new TransferSceneReportInfo();
@@ -485,11 +485,11 @@ public class AppletServiceImpl implements AppletService {
       request.setTransferSceneId("1005");
       // 调用接口
       InitiateBillTransferResponse initiateBillTransferResponse = service.initiateBillTransfer(request);
-      log.info("微信查询退款订单调用结果: {}", initiateBillTransferResponse.getState());
+      log.info("微信转账调用结果: {}", initiateBillTransferResponse.getState());
       return initiateBillTransferResponse.getState();
     } catch (Exception e) {
-      log.error("微信查询退款订单方法异常: {}", e.getMessage());
-      throw new RuntimeException("微信查询退款订单方法异常: " + e.getMessage(), e);
+      log.error("微信转账方法异常: {}", e.getMessage());
+      throw new RuntimeException("微信转账方法异常: " + e.getMessage(), e);
     }
   }
 
