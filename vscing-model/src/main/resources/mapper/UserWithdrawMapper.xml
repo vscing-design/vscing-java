@@ -10,6 +10,8 @@
         <result column="platform" property="platform" jdbcType="TINYINT" />
         <result column="withdraw_amount" property="withdrawAmount" jdbcType="DECIMAL" />
         <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="withdraw_sn" property="withdrawSn" jdbcType="VARCHAR" />
+        <result column="transfer_no" property="transferNo" jdbcType="VARCHAR" />
         <result column="withdraw_status" property="withdrawStatus" jdbcType="TINYINT" />
         <result column="reject_reason" property="rejectReason" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
@@ -68,6 +70,7 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="withdrawSn != null">withdraw_sn = #{withdrawSn, jdbcType=VARCHAR},</if>
             <if test="withdrawStatus != null">withdraw_status = #{withdrawStatus, jdbcType=TINYINT},</if>
             <if test="rejectReason != null">reject_reason = #{rejectReason, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>

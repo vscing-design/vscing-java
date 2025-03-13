@@ -1,7 +1,6 @@
 package com.vscing.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -17,6 +16,7 @@ import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
+import com.vscing.common.utils.OrderUtils;
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
@@ -99,21 +99,6 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private RabbitMQService rabbitMQService;
-
-  /**
-   * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
-   */
-  private String generateOrderSn() {
-
-    // 获取当前时间戳，格式为yyyyMMddHHmmssSSS（17位）
-    String timestamp = DateUtil.now().replaceAll("-", "").replaceAll(" ", "").replaceAll(":", "") + DateUtil.format(DateUtil.date(), "SSS");
-
-    // 生成5位随机数字，用于补足18位
-    String randomNum = RandomUtil.randomNumbers(5);
-
-    // 组合生成订单号
-    return "HY" + (timestamp + randomNum).substring(0, 18);
-  }
 
   @Override
   public List<OrderVo> getList(OrderListDto data, Integer pageSize, Integer pageNum) {
@@ -344,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
       // 备注信息
       order.setMemo(orderSave.getMemo());
       // 订单号
-      String orderSn = this.generateOrderSn();
+      String orderSn = OrderUtils.generateOrderSn("HY", 1);
       order.setOrderSn(orderSn);
       order.setCreatedBy(by);
       // 开始创建

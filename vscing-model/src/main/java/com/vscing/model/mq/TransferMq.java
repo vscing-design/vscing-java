@@ -17,6 +17,9 @@ public class TransferMq {
   @Schema(description = "转账用户id")
   private Long userId;
 
+  @Schema(description = "商家提现单号")
+  private String withdrawSn;
+
   @Schema(description = "转账平台")
   private Integer platform;
 

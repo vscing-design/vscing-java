@@ -7,6 +7,7 @@ import com.vscing.admin.service.UserWithdrawService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.common.utils.OrderUtils;
 import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
 import com.vscing.model.entity.UserAuth;
@@ -54,21 +55,6 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
   @Autowired
   private AppletServiceFactory appletServiceFactory;
 
-  /**
-   * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
-   */
-  private String generateOrderSn() {
-
-    // 获取当前时间戳，格式为yyyyMMddHHmmssSSS（17位）
-    String timestamp = DateUtil.now().replaceAll("-", "").replaceAll(" ", "").replaceAll(":", "") + DateUtil.format(DateUtil.date(), "SSS");
-
-    // 生成5位随机数字，用于补足18位
-    String randomNum = RandomUtil.randomNumbers(5);
-
-    // 组合生成订单号
-    return "HY-TX" + (timestamp + randomNum).substring(0, 18);
-  }
-
   @Override
   public List<UserWithdrawListVo> getList(UserWithdrawListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
@@ -86,7 +72,9 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
     try {
       UserWithdraw userWithdraw = userWithdrawMapper.selectById(data.getId());
       int status = data.getStatus();
+      String withdrawSn = OrderUtils.generateOrderSn("HY-TX", 1);
       if(status == 2) {
+        data.setWithdrawSn(withdrawSn);
         data.setWithdrawStatus(1);
       }
       // 改变提现状态
@@ -105,6 +93,7 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         transferMq.setUserId(userWithdraw.getUserId());
         transferMq.setPlatform(userWithdraw.getPlatform());
         transferMq.setAmount(userWithdraw.getWithdrawAmount());
+        transferMq.setWithdrawSn(withdrawSn);
         rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, transferMq);
       }
     } catch (Exception e) {
@@ -125,7 +114,7 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
       Map<String, Object> transferData = new HashMap<>(3);
       transferData.put("openid", userAuth.getOpenid());
       transferData.put("amount", transferMq.getAmount());
-      transferData.put("outBillNo", generateOrderSn());
+      transferData.put("outBillNo", transferMq.getWithdrawSn());
       appletService.transferOrder(transferData);
     } catch (Exception e) {
       log.error("转账请求异常：", e);

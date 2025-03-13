@@ -1,7 +1,5 @@
 package com.vscing.api.receiver;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.vscing.api.service.OrderService;
@@ -12,6 +10,7 @@ import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
+import com.vscing.common.utils.OrderUtils;
 import com.vscing.common.utils.StringUtils;
 import com.vscing.model.entity.Order;
 import com.vscing.model.enums.AppletTypeEnum;
@@ -62,18 +61,6 @@ public class DelayMessageReceiver {
 
   @Autowired
   private OrderMapper orderMapper;
-
-  /**
-   * 生成18位订单编号:8位日期+2位平台号码+2位支付方式+6位以上自增id
-   */
-  private String generateOrderSn() {
-    // 获取当前时间戳，格式为yyyyMMddHHmmssSSS（17位）
-    String timestamp = DateUtil.now().replaceAll("-", "").replaceAll(" ", "").replaceAll(":", "") + DateUtil.format(DateUtil.date(), "SSS");
-    // 生成5位随机数字，用于补足18位
-    String randomNum = RandomUtil.randomNumbers(5);
-    // 组合生成订单号
-    return "HY-TD" + (timestamp + randomNum).substring(0, 18);
-  }
 
   /**
    * 同步场次码延迟队列 手动应答，再执行一个消息。
@@ -198,7 +185,7 @@ public class DelayMessageReceiver {
       String appletType = AppletTypeEnum.findByCode(order.getPlatform());
       AppletService appletService = appletServiceFactory.getAppletService(appletType);
       // 扭转订单状态到退款中，并生成退款订单号
-      String refundNo = generateOrderSn();
+      String refundNo = OrderUtils.generateOrderSn("HY-TD", 1);
       if(order.getRefundNo() != null) {
         refundNo = order.getRefundNo();
       } else {
