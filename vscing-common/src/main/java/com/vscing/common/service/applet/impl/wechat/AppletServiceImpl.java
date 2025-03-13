@@ -475,12 +475,13 @@ public class AppletServiceImpl implements AppletService {
       request.setTransferAmount(amount.intValueExact());
       // 转账备注
       request.setTransferRemark("用户提现");
+//      request.setUserRecvPerception("现金奖励");
       // 通知地址
       request.setNotifyUrl("https://sys-api.hiyaflix.cn/v1/notify/wechatTransfer");
       // 转账场景报备信息
       List<TransferSceneReportInfo> transferSceneReportInfos = List.of(
-          new TransferSceneReportInfo.Builder().setInfoType("活动名称").setInfoContent("推广奖励").build(),
-          new TransferSceneReportInfo.Builder().setInfoType("奖励说明").setInfoContent("佣金报酬").build()
+          new TransferSceneReportInfo.Builder().setInfoType("岗位类型").setInfoContent("推广员").build(),
+          new TransferSceneReportInfo.Builder().setInfoType("报酬说明").setInfoContent("佣金提现").build()
       );
       request.setTransferSceneReportInfos(transferSceneReportInfos);
       // 转账场景ID
