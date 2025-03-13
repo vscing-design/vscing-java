@@ -1,8 +1,8 @@
 package com.vscing.common.service.applet.impl.wechat.extend;
 
 import com.google.gson.annotations.SerializedName;
-import com.wechat.pay.java.core.cipher.Encryption;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,8 @@ import java.util.function.UnaryOperator;
  * @author vscing
  * @date 2025/3/9 23:21
  */
-@Data
+@Getter
+@Setter
 public class InitiateBillTransferRequest {
 
   @SerializedName("appid")
@@ -35,7 +36,6 @@ public class InitiateBillTransferRequest {
   private String notifyUrl;
   @SerializedName("user_recv_perception")
   private String userRecvPerception;
-  @Encryption
   @SerializedName("transfer_scene_report_infos")
   private List<TransferSceneReportInfo> transferSceneReportInfos = new ArrayList<>();
 

@@ -1,12 +1,11 @@
 package com.vscing.admin.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.UserWithdrawService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.OrderUtils;
 import com.vscing.model.dto.UserWithdrawApproveDto;
 import com.vscing.model.dto.UserWithdrawListDto;
@@ -94,7 +93,8 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         transferMq.setPlatform(userWithdraw.getPlatform());
         transferMq.setAmount(userWithdraw.getWithdrawAmount());
         transferMq.setWithdrawSn(withdrawSn);
-        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, transferMq);
+        String msg = JsonUtils.toJsonString(transferMq);
+        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
       }
     } catch (Exception e) {
       log.error("提现请求异常：", e);

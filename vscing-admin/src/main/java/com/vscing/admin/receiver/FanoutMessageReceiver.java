@@ -34,7 +34,7 @@ public class FanoutMessageReceiver {
    * 转账队列
    */
   @RabbitListener(queues = FanoutRabbitMQConfig.TRANSFER_QUEUE, ackMode = "MANUAL")
-  public void receiveInviteMessage(Message message, Channel channel,
+  public void receiveTransferMessage(Message message, Channel channel,
                                      @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
     try {
       // 处理队列消息

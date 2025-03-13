@@ -2,12 +2,16 @@ package com.vscing.api.controller.v1;
 
 import com.vscing.api.service.TestService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.InviteCodeService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.model.entity.UserAuth;
+import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.UserAuthMapper;
+import com.vscing.model.mq.TransferMq;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.service.RabbitMQService;
@@ -61,10 +65,41 @@ public class TestController {
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
 
-        String inviteCode = inviteCodeService.idToInviteCode(1894419529721880576L);
-        log.info("inviteCode: {}", inviteCode);
-        Long id = inviteCodeService.inviteCodeToId(inviteCode);
-        log.info("id: {}", id);
+        try {
+            TransferMq transferMq = new TransferMq();
+            transferMq.setUserId(1881281583710961664L);
+            transferMq.setPlatform(1);
+            transferMq.setAmount(new BigDecimal("13.00"));
+            transferMq.setWithdrawSn("HYT202503132312300921");
+            UserAuth userAuth = userAuthMapper.findOpenid(transferMq.getUserId(), transferMq.getPlatform());
+            if(userAuth == null) {
+                throw new ServiceException("转账用户不存在");
+            }
+            int platform = transferMq.getPlatform();
+            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.findByCode(platform));
+            Map<String, Object> transferData = new HashMap<>(3);
+            transferData.put("openid", userAuth.getOpenid());
+            transferData.put("amount", transferMq.getAmount());
+            transferData.put("outBillNo", transferMq.getWithdrawSn());
+            appletService.transferOrder(transferData);
+        } catch (Exception e) {
+            log.error("转账请求异常：", e);
+            throw new ServiceException(e.getMessage());
+        }
+
+        // 发起提现
+//        TransferMq transferMq = new TransferMq();
+//        transferMq.setUserId(1881281583710961664L);
+//        transferMq.setPlatform(1);
+//        transferMq.setAmount(new BigDecimal("13.00"));
+//        transferMq.setWithdrawSn("HY-TX202503132312300921");
+//        String msg = JsonUtils.toJsonString(transferMq);
+//        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
+
+//        String inviteCode = inviteCodeService.idToInviteCode(1894419529721880576L);
+//        log.info("inviteCode: {}", inviteCode);
+//        Long id = inviteCodeService.inviteCodeToId(inviteCode);
+//        log.info("id: {}", id);
 
 //        Order order = orderMapper.selectById(1894419529721880576L);
 //        // 下发支付参数

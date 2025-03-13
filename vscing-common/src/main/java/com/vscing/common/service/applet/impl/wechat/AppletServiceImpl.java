@@ -43,7 +43,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -464,22 +463,25 @@ public class AppletServiceImpl implements AppletService {
       TransferBillsService service = new TransferBillsService.Builder().config(getConfig()).build();
       // 创建请求
       InitiateBillTransferRequest request = new InitiateBillTransferRequest();
+      // appId
+      request.setAppid(appletProperties.getAppId());
       // 商户转账单号
       request.setOutBillNo(transferData.get("outBillNo").toString());
       // 用户openid
       request.setOpenid(transferData.get("openid").toString());
       // 转账金额
-      request.setTransferAmount(Integer.parseInt(transferData.get("amount").toString()));
+      BigDecimal amount = (BigDecimal) transferData.get("amount");
+      amount = amount.multiply(BigDecimal.valueOf(100));
+      request.setTransferAmount(amount.intValueExact());
       // 转账备注
       request.setTransferRemark("用户提现");
       // 通知地址
       request.setNotifyUrl("https://sys-api.hiyaflix.cn/v1/notify/wechatTransfer");
       // 转账场景报备信息
-      List<TransferSceneReportInfo> transferSceneReportInfos = new ArrayList<>();
-      TransferSceneReportInfo transferSceneReportInfo = new TransferSceneReportInfo();
-      transferSceneReportInfo.setInfoType("奖励说明");
-      transferSceneReportInfo.setInfoContent("佣金报酬");
-      transferSceneReportInfos.add(transferSceneReportInfo);
+      List<TransferSceneReportInfo> transferSceneReportInfos = List.of(
+          new TransferSceneReportInfo.Builder().setInfoType("活动名称").setInfoContent("推广奖励").build(),
+          new TransferSceneReportInfo.Builder().setInfoType("奖励说明").setInfoContent("佣金报酬").build()
+      );
       request.setTransferSceneReportInfos(transferSceneReportInfos);
       // 转账场景ID
       request.setTransferSceneId("1005");
