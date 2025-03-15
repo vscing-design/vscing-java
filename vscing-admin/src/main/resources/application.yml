@@ -24,10 +24,9 @@ logging:
   level:
     root: WARN
     org.springframework.web: DEBUG
-    com.vscing.admin: INFO
     org.springdoc: DEBUG
     com.github.xiaoymin: DEBUG
-#    com.vscing.model.mapper: DEBUG
+    com.vscing: INFO
   config: classpath:logback-spring.xml
 springdoc:
   api-docs:

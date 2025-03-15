@@ -94,9 +94,16 @@
                 <pattern>${STANDARD_LOG_PATTERN}</pattern>
             </encoder>
 
-            <!--过滤器，只有过滤到指定级别的日志信息才会输出，如果level为ERROR，那么控制台只会输出ERROR日志-->
-            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- 过滤器，只允许 INFO 和 WARN 级别的日志 -->
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
             </filter>
         </appender>
 
