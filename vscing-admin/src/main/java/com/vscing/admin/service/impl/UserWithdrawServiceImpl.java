@@ -1,5 +1,6 @@
 package com.vscing.admin.service.impl;
 
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.UserWithdrawService;
 import com.vscing.common.exception.ServiceException;
@@ -87,14 +88,16 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         if (rowsAffected <= 0) {
           throw new ServiceException("更新用户余额失败");
         }
-        // 发起提现
-        TransferMq transferMq = new TransferMq();
-        transferMq.setUserId(userWithdraw.getUserId());
-        transferMq.setPlatform(userWithdraw.getPlatform());
-        transferMq.setAmount(userWithdraw.getWithdrawAmount());
-        transferMq.setWithdrawSn(withdrawSn);
-        String msg = JsonUtils.toJsonString(transferMq);
-        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
+        if (userWithdraw.getPlatform() == 2) {
+          // 支付宝发起转账、微信手动触发转账
+          TransferMq transferMq = new TransferMq();
+          transferMq.setUserId(userWithdraw.getUserId());
+          transferMq.setPlatform(userWithdraw.getPlatform());
+          transferMq.setAmount(userWithdraw.getWithdrawAmount());
+          transferMq.setWithdrawSn(withdrawSn);
+          String msg = JsonUtils.toJsonString(transferMq);
+          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
+        }
       }
     } catch (Exception e) {
       log.error("提现请求异常：", e);
@@ -110,12 +113,27 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         throw new ServiceException("转账用户不存在");
       }
       int platform = transferMq.getPlatform();
+      if (platform == 2) {
+        throw new ServiceException("转账平台错误");
+      }
       AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.findByCode(platform));
       Map<String, Object> transferData = new HashMap<>(3);
       transferData.put("openid", userAuth.getOpenid());
       transferData.put("amount", transferMq.getAmount());
-      transferData.put("outBillNo", transferMq.getWithdrawSn());
-      appletService.transferOrder(transferData);
+      transferData.put("withdrawSn", transferMq.getWithdrawSn());
+      AlipayFundTransUniTransferResponse response = (AlipayFundTransUniTransferResponse) appletService.transferOrder(transferData);
+      UserWithdraw userWithdraw = userWithdrawMapper.selectByWithdrawSn(transferMq.getWithdrawSn());
+      // 默认打款失败
+      userWithdraw.setWithdrawStatus(3);
+      if (response.getStatus() != null && response.getStatus().equals("SUCCESS")) {
+        userWithdraw.setWithdrawStatus(2);
+        userWithdraw.setTransferNo(response.getOrderId());
+      }
+      log.info("转账更新类 userWithdraw: {}", userWithdraw);
+      int rowsAffected = userWithdrawMapper.updateTransfer(userWithdraw);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("转账更新提现表失败");
+      }
     } catch (Exception e) {
       log.error("转账请求异常：", e);
       throw new ServiceException(e.getMessage());

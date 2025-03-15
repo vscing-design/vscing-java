@@ -78,6 +78,23 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 公用佣金提现详情 -->
+    <select id="selectByWithdrawSn" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE withdraw_sn = #{withdrawSn, jdbcType=VARCHAR} and deleted_at IS NULL
+        Limit 1
+    </select>
+
+    <!-- 公用修改提现信息 -->
+    <update id="updateTransfer" parameterType="com.vscing.model.entity.UserWithdraw">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="withdrawStatus != null">withdraw_status = #{withdrawStatus, jdbcType=TINYINT},</if>
+            <if test="transferNo != null">transfer_no = #{transferNo, jdbcType=VARCHAR}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
     <!-- 用户佣金提现列表查询 -->
     <select id="selectApiList" resultType="com.vscing.model.vo.UserWithdrawApiListVo">
         SELECT id, status, reject_reason, withdraw_amount, platform, created_at, updated_at

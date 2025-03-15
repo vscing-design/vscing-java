@@ -94,8 +94,8 @@ public class FanoutRabbitMQConfig {
      * 绑定转账队列到延迟交换机
      */
     @Bean
-    public Binding transferBinding(Queue rebateQueue) {
-        return BindingBuilder.bind(rebateQueue).to(fanoutExchange()).with(TRANSFER_ROUTING_KEY);
+    public Binding transferBinding(Queue transferQueue) {
+        return BindingBuilder.bind(transferQueue).to(fanoutExchange()).with(TRANSFER_ROUTING_KEY);
     }
 
 }

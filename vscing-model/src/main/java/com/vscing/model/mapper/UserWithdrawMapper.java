@@ -42,6 +42,16 @@ public interface UserWithdrawMapper {
   int approve(UserWithdrawApproveDto record);
 
   /**
+   * 公用佣金提现详情
+   */
+  UserWithdraw selectByWithdrawSn(@Param("withdrawSn") String withdrawSn);
+
+  /**
+   * 公用修改提现信息
+  */
+  int updateTransfer(UserWithdraw userWithdraw);
+
+  /**
    * 用户佣金提现列表查询
    * @param userId 用户ID
    * @param record 筛选参数

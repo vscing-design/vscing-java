@@ -9,19 +9,23 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.diagnosis.DiagnosisUtils;
+import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayOpenAppQrcodeCreateModel;
 import com.alipay.api.domain.AlipayTradeCreateModel;
 import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.domain.Participant;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayOpenAppQrcodeCreateRequest;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayTradeCreateRequest;
 import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayOpenAppQrcodeCreateResponse;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayTradeCreateResponse;
@@ -449,7 +453,47 @@ public class AppletServiceImpl implements AppletService {
   @Override
   public Object transferOrder(Map<String, Object> transferData) {
     // 接口文档： https://opendocs.alipay.com/open/62987723_alipay.fund.trans.uni.transfer?scene=ca56bca529e64125a2786703c6192d41&pathHash=66064890
-    return null;
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
+      AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
+      // 设置商家侧唯一订单号
+      model.setOutBizNo(transferData.get("withdrawSn").toString());
+      // 设置订单总金额
+      BigDecimal amount = (BigDecimal) transferData.get("amount");
+      model.setTransAmount(amount.toString());
+      // 设置描述特定的业务场景
+      model.setBizScene("DIRECT_TRANSFER");
+      // 设置业务产品码
+      model.setProductCode("TRANS_ACCOUNT_NO_PWD");
+      // 设置转账业务的标题
+      model.setOrderTitle("嗨丫提现转账");
+      // 设置收款方信息
+      Participant payeeInfo = new Participant();
+      payeeInfo.setIdentityType("ALIPAY_OPEN_ID");
+      payeeInfo.setIdentity(transferData.get("openid").toString());
+//      payeeInfo.setCertType("IDENTITY_CARD");
+//      payeeInfo.setCertNo("1201152******72917");
+//      payeeInfo.setName("黄龙国际有限公司");
+      model.setPayeeInfo(payeeInfo);
+      // 设置业务备注
+      model.setRemark("嗨丫提现转账");
+      // 设置转账业务请求的扩展参数
+//      model.setBusinessParams("{\"payer_show_name_use_alias\":\"true\"}");
+      request.setBizModel(model);
+      AlipayFundTransUniTransferResponse response = alipayClient.certificateExecute(request);
+      if (response.isSuccess()) {
+        log.info("支付宝转账成功: {}", response.getBody());
+        return response;
+      } else {
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝转账失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }
