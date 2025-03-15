@@ -106,4 +106,19 @@ public class NotifyController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
+  @PostMapping("/wechatTransfer")
+  @Operation(summary = "微信转账异步通知")
+  public ResponseEntity<Object> wechatTransfer(HttpServletRequest request) {
+    // 查询订单接口，获取订单状态
+    boolean res = notifyService.queryWechatTransfer(request);
+    if (!res) {
+      HashMap<String, String> errorResponse = new HashMap<>(2);
+      errorResponse.put("code", "FAIL");
+      errorResponse.put("message", "失败");
+      return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    } else {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+  }
+
 }

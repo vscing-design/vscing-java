@@ -23,6 +23,11 @@ public interface NotifyService {
   boolean queryWechatOrder(HttpServletRequest request);
 
   /**
+   * 查询微信转账是否成功
+   */
+  boolean queryWechatTransfer(HttpServletRequest request);
+
+  /**
    * 查询百度订单是否成功
    */
   boolean queryBaiduOrder(BaiduCreateNotifyDto baiduCreateNotifyDto);
