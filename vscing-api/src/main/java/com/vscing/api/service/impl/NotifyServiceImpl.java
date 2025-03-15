@@ -7,9 +7,13 @@ import com.vscing.api.service.NotifyService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.common.service.applet.impl.wechat.AppletProperties;
 import com.vscing.common.service.applet.impl.wechat.extend.Transfer;
+import com.vscing.common.service.applet.impl.wechat.extend.TransferCallback;
+import com.vscing.common.service.applet.impl.wechat.extend.TransferCallbackResource;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
+import com.vscing.common.utils.AesUtil;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
@@ -19,11 +23,13 @@ import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Show;
+import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.mapper.UserWithdrawMapper;
 import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.mq.config.DelayRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
@@ -69,6 +75,12 @@ public class NotifyServiceImpl implements NotifyService {
 
   @Autowired
   private ShowMapper showMapper;
+
+  @Autowired
+  private UserWithdrawMapper userWithdrawMapper;
+
+  @Autowired
+  private AppletProperties appletProperties;
 
   @Override
   public boolean queryAlipayOrder(HttpServletRequest request) {
@@ -172,7 +184,7 @@ public class NotifyServiceImpl implements NotifyService {
     try {
       // 原始请求体内容
       String requestBody = RequestUtil.getRequestBody(request);
-      log.error("微信转账异步通知请求参数: {}", requestBody);
+      log.info("微信转账异步通知请求参数: {}", requestBody);
       // 返回结果
       Map<String, String> params = new HashMap<>(6);
       params.put("wechatPaySerial", request.getHeader("Wechatpay-Serial"));
@@ -180,18 +192,36 @@ public class NotifyServiceImpl implements NotifyService {
       params.put("wechatSignature", request.getHeader("Wechatpay-Signature"));
       params.put("wechatTimestamp", request.getHeader("Wechatpay-Timestamp"));
       params.put("requestBody", requestBody);
-      log.error("微信转账异步通知请求参数集合: {}", params);
+      log.info("微信转账异步通知请求参数集合: {}", params);
       // 支付类
       AppletService appletService = appletServiceFactory.getAppletService("wechat");
       // 签名认证
-      Transfer transfer = (Transfer) appletService.signValidation(params);
-      if (!Objects.nonNull(transfer)) {
-        throw new ServiceException("微信转账验证签名未通过");
+      TransferCallback transferCallback = (TransferCallback) appletService.signValidation(params);
+      if (!Objects.nonNull(transferCallback)) {
+        throw new ServiceException("微信转账异步通知验证签名未通过");
       }
-      log.error("微信转账异步通知数据解密: {}", transfer);
+      log.info("微信转账异步通知数据解密: {}", transferCallback);
+      // 数据解析
+      TransferCallbackResource transferCallbackResource = transferCallback.getResource();
+      AesUtil aesUtil = new AesUtil(appletProperties.getApiV3Key().getBytes());
+      String transferStr = aesUtil.decryptToString(transferCallbackResource.getAssociatedData().getBytes(), transferCallbackResource.getNonce().getBytes(), transferCallbackResource.getCiphertext());
+      // 解析数据
+      Transfer transfer = JsonUtils.parseObject(transferStr, Transfer.class);
+      log.info("微信转账异步通知数据: {}", transferCallback);
+      if (transfer == null || transfer.getState() == null || !transfer.getState().equals("SUCCESS")) {
+        throw new ServiceException("微信转账异步通知数据解析失败");
+      }
+      UserWithdraw userWithdraw = userWithdrawMapper.selectByWithdrawSn(transfer.getOutBillNo());
+      userWithdraw.setWithdrawStatus(2);
+      userWithdraw.setTransferNo(transfer.getTransferBillNo());
+      log.info("微信转账更新类 userWithdraw: {}", userWithdraw);
+      int rowsAffected = userWithdrawMapper.updateTransfer(userWithdraw);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("微信转账更新提现表失败");
+      }
       return true;
     } catch (Exception e) {
-      log.error("微信转账回调异常", e);
+      log.error("微信转账回调异常: {}", e.getMessage());
       return false;
     }
   }
