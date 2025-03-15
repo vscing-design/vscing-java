@@ -456,44 +456,100 @@ public class AppletServiceImpl implements AppletService {
 
   @Override
   public Object transferOrder(Map<String, Object> transferData) {
-    // 前置条件 https://pay.weixin.qq.com/doc/v3/merchant/4012065126
-    // 接口文档 https://pay.weixin.qq.com/doc/v3/merchant/4012716434
-    // https://github.com/wechatpay-apiv3/wechatpay-java/blob/main/service/src/example/java/com/wechat/pay/java/service/transferbatch/TransferBatchServiceExample.java
     try {
-      TransferBillsService service = new TransferBillsService.Builder().config(getConfig()).build();
-      // 创建请求
-      InitiateBillTransferRequest request = new InitiateBillTransferRequest();
-      // appId
-      request.setAppid(appletProperties.getAppId());
-      // 商户转账单号
-      request.setOutBillNo(transferData.get("outBillNo").toString());
-      // 用户openid
-      request.setOpenid(transferData.get("openid").toString());
-      // 转账金额
-      BigDecimal amount = (BigDecimal) transferData.get("amount");
-      amount = amount.multiply(BigDecimal.valueOf(100));
-      request.setTransferAmount(amount.intValueExact());
-      // 转账备注
-      request.setTransferRemark("用户提现");
+      // 结果
+      InitiateBillTransferResponse initiateBillTransferResponse = new InitiateBillTransferResponse();
+      // 状态
+      int status = (int) transferData.get("status");
+      // 判断
+      if(status == 1) {
+        initiateBillTransferResponse.setState("V");
+        initiateBillTransferResponse.setPackageInfo(transferData.get("transferNo").toString());
+      } else {
+        TransferBillsService service = new TransferBillsService.Builder().config(getConfig()).build();
+        // 创建请求
+        InitiateBillTransferRequest request = new InitiateBillTransferRequest();
+        // appId
+        request.setAppid(appletProperties.getAppId());
+        // 商户转账单号
+        request.setOutBillNo(transferData.get("withdrawSn").toString());
+        // 用户openid
+        request.setOpenid(transferData.get("openid").toString());
+        // 转账金额
+        BigDecimal amount = (BigDecimal) transferData.get("amount");
+        amount = amount.multiply(BigDecimal.valueOf(100));
+        request.setTransferAmount(amount.intValueExact());
+        // 转账备注
+        request.setTransferRemark("用户提现");
 //      request.setUserRecvPerception("现金奖励");
-      // 通知地址
-      request.setNotifyUrl("https://sys-api.hiyaflix.cn/v1/notify/wechatTransfer");
-      // 转账场景报备信息
-      List<TransferSceneReportInfo> transferSceneReportInfos = List.of(
-          new TransferSceneReportInfo.Builder().setInfoType("岗位类型").setInfoContent("推广员").build(),
-          new TransferSceneReportInfo.Builder().setInfoType("报酬说明").setInfoContent("佣金提现").build()
-      );
-      request.setTransferSceneReportInfos(transferSceneReportInfos);
-      // 转账场景ID
-      request.setTransferSceneId("1005");
-      // 调用接口
-      InitiateBillTransferResponse initiateBillTransferResponse = service.initiateBillTransfer(request);
-      log.info("微信转账调用结果: {}", initiateBillTransferResponse.getState());
-      return initiateBillTransferResponse.getState();
+        // 通知地址
+        request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/wechatTransfer");
+        // 转账场景报备信息
+        List<TransferSceneReportInfo> transferSceneReportInfos = List.of(
+            new TransferSceneReportInfo.Builder().setInfoType("岗位类型").setInfoContent("推广员").build(),
+            new TransferSceneReportInfo.Builder().setInfoType("报酬说明").setInfoContent("佣金提现").build()
+        );
+        request.setTransferSceneReportInfos(transferSceneReportInfos);
+        // 转账场景ID
+        request.setTransferSceneId("1005");
+        // 调用接口
+        initiateBillTransferResponse = service.initiateBillTransfer(request);
+      }
+      initiateBillTransferResponse.setMchId(appletProperties.getMerchantId());
+      initiateBillTransferResponse.setAppId(appletProperties.getAppId());
+      log.info("微信转账调用结果: {}", initiateBillTransferResponse);
+      return initiateBillTransferResponse;
     } catch (Exception e) {
       log.error("微信转账方法异常: {}", e.getMessage());
       throw new RuntimeException("微信转账方法异常: " + e.getMessage(), e);
     }
   }
+
+//  public Object transferOrder(Map<String, Object> transferData) {
+//    try {
+//      TransferBatchService service = new TransferBatchService.Builder().config(getConfig()).build();
+//      // 创建请求
+//      InitiateBatchTransferRequest request = new InitiateBatchTransferRequest();
+//      // appId
+//      request.setAppid(appletProperties.getAppId());
+//      // 商家批次单号
+//      request.setOutBatchNo(transferData.get("withdrawBatchSn").toString());
+//      // 批次名称
+//      request.setBatchName("提现"+transferData.get("withdrawBatchSn").toString());
+//      // 批次备注
+//      request.setBatchRemark("用户提现申请通过");
+//      // 转账总金额
+//      BigDecimal amount = (BigDecimal) transferData.get("amount");
+//      amount = amount.multiply(BigDecimal.valueOf(100));
+//      request.setTotalAmount(amount.longValueExact());
+//      // 转账总笔数
+//      request.setTotalNum(1);
+//      // 商家明细单号
+//      List<TransferDetailInput> transferDetailList = new ArrayList<>();
+//      TransferDetailInput transferDetailInput = new TransferDetailInput();
+//      // 商家明细单号
+//      transferDetailInput.setOutDetailNo(transferData.get("withdrawSn").toString());
+//      // 转账金额
+//      transferDetailInput.setTransferAmount(amount.longValueExact());
+//      // 转账备注
+//      transferDetailInput.setTransferRemark("嗨丫提现");
+//      // 收款用户openid
+//      transferDetailInput.setOpenid(transferData.get("openid").toString());
+//      transferDetailList.add(transferDetailInput);
+//      request.setTransferDetailList(transferDetailList);
+//      // 转账场景ID
+//      request.setTransferSceneId("1001");
+//      // 通知地址
+//      request.setNotifyUrl("https://api.hiyaflix.cn/v1/notify/wechatTransfer");
+//      // 发气请求
+//      InitiateBatchTransferResponse initiateBatchTransferResponse = service.initiateBatchTransfer(request);
+//
+//      log.info("微信转账调用结果: {}", initiateBatchTransferResponse);
+//      return initiateBatchTransferResponse;
+//    } catch (Exception e) {
+//      log.error("微信转账方法异常: {}", e.getMessage());
+//      throw new RuntimeException("微信转账方法异常: " + e.getMessage(), e);
+//    }
+//  }
 
 }

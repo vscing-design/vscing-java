@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 public class InitiateBillTransferResponse {
 
+  @SerializedName("mch_id")
+  private String mchId;
+  @SerializedName("app_id")
+  private String appId;
   @SerializedName("out_bill_no")
   private String outBillNo;
   @SerializedName("transfer_bill_no")

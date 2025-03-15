@@ -72,7 +72,7 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
     try {
       UserWithdraw userWithdraw = userWithdrawMapper.selectById(data.getId());
       int status = data.getStatus();
-      String withdrawSn = OrderUtils.generateOrderSn("HY-TX", 1);
+      String withdrawSn = OrderUtils.generateOrderSn("HYT", 1);
       if(status == 2) {
         data.setWithdrawSn(withdrawSn);
         data.setWithdrawStatus(1);

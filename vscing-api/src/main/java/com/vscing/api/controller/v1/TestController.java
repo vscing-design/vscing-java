@@ -65,11 +65,20 @@ public class TestController {
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
 
+        // 发起提现
+//        TransferMq transferMq = new TransferMq();
+//        transferMq.setUserId(1881281583710961664L);
+//        transferMq.setPlatform(1);
+//        transferMq.setAmount(new BigDecimal("0.01"));
+//        transferMq.setWithdrawSn("HY-TX202503132312300921");
+//        String msg = JsonUtils.toJsonString(transferMq);
+//        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
+
         try {
             TransferMq transferMq = new TransferMq();
             transferMq.setUserId(1881281583710961664L);
-            transferMq.setPlatform(1);
-            transferMq.setAmount(new BigDecimal("13.00"));
+            transferMq.setPlatform(2);
+            transferMq.setAmount(new BigDecimal("1.00"));
             transferMq.setWithdrawSn("HYT202503132312300921");
             UserAuth userAuth = userAuthMapper.findOpenid(transferMq.getUserId(), transferMq.getPlatform());
             if(userAuth == null) {
@@ -80,21 +89,14 @@ public class TestController {
             Map<String, Object> transferData = new HashMap<>(3);
             transferData.put("openid", userAuth.getOpenid());
             transferData.put("amount", transferMq.getAmount());
-            transferData.put("outBillNo", transferMq.getWithdrawSn());
-            appletService.transferOrder(transferData);
+            transferData.put("withdrawBatchSn", "HYBT202503152312300923");
+            transferData.put("withdrawSn", "HYT202503132312300921");
+            Object result = appletService.transferOrder(transferData);
+            log.info("transferResult: {}", result);
         } catch (Exception e) {
             log.error("转账请求异常：", e);
             throw new ServiceException(e.getMessage());
         }
-
-        // 发起提现
-//        TransferMq transferMq = new TransferMq();
-//        transferMq.setUserId(1881281583710961664L);
-//        transferMq.setPlatform(1);
-//        transferMq.setAmount(new BigDecimal("13.00"));
-//        transferMq.setWithdrawSn("HY-TX202503132312300921");
-//        String msg = JsonUtils.toJsonString(transferMq);
-//        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
 
 //        String inviteCode = inviteCodeService.idToInviteCode(1894419529721880576L);
 //        log.info("inviteCode: {}", inviteCode);

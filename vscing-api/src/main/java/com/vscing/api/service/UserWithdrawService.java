@@ -2,6 +2,7 @@ package com.vscing.api.service;
 
 import com.vscing.model.dto.UserWithdrawApiListDto;
 import com.vscing.model.request.InitiateWithdrawRequest;
+import com.vscing.model.vo.TransferVo;
 import com.vscing.model.vo.UserWithdrawApiListVo;
 
 import java.util.List;
@@ -24,5 +25,9 @@ public interface UserWithdrawService {
    */
   boolean initiateApiWithdraw(Long userId, InitiateWithdrawRequest initiateWithdrawRequest);
 
+  /**
+   * 用户提现确认
+  */
+  TransferVo getTransfer(long id);
 
 }
