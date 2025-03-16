@@ -10,15 +10,19 @@ import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
+import com.alipay.api.domain.AlipayMerchantOrderSyncModel;
 import com.alipay.api.domain.AlipayOpenAppQrcodeCreateModel;
 import com.alipay.api.domain.AlipayTradeCreateModel;
 import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.domain.ItemOrderInfo;
+import com.alipay.api.domain.OrderExtInfo;
 import com.alipay.api.domain.Participant;
 import com.alipay.api.internal.util.AlipayEncrypt;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
+import com.alipay.api.request.AlipayMerchantOrderSyncRequest;
 import com.alipay.api.request.AlipayOpenAppQrcodeCreateRequest;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayTradeCreateRequest;
@@ -26,6 +30,7 @@ import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
+import com.alipay.api.response.AlipayMerchantOrderSyncResponse;
 import com.alipay.api.response.AlipayOpenAppQrcodeCreateResponse;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayTradeCreateResponse;
@@ -42,7 +47,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -490,6 +501,92 @@ public class AppletServiceImpl implements AppletService {
       } else {
         String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
         throw new HttpException("支付宝转账失败: " + diagnosisUrl);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void syncOrder(Map<String, Object> syncOrderData) {
+    try {
+      // 初始化SDK
+      AlipayClient alipayClient = new DefaultAlipayClient(getAlipayConfig());
+      // 构造请求参数以调用接口
+      AlipayMerchantOrderSyncRequest request = new AlipayMerchantOrderSyncRequest();
+      AlipayMerchantOrderSyncModel model = new AlipayMerchantOrderSyncModel();
+      // 设置外部订单号
+      model.setOutBizNo((String) syncOrderData.get("outBizNo"));
+      // 设置订单修改时间
+      LocalDateTime orderModifiedTime = (LocalDateTime) syncOrderData.get("orderModifiedTime");
+      model.setOrderModifiedTime(Date.from(orderModifiedTime.atZone(ZoneId.systemDefault()).toInstant()));
+      // buyer_open_id
+      model.setBuyerOpenId((String) syncOrderData.get("buyerOpenId"));
+      // source_app
+      model.setSourceApp("Alipay");
+      // 订单类型
+      model.setOrderType("SERVICE_ORDER");
+      // 订单金额
+      BigDecimal amount = (BigDecimal) syncOrderData.get("amount");
+      model.setAmount(String.valueOf(amount));
+      // 优惠金额
+      model.setDiscountAmount("0");
+      // 支付金额
+      model.setPayAmount(String.valueOf(amount));
+      // 订单创建时间
+      LocalDateTime orderCreateTime = (LocalDateTime) syncOrderData.get("orderCreateTime");
+      model.setOrderCreateTime(Date.from(orderCreateTime.atZone(ZoneId.systemDefault()).toInstant()));
+      // 设置商品信息列表
+      List<ItemOrderInfo> itemOrderList = new ArrayList<ItemOrderInfo>();
+      // 单个商品信息
+      ItemOrderInfo itemOrderInfo = new ItemOrderInfo();
+      // 商品名称
+      itemOrderInfo.setItemName("电影票");
+      // 商品数量
+      int purchaseQuantity = (int) syncOrderData.get("purchaseQuantity");
+      itemOrderInfo.setQuantity((long) purchaseQuantity);
+      // 单价
+      BigDecimal price = amount.divide(BigDecimal.valueOf(purchaseQuantity), 2, RoundingMode.HALF_UP);
+      itemOrderInfo.setUnitPrice(String.valueOf(price));
+      // 单位
+      itemOrderInfo.setUnit("张");
+      // 添加商品扩展信息
+//      List<OrderExtInfo> extInfoJNbyF = new ArrayList<OrderExtInfo>();
+//      OrderExtInfo extInfoJNbyF0 = new OrderExtInfo();
+//      extInfoJNbyF0.setExtKey("MY_KEY");
+//      extInfoJNbyF0.setExtValue("MY_VALUE");
+//      extInfoJNbyF.add(extInfoJNbyF0);
+//      itemOrderInfo.setExtInfo(extInfoJNbyF);
+      itemOrderList.add(itemOrderInfo);
+      model.setItemOrderList(itemOrderList);
+      // 设置其它扩展信息
+      List<OrderExtInfo> extInfoList = new ArrayList<OrderExtInfo>();
+      OrderExtInfo extInfoTHceR0 = new OrderExtInfo();
+      extInfoTHceR0.setExtKey("merchant_biz_type");
+      extInfoTHceR0.setExtValue("MOVIE_TICKET");
+      extInfoList.add(extInfoTHceR0);
+      OrderExtInfo extInfoTHceR1 = new OrderExtInfo();
+      extInfoTHceR1.setExtKey("merchant_order_status");
+      extInfoTHceR1.setExtValue("FINISHED");
+      extInfoList.add(extInfoTHceR1);
+      OrderExtInfo extInfoTHceR2 = new OrderExtInfo();
+      extInfoTHceR2.setExtKey("merchant_order_link_page");
+      extInfoTHceR2.setExtValue("/pages/home/index/index");
+      extInfoList.add(extInfoTHceR2);
+      OrderExtInfo extInfoTHceR3 = new OrderExtInfo();
+      extInfoTHceR3.setExtKey("tiny_app_id");
+      extInfoTHceR3.setExtValue(appletProperties.getAppId());
+      extInfoList.add(extInfoTHceR3);
+      model.setExtInfo(extInfoList);
+      request.setBizModel(model);
+      // 请求接口
+      AlipayMerchantOrderSyncResponse response = alipayClient.certificateExecute(request);
+      log.info("支付宝同步订单：{}", response.getBody());
+      if (response.isSuccess()) {
+        log.info("支付宝同步订单成功");
+      } else {
+        String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+        throw new HttpException("支付宝同步订单失败: " + diagnosisUrl);
       }
     } catch (Exception e) {
       throw new RuntimeException(e);

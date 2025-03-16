@@ -30,8 +30,10 @@ import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.mapper.UserWithdrawMapper;
+import com.vscing.model.mq.RebateMq;
 import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.mq.config.DelayRabbitMQConfig;
+import com.vscing.mq.config.FanoutRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import com.wechat.pay.java.service.payments.model.Transaction;
 import jakarta.servlet.http.HttpServletRequest;
@@ -340,6 +342,12 @@ public class NotifyServiceImpl implements NotifyService {
       }
       // 黑名单测试
       if("15901799236".equals(order.getPhone())) {
+        // 发送mq异步处理
+        RebateMq rebateMq = new RebateMq();
+        rebateMq.setUserId(order.getUserId());
+        rebateMq.setOrderId(order.getId());
+        String msg = JsonUtils.toJsonString(rebateMq);
+        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.REBATE_ROUTING_KEY, msg);
         // 发送mq异步处理 退款
         rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.REFUND_ROUTING_KEY, order.getId().toString(), 2*60 *1000);
         throw new ServiceException("测试退款手机号");

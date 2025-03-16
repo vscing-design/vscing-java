@@ -1,6 +1,7 @@
 package com.vscing.api.receiver;
 
 import com.rabbitmq.client.Channel;
+import com.vscing.api.service.OrderService;
 import com.vscing.api.service.UserService;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.StringUtils;
@@ -30,6 +31,9 @@ public class FanoutMessageReceiver {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private OrderService orderService;
 
   /**
    * 邀请新人队列
@@ -79,6 +83,32 @@ public class FanoutMessageReceiver {
       userService.userRebate(rebateMq);
     } catch (Exception e) {
       log.error("订单返利队列消息处理失败: {}", e.getMessage());
+    } finally {
+      channel.basicAck(deliveryTag, false);
+    }
+  }
+
+  /**
+   * 订单数据同步队列
+   */
+  @RabbitListener(queues = FanoutRabbitMQConfig.SYNC_ORDER_QUEUE, ackMode = "MANUAL")
+  public void receiveSyncOrderMessage(Message message, Channel channel,
+                                   @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
+    try {
+      // 处理队列消息
+      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+      log.error("订单数据同步队列消息: {}", msg);
+      if(StringUtils.isEmpty(msg)) {
+        throw new Exception("消息体错误");
+      }
+      long orderId = Long.parseLong(msg);
+      log.error("订单数据同步队列 orderId: {}", orderId);
+      if(orderId <= 0) {
+        throw new Exception("订单ID错误");
+      }
+      orderService.syncAlipayOrder(orderId);
+    } catch (Exception e) {
+      log.error("订单数据同步队列消息处理失败: {}", e.getMessage());
     } finally {
       channel.basicAck(deliveryTag, false);
     }

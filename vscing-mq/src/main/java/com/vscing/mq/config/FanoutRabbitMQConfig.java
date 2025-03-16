@@ -43,6 +43,12 @@ public class FanoutRabbitMQConfig {
     public static final String TRANSFER_ROUTING_KEY = "transfer_routing_key";
 
     /**
+     * 订单数据同步配置
+    */
+    public static final String SYNC_ORDER_QUEUE = "sync_order_queue";
+    public static final String SYNC_ORDER_ROUTING_KEY = "sync_order_routing_key";
+
+    /**
      * 延迟交换机
      */
     @Bean
@@ -96,6 +102,22 @@ public class FanoutRabbitMQConfig {
     @Bean
     public Binding transferBinding(Queue transferQueue) {
         return BindingBuilder.bind(transferQueue).to(fanoutExchange()).with(TRANSFER_ROUTING_KEY);
+    }
+
+    /**
+     * 订单数据同步队列
+     */
+    @Bean
+    public Queue syncOrderQueue() {
+        return QueueBuilder.durable(SYNC_ORDER_QUEUE).build();
+    }
+
+    /**
+     * 绑定订单数据同步队列到延迟交换机
+     */
+    @Bean
+    public Binding syncOrderBinding(Queue syncOrderQueue) {
+        return BindingBuilder.bind(syncOrderQueue).to(fanoutExchange()).with(SYNC_ORDER_ROUTING_KEY);
     }
 
 }

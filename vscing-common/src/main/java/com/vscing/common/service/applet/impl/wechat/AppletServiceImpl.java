@@ -505,6 +505,10 @@ public class AppletServiceImpl implements AppletService {
     }
   }
 
+  @Override
+  public void syncOrder(Map<String, Object> syncOrderData) {
+  }
+
 //  public Object transferOrder(Map<String, Object> transferData) {
 //    try {
 //      TransferBatchService service = new TransferBatchService.Builder().config(getConfig()).build();

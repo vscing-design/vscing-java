@@ -59,4 +59,9 @@ public interface AppletService {
    */
   Object transferOrder(Map<String, Object> transferData);
 
+  /**
+   * 同步订单
+  */
+  void syncOrder(Map<String, Object> syncOrderData);
+
 }

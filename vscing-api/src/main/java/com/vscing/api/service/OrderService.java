@@ -83,5 +83,9 @@ public interface OrderService {
    */
   boolean supplierOrder(HttpOrder httpOrder);
 
+  /**
+   * 支付宝订单同步
+  */
+  void syncAlipayOrder(long orderId);
 
 }

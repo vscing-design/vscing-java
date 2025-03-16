@@ -381,4 +381,9 @@ public class AppletServiceImpl implements AppletService {
     public Object transferOrder(Map<String, Object> transferData) {
         throw new RuntimeException("百度小程序不支持提现");
     }
+
+    @Override
+    public void syncOrder(Map<String, Object> syncOrderData) {
+
+    }
 }

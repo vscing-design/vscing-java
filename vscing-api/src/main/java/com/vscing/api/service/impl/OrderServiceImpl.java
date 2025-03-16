@@ -610,17 +610,49 @@ public class OrderServiceImpl implements OrderService {
       if (rowsAffected <= 0) {
         throw new ServiceException("改变订单状态失败");
       } else {
+        // 支付成功通知
+        String msg = String.valueOf(order.getId());
+        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.SYNC_ORDER_ROUTING_KEY, msg);
         // 发送mq异步处理
         RebateMq rebateMq = new RebateMq();
         rebateMq.setUserId(order.getUserId());
         rebateMq.setOrderId(order.getId());
-        String msg = JsonUtils.toJsonString(rebateMq);
+        msg = JsonUtils.toJsonString(rebateMq);
         rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.REBATE_ROUTING_KEY, msg);
       }
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());
     }
     return true;
+  }
+
+  @Override
+  public void syncAlipayOrder(long orderId) {
+    try {
+      // 查询订单信息
+      Order order = orderMapper.selectById(orderId);
+      if(order == null) {
+        throw new ServiceException("订单数据不存在");
+      }
+      if(order.getPlatform() != AppletTypeEnum.ALIPAY.getCode()) {
+        throw new ServiceException("订单平台错误");
+      }
+      // 查询用户openid
+      UserAuth userAuth = userAuthMapper.findOpenid(order.getUserId(), order.getPlatform());
+      // 调用支付宝同步订单
+      AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.ALIPAY.getApplet());
+      Map<String, Object> syncOrderData = new HashMap<>(1);
+      syncOrderData.put("outBizNo", order.getOrderSn());
+      syncOrderData.put("orderModifiedTime", order.getUpdatedAt());
+      syncOrderData.put("orderCreateTime", order.getCreatedAt());
+      syncOrderData.put("buyerOpenId", userAuth.getOpenid());
+      syncOrderData.put("amount", order.getTotalPrice());
+      syncOrderData.put("tradeNo", order.getTradeNo());
+      syncOrderData.put("purchaseQuantity", order.getPurchaseQuantity());
+      appletService.syncOrder(syncOrderData);
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
   }
 
 }

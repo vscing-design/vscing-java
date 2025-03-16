@@ -7,11 +7,11 @@ import com.vscing.common.service.InviteCodeService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
+import com.vscing.model.entity.Order;
 import com.vscing.model.entity.UserAuth;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.UserAuthMapper;
-import com.vscing.model.mq.TransferMq;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.service.RabbitMQService;
@@ -65,6 +65,37 @@ public class TestController {
     @Operation(summary = "测试mq")
     public CommonResult<Object> test() {
 
+
+        // 支付成功通知
+//        String msg = String.valueOf(1883894846693003264L);
+//        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.SYNC_ORDER_ROUTING_KEY, msg);
+
+        try {
+            // 查询订单信息
+            Order order = orderMapper.selectById(1883894846693003264L);
+            if(order == null) {
+                throw new ServiceException("订单数据不存在");
+            }
+            if(order.getPlatform() != AppletTypeEnum.ALIPAY.getCode()) {
+                throw new ServiceException("订单平台错误");
+            }
+            // 查询用户openid
+            UserAuth userAuth = userAuthMapper.findOpenid(order.getUserId(), order.getPlatform());
+            // 调用支付宝同步订单
+            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.ALIPAY.getApplet());
+            Map<String, Object> syncOrderData = new HashMap<>(1);
+            syncOrderData.put("outBizNo", order.getOrderSn());
+            syncOrderData.put("orderModifiedTime", order.getUpdatedAt());
+            syncOrderData.put("orderCreateTime", order.getCreatedAt());
+            syncOrderData.put("buyerOpenId", userAuth.getOpenid());
+            syncOrderData.put("amount", order.getTotalPrice());
+            syncOrderData.put("tradeNo", order.getTradeNo());
+            syncOrderData.put("purchaseQuantity", order.getPurchaseQuantity());
+            appletService.syncOrder(syncOrderData);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+
         // 发起提现
 //        TransferMq transferMq = new TransferMq();
 //        transferMq.setUserId(1881281583710961664L);
@@ -74,29 +105,29 @@ public class TestController {
 //        String msg = JsonUtils.toJsonString(transferMq);
 //        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.TRANSFER_ROUTING_KEY, msg);
 
-        try {
-            TransferMq transferMq = new TransferMq();
-            transferMq.setUserId(1881281583710961664L);
-            transferMq.setPlatform(2);
-            transferMq.setAmount(new BigDecimal("1.00"));
-            transferMq.setWithdrawSn("HYT202503132312300921");
-            UserAuth userAuth = userAuthMapper.findOpenid(transferMq.getUserId(), transferMq.getPlatform());
-            if(userAuth == null) {
-                throw new ServiceException("转账用户不存在");
-            }
-            int platform = transferMq.getPlatform();
-            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.findByCode(platform));
-            Map<String, Object> transferData = new HashMap<>(3);
-            transferData.put("openid", userAuth.getOpenid());
-            transferData.put("amount", transferMq.getAmount());
-            transferData.put("withdrawBatchSn", "HYBT202503152312300923");
-            transferData.put("withdrawSn", "HYT202503132312300921");
-            Object result = appletService.transferOrder(transferData);
-            log.info("transferResult: {}", result);
-        } catch (Exception e) {
-            log.error("转账请求异常：", e);
-            throw new ServiceException(e.getMessage());
-        }
+//        try {
+//            TransferMq transferMq = new TransferMq();
+//            transferMq.setUserId(1881281583710961664L);
+//            transferMq.setPlatform(2);
+//            transferMq.setAmount(new BigDecimal("1.00"));
+//            transferMq.setWithdrawSn("HYT202503132312300921");
+//            UserAuth userAuth = userAuthMapper.findOpenid(transferMq.getUserId(), transferMq.getPlatform());
+//            if(userAuth == null) {
+//                throw new ServiceException("转账用户不存在");
+//            }
+//            int platform = transferMq.getPlatform();
+//            AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.findByCode(platform));
+//            Map<String, Object> transferData = new HashMap<>(3);
+//            transferData.put("openid", userAuth.getOpenid());
+//            transferData.put("amount", transferMq.getAmount());
+//            transferData.put("withdrawBatchSn", "HYBT202503152312300923");
+//            transferData.put("withdrawSn", "HYT202503132312300921");
+//            Object result = appletService.transferOrder(transferData);
+//            log.info("transferResult: {}", result);
+//        } catch (Exception e) {
+//            log.error("转账请求异常：", e);
+//            throw new ServiceException(e.getMessage());
+//        }
 
 //        String inviteCode = inviteCodeService.idToInviteCode(1894419529721880576L);
 //        log.info("inviteCode: {}", inviteCode);
