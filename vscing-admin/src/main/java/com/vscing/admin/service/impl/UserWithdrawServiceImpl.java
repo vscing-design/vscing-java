@@ -113,7 +113,8 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         throw new ServiceException("转账用户不存在");
       }
       int platform = transferMq.getPlatform();
-      if (platform == 2) {
+      // 2 支付宝平台
+      if (platform != 2) {
         throw new ServiceException("转账平台错误");
       }
       AppletService appletService = appletServiceFactory.getAppletService(AppletTypeEnum.findByCode(platform));
