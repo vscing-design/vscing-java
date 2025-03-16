@@ -37,6 +37,11 @@ public interface UserWithdrawMapper {
   List<UserWithdrawAmountVo> getUserWithdrawAmount();
 
   /**
+   * 用户佣金提现列表总数
+   */
+  List<UserWithdrawAmountVo> selectApiAmount(@Param("userId") Long userId);
+
+  /**
    * 管理后台佣金提现审核
    */
   int approve(UserWithdrawApproveDto record);

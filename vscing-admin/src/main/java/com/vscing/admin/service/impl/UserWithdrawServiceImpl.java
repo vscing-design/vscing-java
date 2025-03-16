@@ -80,7 +80,7 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
       // 改变提现状态
       int rowsAffected = userWithdrawMapper.approve(data);
       if (rowsAffected <= 0) {
-        throw new ServiceException("删除用户失败");
+        throw new ServiceException("改变提现状态失败");
       }
       if (status == 2) {
         // 更新用户余额

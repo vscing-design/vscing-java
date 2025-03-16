@@ -96,6 +96,17 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 用户佣金提现详情 -->
+    <select id="selectApiAmount" resultType="com.vscing.model.vo.UserWithdrawAmountVo">
+        SELECT status, SUM(withdraw_amount) AS withdrawAmount
+        FROM <include refid="tableName" />
+        <where>
+            user_id = #{userId}
+            AND deleted_at IS NULL
+        </where>
+        GROUP BY status
+    </select>
+
     <!-- 用户佣金提现列表查询 -->
     <select id="selectApiList" resultType="com.vscing.model.vo.UserWithdrawApiListVo">
         SELECT id, status, reject_reason, withdraw_amount, platform, created_at, updated_at

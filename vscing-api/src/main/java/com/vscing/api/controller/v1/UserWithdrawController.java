@@ -7,6 +7,7 @@ import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.UserWithdrawApiListDto;
 import com.vscing.model.request.InitiateWithdrawRequest;
 import com.vscing.model.vo.TransferVo;
+import com.vscing.model.vo.UserAmountVo;
 import com.vscing.model.vo.UserWithdrawAmountVo;
 import com.vscing.model.vo.UserWithdrawApiListVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,13 @@ public class UserWithdrawController {
                                                                @AuthenticationPrincipal UserDetails userInfo) {
     List<UserWithdrawApiListVo> list = userWithdrawService.getApilist(userInfo.getUserId(), queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @GetMapping("/amount")
+  @Operation(summary = "用户提现总金额")
+  public CommonResult<UserAmountVo> amount(@AuthenticationPrincipal UserDetails userInfo) {
+    UserAmountVo userAmountVo = userWithdrawService.getTotalAmount(userInfo);
+    return CommonResult.success(userAmountVo);
   }
 
   @PostMapping("/withdraw")

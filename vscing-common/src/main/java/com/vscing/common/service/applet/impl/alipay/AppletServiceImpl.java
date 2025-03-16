@@ -50,6 +50,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -551,12 +552,21 @@ public class AppletServiceImpl implements AppletService {
       // 单位
       itemOrderInfo.setUnit("张");
       // 添加商品扩展信息
-//      List<OrderExtInfo> extInfoJNbyF = new ArrayList<OrderExtInfo>();
-//      OrderExtInfo extInfoJNbyF0 = new OrderExtInfo();
-//      extInfoJNbyF0.setExtKey("MY_KEY");
-//      extInfoJNbyF0.setExtValue("MY_VALUE");
-//      extInfoJNbyF.add(extInfoJNbyF0);
-//      itemOrderInfo.setExtInfo(extInfoJNbyF);
+      LocalDateTime stopShowTime = (LocalDateTime) syncOrderData.get("stopShowTime");
+      List<OrderExtInfo> extInfoJNbyF = new ArrayList<OrderExtInfo>();
+      OrderExtInfo extInfoJNbyF0 = new OrderExtInfo();
+      extInfoJNbyF0.setExtKey("start_time");
+      extInfoJNbyF0.setExtValue(stopShowTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+      extInfoJNbyF.add(extInfoJNbyF0);
+      OrderExtInfo extInfoJNbyF1 = new OrderExtInfo();
+      extInfoJNbyF1.setExtKey("ticket_type");
+      extInfoJNbyF1.setExtValue("NORMAL");
+      extInfoJNbyF.add(extInfoJNbyF1);
+      OrderExtInfo extInfoJNbyF2 = new OrderExtInfo();
+      extInfoJNbyF2.setExtKey("end_time");
+      extInfoJNbyF2.setExtValue(stopShowTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+      extInfoJNbyF.add(extInfoJNbyF2);
+      itemOrderInfo.setExtInfo(extInfoJNbyF);
       itemOrderList.add(itemOrderInfo);
       model.setItemOrderList(itemOrderList);
       // 设置其它扩展信息

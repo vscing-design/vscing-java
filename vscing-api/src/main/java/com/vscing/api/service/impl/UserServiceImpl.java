@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
     String token = null;
     try {
       // 根据用户信息生成token
-      UserDetailVo userData = this.self(1883117511135916032L);
+      UserDetailVo userData = this.self(1881281583710961664L);
       VscingUserDetails userDetails = new UserDetailsImpl(userData);
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);

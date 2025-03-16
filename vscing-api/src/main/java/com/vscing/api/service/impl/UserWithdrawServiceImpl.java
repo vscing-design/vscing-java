@@ -3,6 +3,7 @@ package com.vscing.api.service.impl;
 import cn.hutool.core.date.TemporalUtil;
 import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
+import com.vscing.api.po.UserDetails;
 import com.vscing.api.service.UserWithdrawService;
 import com.vscing.common.exception.ServiceException;
 import com.vscing.common.service.applet.AppletService;
@@ -17,11 +18,14 @@ import com.vscing.model.mapper.UserAuthMapper;
 import com.vscing.model.mapper.UserWithdrawMapper;
 import com.vscing.model.request.InitiateWithdrawRequest;
 import com.vscing.model.vo.TransferVo;
+import com.vscing.model.vo.UserAmountVo;
+import com.vscing.model.vo.UserWithdrawAmountVo;
 import com.vscing.model.vo.UserWithdrawApiListVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -45,6 +49,34 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
   public List<UserWithdrawApiListVo> getApilist(Long userId, UserWithdrawApiListDto queryParam, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return userWithdrawMapper.selectApiList(userId, queryParam);
+  }
+
+  @Override
+  public UserAmountVo getTotalAmount(UserDetails userInfo) {
+    UserAmountVo userAmountVo = new UserAmountVo();
+    List<UserWithdrawAmountVo> userWithdrawAmountVoList = userWithdrawMapper.selectApiAmount(userInfo.getUserId());
+    // 用户余额
+    BigDecimal pendingAmount = userInfo.getUser().getPendingAmount() == null ? BigDecimal.ZERO : userInfo.getUser().getPendingAmount();
+    // 累计佣金
+    BigDecimal totalWithdrawAmount = userInfo.getUser().getTotalAmount();
+    userAmountVo.setTotalAmount(totalWithdrawAmount);
+    // 已提现金额
+    BigDecimal withdrawnAmount = userInfo.getUser().getWithdrawnAmount();
+    userAmountVo.setWithdrawnAmount(withdrawnAmount);
+    // 设置默认值
+    userAmountVo.setPendingAmount(BigDecimal.ZERO);
+    userAmountVo.setApproveAmount(BigDecimal.ZERO);
+    // 遍历列表
+    for (UserWithdrawAmountVo withdrawal : userWithdrawAmountVoList) {
+      int status = withdrawal.getStatus();
+      BigDecimal amount = withdrawal.getWithdrawAmount() == null ? BigDecimal.ZERO : withdrawal.getWithdrawAmount();
+      if(status == 1) {
+        // 当 status 为 1 时，从用户金额中减去 amount
+        userAmountVo.setPendingAmount(pendingAmount.subtract(amount));
+        userAmountVo.setApproveAmount(amount);
+      }
+    }
+    return userAmountVo;
   }
 
   @Override

@@ -91,6 +91,7 @@ public class TestController {
             syncOrderData.put("amount", order.getTotalPrice());
             syncOrderData.put("tradeNo", order.getTradeNo());
             syncOrderData.put("purchaseQuantity", order.getPurchaseQuantity());
+            syncOrderData.put("stopShowTime", order.getStopShowTime());
             appletService.syncOrder(syncOrderData);
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());

@@ -20,6 +20,9 @@ public class UserAmountVo {
   @Schema(description = "已提现金额(元)")
   private BigDecimal withdrawnAmount;
 
+  @Schema(description = "审核金额(元)")
+  private BigDecimal approveAmount;
+
   @Schema(description = "累计佣金(元)")
   private BigDecimal totalAmount;
 
