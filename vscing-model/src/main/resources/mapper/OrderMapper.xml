@@ -23,6 +23,7 @@
         <result column="payment_status" property="paymentStatus" jdbcType="TINYINT" />
         <result column="settle_status" property="settleStatus" jdbcType="TINYINT" />
         <result column="purchase_quantity" property="purchaseQuantity" jdbcType="INTEGER" />
+        <result column="hall_name" property="hallName" jdbcType="VARCHAR" />
         <result column="seat_info" property="seatInfo" jdbcType="VARCHAR" />
         <result column="seat_adjusted" property="seatAdjusted" jdbcType="TINYINT" />
         <result column="is_adjusted" property="isAdjusted" jdbcType="TINYINT" />
@@ -303,6 +304,7 @@
             <if test="paymentStatus != null">payment_status,</if>
             <if test="settleStatus != null">settle_status,</if>
             <if test="purchaseQuantity != null">purchase_quantity,</if>
+            <if test="hallName != null">hall_name,</if>
             <if test="seatInfo != null">seat_info,</if>
             <if test="seatAdjusted != null">seat_adjusted,</if>
             <if test="isAdjusted != null">is_adjusted,</if>
@@ -333,6 +335,7 @@
             <if test="paymentStatus != null">#{paymentStatus, jdbcType=TINYINT},</if>
             <if test="settleStatus != null">#{settleStatus, jdbcType=TINYINT},</if>
             <if test="purchaseQuantity != null">#{purchaseQuantity, jdbcType=INTEGER},</if>
+            <if test="hallName != null">#{hallName, jdbcType=VARCHAR},</if>
             <if test="seatInfo != null">#{seatInfo, jdbcType=VARCHAR},</if>
             <if test="seatAdjusted != null">#{seatAdjusted, jdbcType=TINYINT},</if>
             <if test="isAdjusted != null">#{isAdjusted, jdbcType=TINYINT},</if>

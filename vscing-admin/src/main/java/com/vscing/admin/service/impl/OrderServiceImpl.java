@@ -217,7 +217,7 @@ public class OrderServiceImpl implements OrderService {
     // 构建区域价格映射
     Map<String, ShowArea> areaPriceMap = new HashMap<>(0);
     // 计算价格
-    if(areas != null && !areas.isEmpty()) {
+    if(!areas.isEmpty()) {
       // 获取区域价格
       List<ShowArea> showAreaList = showAreaMapper.selectByShowIdAreas(showId, areas);
       // 构建区域价格映射
@@ -322,9 +322,10 @@ public class OrderServiceImpl implements OrderService {
       order.setTotalPrice(totalPrice);
       order.setOfficialPrice(officialPrice);
       order.setSettlementPrice(settlementPrice);
+      // 场次信息
+      order.setHallName(show.getHallName());
       // 座位信息
-      String seatInfoStr = seatInfo.stream()
-          .collect(Collectors.joining(","));
+      String seatInfoStr = String.join(",", seatInfo);
       order.setSeatInfo(seatInfoStr);
       // 备注信息
       order.setMemo(orderSave.getMemo());

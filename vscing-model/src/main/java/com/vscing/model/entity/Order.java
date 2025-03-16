@@ -70,6 +70,9 @@ public class Order extends BaseEntity {
   @Schema(description = "购票张数")
   private Integer purchaseQuantity;
 
+  @Schema(description = "影厅名称")
+  private String hallName;
+
   @Schema(description = "购票座位")
   private String seatInfo;
 
