@@ -55,27 +55,36 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
   public UserAmountVo getTotalAmount(UserDetails userInfo) {
     UserAmountVo userAmountVo = new UserAmountVo();
     List<UserWithdrawAmountVo> userWithdrawAmountVoList = userWithdrawMapper.selectApiAmount(userInfo.getUserId());
-    // 用户余额
-    BigDecimal pendingAmount = userInfo.getUser().getPendingAmount() == null ? BigDecimal.ZERO : userInfo.getUser().getPendingAmount();
-    // 累计佣金
-    BigDecimal totalWithdrawAmount = userInfo.getUser().getTotalAmount();
-    userAmountVo.setTotalAmount(totalWithdrawAmount);
-    // 已提现金额
-    BigDecimal withdrawnAmount = userInfo.getUser().getWithdrawnAmount();
-    userAmountVo.setWithdrawnAmount(withdrawnAmount);
-    // 设置默认值
-    userAmountVo.setPendingAmount(BigDecimal.ZERO);
-    userAmountVo.setApproveAmount(BigDecimal.ZERO);
+    // 用户累计提现金额
+    BigDecimal totalAmount = userInfo.getUser().getTotalAmount();
+    // 用户待提现金额
+    BigDecimal pendingAmount = userInfo.getUser().getPendingAmount();
+    // 用户审核中金额
+    BigDecimal approveAmount = BigDecimal.ZERO;
+    // 用户已提现金额
+    BigDecimal withdrawnAmount = BigDecimal.ZERO;
     // 遍历列表
     for (UserWithdrawAmountVo withdrawal : userWithdrawAmountVoList) {
       int status = withdrawal.getStatus();
       BigDecimal amount = withdrawal.getWithdrawAmount() == null ? BigDecimal.ZERO : withdrawal.getWithdrawAmount();
       if(status == 1) {
-        // 当 status 为 1 时，从用户金额中减去 amount
-        userAmountVo.setPendingAmount(pendingAmount.subtract(amount));
-        userAmountVo.setApproveAmount(amount);
+        // 当 status 为 1 时，审核中金额
+        approveAmount = amount;
+        pendingAmount = pendingAmount.subtract(amount);
+        totalAmount = totalAmount.add(amount);
+      } else if(status == 2) {
+        // 当 status 为 2 时，已提现金额
+        withdrawnAmount = amount;
       }
     }
+    // 审核中金额
+    userAmountVo.setApproveAmount(approveAmount);
+    // 已提现金额
+    userAmountVo.setWithdrawnAmount(withdrawnAmount);
+    // 累计金额
+    userAmountVo.setTotalAmount(totalAmount);
+    // 待提现金额
+    userAmountVo.setPendingAmount(pendingAmount);
     return userAmountVo;
   }
 
