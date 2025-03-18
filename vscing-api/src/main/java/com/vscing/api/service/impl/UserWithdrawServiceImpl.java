@@ -56,7 +56,7 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
     UserAmountVo userAmountVo = new UserAmountVo();
     List<UserWithdrawAmountVo> userWithdrawAmountVoList = userWithdrawMapper.selectApiAmount(userInfo.getUserId());
     // 用户累计提现金额
-    BigDecimal totalAmount = userInfo.getUser().getTotalAmount();
+    BigDecimal totalAmount = userInfo.getUser().getPendingAmount();
     // 用户待提现金额
     BigDecimal pendingAmount = userInfo.getUser().getPendingAmount();
     // 用户审核中金额
@@ -71,10 +71,10 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         // 当 status 为 1 时，审核中金额
         approveAmount = amount;
         pendingAmount = pendingAmount.subtract(amount);
-        totalAmount = totalAmount.add(amount);
       } else if(status == 2) {
         // 当 status 为 2 时，已提现金额
         withdrawnAmount = amount;
+        totalAmount = totalAmount.add(amount);
       }
     }
     // 审核中金额
