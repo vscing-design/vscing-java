@@ -186,6 +186,7 @@ public class NotifyServiceImpl implements NotifyService {
       log.info("微信转账异步通知请求参数: {}", requestBody);
       // 返回结果
       Map<String, String> params = new HashMap<>(6);
+      params.put("transfer", "1");
       params.put("wechatPaySerial", request.getHeader("Wechatpay-Serial"));
       params.put("wechatpayNonce", request.getHeader("Wechatpay-Nonce"));
       params.put("wechatSignature", request.getHeader("Wechatpay-Signature"));
