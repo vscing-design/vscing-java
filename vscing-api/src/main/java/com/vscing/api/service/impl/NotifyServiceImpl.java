@@ -9,11 +9,8 @@ import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
 import com.vscing.common.service.applet.impl.wechat.AppletProperties;
 import com.vscing.common.service.applet.impl.wechat.extend.Transfer;
-import com.vscing.common.service.applet.impl.wechat.extend.TransferCallback;
-import com.vscing.common.service.applet.impl.wechat.extend.TransferCallbackResource;
 import com.vscing.common.service.supplier.SupplierService;
 import com.vscing.common.service.supplier.SupplierServiceFactory;
-import com.vscing.common.utils.AesUtil;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.MapstructUtils;
 import com.vscing.common.utils.RequestUtil;
@@ -198,19 +195,12 @@ public class NotifyServiceImpl implements NotifyService {
       // 支付类
       AppletService appletService = appletServiceFactory.getAppletService("wechat");
       // 签名认证
-      TransferCallback transferCallback = (TransferCallback) appletService.signValidation(params);
-      if (!Objects.nonNull(transferCallback)) {
+      Transfer transfer = (Transfer) appletService.signValidation(params);
+      if (!Objects.nonNull(transfer)) {
         throw new ServiceException("微信转账异步通知验证签名未通过");
       }
-      log.info("微信转账异步通知数据解密: {}", transferCallback);
-      // 数据解析
-      TransferCallbackResource transferCallbackResource = transferCallback.getResource();
-      AesUtil aesUtil = new AesUtil(appletProperties.getApiV3Key().getBytes());
-      String transferStr = aesUtil.decryptToString(transferCallbackResource.getAssociatedData().getBytes(), transferCallbackResource.getNonce().getBytes(), transferCallbackResource.getCiphertext());
-      // 解析数据
-      Transfer transfer = JsonUtils.parseObject(transferStr, Transfer.class);
-      log.info("微信转账异步通知数据: {}", transferCallback);
-      if (transfer == null || transfer.getState() == null || !transfer.getState().equals("SUCCESS")) {
+      log.info("微信转账异步通知数据解密: {}", transfer);
+      if (transfer.getState() == null || !transfer.getState().equals("SUCCESS")) {
         throw new ServiceException("微信转账异步通知数据解析失败");
       }
       UserWithdraw userWithdraw = userWithdrawMapper.selectByWithdrawSn(transfer.getOutBillNo());

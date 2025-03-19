@@ -8,6 +8,7 @@ import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.impl.wechat.extend.InitiateBillTransferRequest;
 import com.vscing.common.service.applet.impl.wechat.extend.InitiateBillTransferResponse;
+import com.vscing.common.service.applet.impl.wechat.extend.Transfer;
 import com.vscing.common.service.applet.impl.wechat.extend.TransferBillsService;
 import com.vscing.common.service.applet.impl.wechat.extend.TransferSceneReportInfo;
 import com.vscing.common.utils.JsonUtils;
@@ -343,6 +344,9 @@ public class AppletServiceImpl implements AppletService {
           .body(params.get("requestBody"))
           .build();
       // 以支付通知回调为例，验签、解密并转换成 Transaction
+      if(params.getOrDefault("transfer", null) != null) {
+        return parser.parse(requestParam, Transfer.class);
+      }
       return parser.parse(requestParam, Transaction.class);
     } catch (ValidationException e) {
       log.error("微信签名验证失败: {}", e.getMessage());
