@@ -21,6 +21,9 @@ public class UserWithdrawApiListVo {
   @Schema(description = "申请提现金额(元)")
   private BigDecimal withdrawAmount;
 
+  @Schema(description = "提现状态 1 打款中  2 打款成功 3 打款不通过")
+  private Integer withdrawStatus;
+
   @Schema(description = "申请提现渠道： 1 微信小程序  2 支付宝小程序  3 百度小程序")
   private Integer platform;
 

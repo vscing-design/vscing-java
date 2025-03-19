@@ -109,7 +109,7 @@
 
     <!-- 用户佣金提现列表查询 -->
     <select id="selectApiList" resultType="com.vscing.model.vo.UserWithdrawApiListVo">
-        SELECT id, status, reject_reason, withdraw_amount, platform, created_at, updated_at
+        SELECT id, status, reject_reason, withdraw_amount, withdraw_status, platform, created_at, updated_at
         FROM <include refid="tableName" />
         <where>
             user_id = #{userId}
