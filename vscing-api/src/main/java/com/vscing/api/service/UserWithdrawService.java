@@ -37,4 +37,9 @@ public interface UserWithdrawService {
   */
   TransferVo getTransfer(long id);
 
+  /**
+   * 用户提现确认异常处理
+   */
+  boolean transferFail(long id);
+
 }

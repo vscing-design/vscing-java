@@ -97,4 +97,18 @@ public class UserWithdrawController {
     }
   }
 
+  @GetMapping("/withdrawFail/{id}")
+  @Operation(summary = "用户确认异常")
+  public CommonResult<Boolean> withdrawFail(@PathVariable("id") Long id) {
+    if (id == null) {
+      return CommonResult.validateFailed("参数错误");
+    }
+    try {
+      return CommonResult.success(userWithdrawService.transferFail(id));
+    } catch (Exception e) {
+      log.error("请求错误: {}", e.getMessage());
+      throw new RuntimeException("请求错误");
+    }
+  }
+
 }

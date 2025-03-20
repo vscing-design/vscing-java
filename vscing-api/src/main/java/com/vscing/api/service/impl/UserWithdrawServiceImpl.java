@@ -142,10 +142,31 @@ public class UserWithdrawServiceImpl implements UserWithdrawService {
         transferVo.setPackageInfo(result.getPackageInfo());
         transferVo.setMchId(result.getMchId());
       }
+      // 锁定
+      userWithdraw.setWithdrawStatus(4);
       // 更新提现记录
       int rowsAffected = userWithdrawMapper.updateTransfer(userWithdraw);
       log.info("转账更新提现表结果：{}", rowsAffected);
       return transferVo;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public boolean transferFail(long id) {
+    try {
+      // 查询提现记录
+      UserWithdraw userWithdraw = userWithdrawMapper.selectById(id);
+      if (userWithdraw == null || userWithdraw.getStatus() != 2 || userWithdraw.getWithdrawStatus() != 4 || userWithdraw.getPlatform() != 1) {
+        throw new ServiceException("提现记录不存在或状态异常");
+      }
+      // 解除锁定
+      userWithdraw.setWithdrawStatus(1);
+      // 更新提现记录
+      int rowsAffected = userWithdrawMapper.updateTransfer(userWithdraw);
+      log.info("解除锁定转账提现结果：{}", rowsAffected);
+      return rowsAffected > 0;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
