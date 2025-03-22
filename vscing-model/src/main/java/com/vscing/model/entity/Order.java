@@ -58,7 +58,7 @@ public class Order extends BaseEntity {
   @Schema(description = "订单类型 1 用户下单 2 手动下单")
   private Integer orderType;
 
-  @Schema(description = "下单平台 1 微信小程序 2 支付宝小程序 3 百度小程序 21 淘宝 22 咸鱼 23 拼多多 24 微信")
+  @Schema(description = "下单平台 1 微信小程序 2 支付宝小程序 3 百度小程序 21 淘宝 22 咸鱼 23 拼多多 24 微信 25 抖音")
   private Integer platform;
 
   @Schema(description = "用户支付状态 1 已支付 2 未支付")

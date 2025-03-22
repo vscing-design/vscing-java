@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.CouponMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Coupon">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="sales_amount" property="salesAmount" jdbcType="DECIMAL" />
+        <result column="face_amount" property="faceAmount" jdbcType="DECIMAL" />
+        <result column="type" property="type" jdbcType="TINYINT" />
+        <result column="attr" property="attr" jdbcType="TINYINT" />
+        <result column="source" property="source" jdbcType="TINYINT" />
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+        <result column="tags" property="tags" jdbcType="VARCHAR" />
+        <result column="condition" property="condition" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="reason" property="reason" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_coupon
+    </sql>
+    <sql id="userTableName">
+        vscing_user
+    </sql>
+    <sql id="orderTableName">
+        vscing_order
+    </sql>
+    <sql id="orderDetailTableName">
+        vscing_order_detail
+    </sql>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Coupon">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="title != null">title,</if>
+            <if test="phone != null">phone,</if>
+            <if test="code != null">code,</if>
+            <if test="salesAmount != null">sales_amount,</if>
+            <if test="faceAmount != null">face_amount,</if>
+            <if test="type != null">type,</if>
+            <if test="attr != null">attr,</if>
+            <if test="source != null">source,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="tags != null">tags,</if>
+            <if test="condition != null">condition,</if>
+            <if test="status != null">status,</if>
+            <if test="reason != null">reason,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdAt != null">created_at,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
+            <if test="title != null">#{title, jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="code != null">#{code, jdbcType=VARCHAR},</if>
+            <if test="salesAmount != null">#{salesAmount, jdbcType=DECIMAL},</if>
+            <if test="faceAmount != null">#{faceAmount, jdbcType=DECIMAL},</if>
+            <if test="type != null">#{type, jdbcType=TINYINT},</if>
+            <if test="attr != null">#{attr, jdbcType=TINYINT},</if>
+            <if test="source != null">#{source, jdbcType=TINYINT},</if>
+            <if test="startTime != null">#{startTime, jdbcType=TIMESTAMP},</if>
+            <if test="endTime != null">#{endTime, jdbcType=TIMESTAMP},</if>
+            <if test="tags != null">#{tags, jdbcType=VARCHAR},</if>
+            <if test="condition != null">#{condition, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="reason != null">#{reason, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT},</if>
+            <if test="createdAt != null">#{createdAt, jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+
+    <!-- 查询详情 -->
+    <select id="selectByPhoneCode" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE phone = #{phone, jdbcType=VARCHAR}
+        and code = #{code, jdbcType=VARCHAR}
+        and deleted_at IS NULL
+    </select>
+
+</mapper>
