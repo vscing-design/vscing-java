@@ -20,7 +20,7 @@
         <result column="tags" property="tags" jdbcType="VARCHAR" />
         <result column="condition" property="condition" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
-        <result column="reason" property="reason" jdbcType="VARCHAR" />
+        <result column="reason" property="reason" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -42,6 +42,45 @@
     <sql id="orderDetailTableName">
         vscing_order_detail
     </sql>
+
+    <!-- 列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="status != null">
+                AND status = #{status, jdbcType=TINYINT}
+            </if>
+            <if test="attr != null">
+                AND attr = #{attr, jdbcType=TINYINT}
+            </if>
+            <if test="reason != null">
+                AND reason = #{reason, jdbcType=TINYINT}
+            </if>
+            <if test="title != null">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="phone != null">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="code != null">
+                AND code LIKE CONCAT('%', #{code}, '%')
+            </if>
+            <if test="startTime != null">
+                AND created_at <![CDATA[ >= ]]> #{startTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null">
+                AND created_at <![CDATA[ <= ]]> #{endTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="cancelStartTime != null">
+                AND updated_at <![CDATA[ >= ]]> #{cancelStartTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="cancelEndTime != null">
+                AND updated_at <![CDATA[ <= ]]> #{cancelEndTime, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
 
     <!-- 插入信息 -->
     <insert id="insert" parameterType="com.vscing.model.entity.Coupon">
@@ -83,7 +122,7 @@
             <if test="tags != null">#{tags, jdbcType=VARCHAR},</if>
             <if test="condition != null">#{condition, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
-            <if test="reason != null">#{reason, jdbcType=VARCHAR},</if>
+            <if test="reason != null">#{reason, jdbcType=TINYINT},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT},</if>
             <if test="createdAt != null">#{createdAt, jdbcType=TIMESTAMP},</if>
         </trim>

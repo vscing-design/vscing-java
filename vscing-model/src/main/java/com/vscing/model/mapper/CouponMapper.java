@@ -1,9 +1,12 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.CouponListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.vo.CouponApiDetailsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * CouponMapper
@@ -13,6 +16,11 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface CouponMapper {
+
+  /**
+   * 列表
+  */
+  List<Coupon> getList(CouponListDto record);
 
   /**
    * 创建

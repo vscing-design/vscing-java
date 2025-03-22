@@ -63,7 +63,7 @@ public class Coupon extends BaseEntity {
   @Schema(description = "优惠券状态 1 待核销 2 已核销 3 已过期 4 已作废")
   private Integer status;
 
-  @Schema(description = "作废原因")
-  private String reason;
+  @Schema(description = "作废原因 1 全部 2 错误券作废 3 订单退款")
+  private Integer reason;
 
 }
