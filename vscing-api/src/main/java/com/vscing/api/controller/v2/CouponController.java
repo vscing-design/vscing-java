@@ -6,7 +6,6 @@ import com.vscing.common.api.CommonResult;
 import com.vscing.model.request.CouponDetailsRequest;
 import com.vscing.model.request.CouponRequest;
 import com.vscing.model.vo.CouponApiDetailsVo;
-import com.vscing.mq.service.RabbitMQService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v2/coupon")
 @Tag(name = "优惠劵接口", description = "优惠劵接口")
 public class CouponController {
-
-  @Autowired
-  private RabbitMQService rabbitMQService;
 
   @Autowired
   private CouponService couponService;
