@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,15 +53,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  FilterChain chain) throws ServletException, IOException {
+                                  @NotNull HttpServletResponse response,
+                                  @NotNull FilterChain chain) throws ServletException, IOException {
     List<String> unprotectedUrls = securityProperties.getUrls();
     String authHeader = request.getHeader(this.tokenHeader);
     // 如果请求路径在白名单中，则直接放行。其它请求路径需要校验。
     if (!unprotectedUrls.contains(request.getRequestURI()) && authHeader != null && authHeader.startsWith(this.tokenHead)) {
       String authToken = authHeader.substring(this.tokenHead.length());
       Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
-      log.error("checking userId:{}", userId);
       if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         VscingUserDetails userDetails = this.vscingUserDetailsService.loadUserByUserId(userId);
         if (userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails.getUserId())) {
@@ -69,7 +69,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
           if (redisService.get(redisKey) != null) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            log.error("authenticated user:{}", userId);
+            log.info("当前登录用户ID:{}", userId);
             SecurityContextHolder.getContext().setAuthentication(authentication);
           }
         }

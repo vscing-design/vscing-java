@@ -1,10 +1,12 @@
 package com.vscing.common.exception;
 
 import com.vscing.common.api.IErrorCode;
+import lombok.Getter;
 
 /**
  * 自定义API异常
  */
+@Getter
 public class ApiException extends RuntimeException {
   private IErrorCode errorCode;
 
@@ -25,7 +27,4 @@ public class ApiException extends RuntimeException {
     super(message, cause);
   }
 
-  public IErrorCode getErrorCode() {
-    return errorCode;
-  }
 }
