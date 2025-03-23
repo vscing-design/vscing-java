@@ -2,6 +2,7 @@ package com.vscing.api.aspect;
 
 import com.vscing.api.annotate.WhiteListAnnotate;
 import com.vscing.api.config.WhiteListConfig;
+import com.vscing.common.api.CommonResult;
 import com.vscing.common.utils.ServletUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,7 +33,7 @@ public class WhiteListAspect {
     List<String> allowedIps = whiteListConfig.getTypes().get(whiteListAnnotate.type());
 
     if (allowedIps == null || !allowedIps.contains(clientIp)) { // 检查客户端IP是否在白名单内
-      throw new SecurityException("Access Denied");
+      return CommonResult.failed("IP地址异常，请联系管理员");
     }
 
     return joinPoint.proceed(); // 继续执行目标方法

@@ -11,7 +11,7 @@ public interface RabbitMQService {
   /**
    * 发送延迟队列
   */
-  void sendDelayedMessage(String routingKey, Object message, int delayMilliseconds);
+  void sendDelayedMessage(String routingKey, Object message, long delayMilliseconds);
 
   /**
    * 发送订阅队列

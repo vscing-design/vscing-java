@@ -27,6 +27,11 @@ public interface CouponService {
   boolean save(CouponRequest data);
 
   /**
+   * 批量新增优惠券
+   */
+  boolean batchSave(List<CouponRequest> list);
+
+  /**
    * 查询优惠券详情
   */
   CouponApiDetailsVo details(CouponDetailsRequest data);

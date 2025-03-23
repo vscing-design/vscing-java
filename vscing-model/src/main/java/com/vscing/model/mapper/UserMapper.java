@@ -31,7 +31,15 @@ public interface UserMapper {
 
     User selectByPhone(String phone);
 
+    /** 
+     * 插入
+    */
     int insert(User record);
+
+    /**
+     * 批量插入
+    */
+    int batchInsert(List<User> list);
 
     /**
      * 更新手机号

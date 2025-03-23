@@ -402,7 +402,7 @@ public class OrderServiceImpl implements OrderService {
         }
       }
       // 发送mq消息
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15 * 60 * 1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15*60*1000);
       // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
       orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));

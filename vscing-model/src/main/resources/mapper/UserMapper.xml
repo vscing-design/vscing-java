@@ -116,6 +116,32 @@
         </trim>
     </insert>
 
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].source != null">`source`,</if>
+            <if test="list[0].username != null">username,</if>
+            <if test="list[0].password != null">password,</if>
+            <if test="list[0].phone != null">phone,</if>
+            <if test="list[0].star != null">star,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.source != null">#{item.source, jdbcType=TINYINT},</if>
+                <if test="item.username != null">#{item.username, jdbcType=VARCHAR},</if>
+                <if test="item.password != null">#{item.password, jdbcType=VARCHAR},</if>
+                <if test="item.phone != null">#{item.phone, jdbcType=VARCHAR},</if>
+                <if test="item.star != null">#{item.star, jdbcType=TINYINT},</if>
+                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+    </insert>
+
     <!-- 更新手机号信息 -->
     <update id="updatePhone" parameterType="com.vscing.model.entity.User">
         UPDATE <include refid="tableName" />

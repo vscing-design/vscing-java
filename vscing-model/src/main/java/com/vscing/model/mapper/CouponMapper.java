@@ -25,6 +25,11 @@ public interface CouponMapper {
   List<Coupon> getList(CouponListDto record);
 
   /**
+   * 详情
+  */
+  Coupon selectById(@Param("id") Long id);
+
+  /**
    * 作废
   */
   int updateCouponCancel(@Param("record") CouponCancelRequest record, @Param("updatedBy") Long by);
@@ -33,6 +38,16 @@ public interface CouponMapper {
    * 创建
   */
   int insert(Coupon record);
+
+  /**
+   * 批量创建
+   */
+  int batchInsert(List<Coupon> list);
+
+  /**
+   * 修改优惠券状态
+  */
+  int updateStatus(Coupon record);
 
   /**
    * 查询详情

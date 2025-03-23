@@ -52,6 +52,12 @@ public class DelayRabbitMQConfig {
   public static final String REFUND_QUERY_ROUTING_KEY = "refund_query_routing_key";
 
   /**
+   * 取消优惠券相关配置
+   */
+  public static final String CANCEL_COUPON_QUEUE = "cancel_coupon_queue";
+  public static final String CANCEL_COUPON_ROUTING_KEY = "cancel_coupon_routing_key";
+
+  /**
    * 创建延迟交换机。
    */
   @Bean
@@ -132,6 +138,22 @@ public class DelayRabbitMQConfig {
   @Bean
   public Binding bindingRefundQueryQueueToDelayedExchange(Queue refundQueryQueue) {
     return BindingBuilder.bind(refundQueryQueue).to(delayedExchange()).with(REFUND_QUERY_ROUTING_KEY).noargs();
+  }
+
+  /**
+   * 创建取消优惠券延迟队列
+   */
+  @Bean
+  public Queue cancelCouponQueue() {
+    return QueueBuilder.durable(CANCEL_COUPON_QUEUE).build();
+  }
+
+  /**
+   * 绑定取消订单队列到延迟交换机
+   */
+  @Bean
+  public Binding bindingCancelCouponQueueToDelayedExchange(Queue cancelCouponQueue) {
+    return BindingBuilder.bind(cancelCouponQueue).to(delayedExchange()).with(CANCEL_COUPON_ROUTING_KEY).noargs();
   }
 
 }

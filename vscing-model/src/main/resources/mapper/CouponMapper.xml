@@ -21,6 +21,8 @@
         <result column="condition" property="condition" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="reason" property="reason" jdbcType="TINYINT" />
+        <result column="verify_at" property="verifyAt" jdbcType="TIMESTAMP" />
+        <result column="cancel_at" property="cancelAt" jdbcType="TIMESTAMP" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -122,9 +124,11 @@
             <if test="startTime != null">start_time,</if>
             <if test="endTime != null">end_time,</if>
             <if test="tags != null">tags,</if>
-            <if test="condition != null">condition,</if>
+            <if test="condition != null">`condition`,</if>
             <if test="status != null">status,</if>
             <if test="reason != null">reason,</if>
+            <if test="verifyAt != null">verify_at,</if>
+            <if test="cancelAt != null">cancel_at,</if>
             <if test="createdBy != null">created_by,</if>
             <if test="createdAt != null">created_at,</if>
         </trim>
@@ -146,9 +150,63 @@
             <if test="condition != null">#{condition, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="reason != null">#{reason, jdbcType=TINYINT},</if>
+            <if test="verifyAt != null">#{verifyAt, jdbcType=TIMESTAMP},</if>
+            <if test="cancelAt != null">#{cancelAt, jdbcType=TIMESTAMP},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT},</if>
             <if test="createdAt != null">#{createdAt, jdbcType=TIMESTAMP},</if>
         </trim>
+    </insert>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].userId != null">user_id,</if>
+            <if test="list[0].title != null">title,</if>
+            <if test="list[0].phone != null">phone,</if>
+            <if test="list[0].code != null">code,</if>
+            <if test="list[0].salesAmount != null">sales_amount,</if>
+            <if test="list[0].faceAmount != null">face_amount,</if>
+            <if test="list[0].type != null">type,</if>
+            <if test="list[0].attr != null">attr,</if>
+            <if test="list[0].source != null">source,</if>
+            <if test="list[0].startTime != null">start_time,</if>
+            <if test="list[0].endTime != null">end_time,</if>
+            <if test="list[0].tags != null">tags,</if>
+            <if test="list[0].condition != null">`condition`,</if>
+            <if test="list[0].status != null">status,</if>
+            <if test="list[0].reason != null">reason,</if>
+            <if test="list[0].verifyAt != null">verify_at,</if>
+            <if test="list[0].cancelAt != null">cancel_at,</if>
+            <if test="list[0].createdBy != null">created_by,</if>
+            <if test="list[0].createdAt != null">created_at,</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.userId != null">#{item.userId, jdbcType=BIGINT},</if>
+                <if test="item.title != null">#{item.title, jdbcType=VARCHAR},</if>
+                <if test="item.phone != null">#{item.phone, jdbcType=VARCHAR},</if>
+                <if test="item.code != null">#{item.code, jdbcType=VARCHAR},</if>
+                <if test="item.salesAmount != null">#{item.salesAmount, jdbcType=DECIMAL},</if>
+                <if test="item.faceAmount != null">#{item.faceAmount, jdbcType=DECIMAL},</if>
+                <if test="item.type != null">#{item.type, jdbcType=TINYINT},</if>
+                <if test="item.attr != null">#{item.attr, jdbcType=TINYINT},</if>
+                <if test="item.source != null">#{item.source, jdbcType=TINYINT},</if>
+                <if test="item.startTime != null">#{item.startTime, jdbcType=TIMESTAMP},</if>
+                <if test="item.endTime != null">#{item.endTime, jdbcType=TIMESTAMP},</if>
+                <if test="item.tags != null">#{item.tags, jdbcType=VARCHAR},</if>
+                <if test="item.condition != null">#{item.condition, jdbcType=VARCHAR},</if>
+                <if test="item.status != null">#{item.status, jdbcType=TINYINT},</if>
+                <if test="item.reason != null">#{item.reason, jdbcType=TINYINT},</if>
+                <if test="item.verifyAt != null">#{item.verifyAt, jdbcType=TIMESTAMP},</if>
+                <if test="item.cancelAt != null">#{item.cancelAt, jdbcType=TIMESTAMP},</if>
+                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT},</if>
+                <if test="item.createdAt != null">#{item.createdAt, jdbcType=TIMESTAMP},</if>
+            </trim>
+        </foreach>
     </insert>
 
     <!-- 作废 -->
@@ -161,8 +219,23 @@
         WHERE id = #{record.id, jdbcType=BIGINT}
     </update>
 
+    <!-- 过期 -->
+    <update id="updateStatus" parameterType="map">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="verifyAt != null">verify_at = #{verifyAt, jdbcType=TIMESTAMP}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
+    </select>
+
     <!-- 查询详情 -->
-    <select id="selectByPhoneCode" resultMap="BaseResultMap">
+    <select id="selectByPhoneCode" resultType="com.vscing.model.vo.CouponApiDetailsVo">
         SELECT * FROM <include refid="tableName" />
         WHERE phone = #{phone, jdbcType=VARCHAR}
         and code = #{code, jdbcType=VARCHAR}

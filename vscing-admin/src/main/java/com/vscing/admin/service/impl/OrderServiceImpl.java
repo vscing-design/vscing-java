@@ -537,7 +537,7 @@ public class OrderServiceImpl implements OrderService {
         syncCodeMq.setOrderId(order.getId());
         syncCodeMq.setNum(1);
         String msg = JsonUtils.toJsonString(syncCodeMq);
-        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60 *1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60*1000);
         return true;
       }
       throw new ServiceException(message);

@@ -66,4 +66,10 @@ public class Coupon extends BaseEntity {
   @Schema(description = "作废原因 1 全部 2 错误券作废 3 订单退款")
   private Integer reason;
 
+  @Schema(description = "核销日期")
+  private LocalDateTime verifyAt;
+
+  @Schema(description = "作废日期")
+  private LocalDateTime cancelAt;
+
 }

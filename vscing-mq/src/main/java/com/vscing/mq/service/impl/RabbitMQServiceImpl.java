@@ -22,7 +22,7 @@ public class RabbitMQServiceImpl implements RabbitMQService {
   private RabbitTemplate rabbitTemplate;
 
   @Override
-  public void sendDelayedMessage(String routingKey, Object message, int delayMilliseconds) {
+  public void sendDelayedMessage(String routingKey, Object message, long delayMilliseconds) {
     rabbitTemplate.convertAndSend(DelayRabbitMQConfig.DELAYED_EXCHANGE_NAME, routingKey, message, msg -> {
       msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
       return msg;

@@ -38,6 +38,9 @@ public class CouponRequest {
   @Schema(description = "优惠券面值（元）")
   private BigDecimal faceAmount;
 
+  @Schema(description = "优惠券类型 1 电影票")
+  private Integer type;
+
   @NotNull(message = "优惠券属性不能为空")
   @Schema(description = "优惠券属性 1 单人 2 双人 3 多人")
   private Integer attr;

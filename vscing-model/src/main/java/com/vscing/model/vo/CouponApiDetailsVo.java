@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class CouponApiDetailsVo {
 
+  @Schema(description = "主键ID")
+  private Long id;
+
   @Schema(description = "优惠券名称")
   private String title;
 
@@ -56,5 +59,11 @@ public class CouponApiDetailsVo {
 
   @Schema(description = "作废原因 1 全部 2 错误券作废 3 订单退款")
   private Integer reason;
+
+  @Schema(description = "核销日期")
+  private LocalDateTime verifyAt;
+
+  @Schema(description = "作废日期")
+  private LocalDateTime cancelAt;
 
 }
