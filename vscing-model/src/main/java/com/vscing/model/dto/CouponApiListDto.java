@@ -1,6 +1,7 @@
 package com.vscing.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
  * CouponApiListDto
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author vscing
  * @date 2025/3/23 17:46
  */
+@Data
 public class CouponApiListDto {
 
   @Schema(description = "用户id")

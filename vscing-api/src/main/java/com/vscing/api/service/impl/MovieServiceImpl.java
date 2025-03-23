@@ -76,7 +76,7 @@ public class MovieServiceImpl implements MovieService {
       // 实际售价
       movieApiVo.setMinPrice(price);
       // 重置其他数据
-      movieApiVo.setMinShowPrice(null);
+//      movieApiVo.setMinShowPrice(null);
       movieApiVo.setMinUserPrice(null);
     });
 
