@@ -5,6 +5,7 @@ import com.vscing.admin.service.CouponService;
 import com.vscing.model.dto.CouponListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.mapper.CouponMapper;
+import com.vscing.model.request.CouponCancelRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,12 @@ public class CouponServiceImpl implements CouponService {
   public List<Coupon> getList(CouponListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return couponMapper.getList(data);
+  }
+
+  @Override
+  public boolean couponCancel(CouponCancelRequest data, Long by) {
+    int rowsAffected = couponMapper.updateCouponCancel(data, by);
+    return rowsAffected > 0;
   }
 
 }

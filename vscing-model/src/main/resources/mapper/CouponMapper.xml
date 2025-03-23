@@ -128,6 +128,16 @@
         </trim>
     </insert>
 
+    <!-- 作废 -->
+    <update id="updateCouponCancel" parameterType="map">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="record.reason != null">reason = #{record.reason, jdbcType=TINYINT},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{record.id, jdbcType=BIGINT}
+    </update>
+
     <!-- 查询详情 -->
     <select id="selectByPhoneCode" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
