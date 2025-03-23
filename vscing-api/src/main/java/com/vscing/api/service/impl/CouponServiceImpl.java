@@ -2,8 +2,10 @@ package com.vscing.api.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.CouponService;
 import com.vscing.common.exception.ServiceException;
+import com.vscing.model.dto.CouponApiListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.User;
 import com.vscing.model.mapper.CouponMapper;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * CouponServiceImpl
@@ -30,6 +34,12 @@ public class CouponServiceImpl implements CouponService {
 
   @Autowired
   private CouponMapper couponMapper;
+
+  @Override
+  public List<Coupon> selectApiList(CouponApiListDto data, Integer pageSize, Integer pageNum) {
+    PageHelper.startPage(pageNum, pageSize);
+    return couponMapper.selectApiList(data);
+  }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)

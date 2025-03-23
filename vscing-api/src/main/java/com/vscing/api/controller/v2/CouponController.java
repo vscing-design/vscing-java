@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/v2/coupon")
-@Tag(name = "优惠劵接口", description = "优惠劵接口")
+@Tag(name = "三方优惠劵接口", description = "三方优惠劵接口")
 public class CouponController {
 
   @Autowired

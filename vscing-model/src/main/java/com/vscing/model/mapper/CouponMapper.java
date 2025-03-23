@@ -1,5 +1,6 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.CouponApiListDto;
 import com.vscing.model.dto.CouponListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.request.CouponCancelRequest;
@@ -37,5 +38,11 @@ public interface CouponMapper {
    * 查询详情
   */
   CouponApiDetailsVo selectByPhoneCode(@Param("phone") String phone, @Param("code") String code);
+
+  /**
+   * 我的列表
+  */
+  List<Coupon> selectApiList(CouponApiListDto record);
+
 
 }

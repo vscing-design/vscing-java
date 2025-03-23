@@ -1,8 +1,12 @@
 package com.vscing.api.service;
 
+import com.vscing.model.dto.CouponApiListDto;
+import com.vscing.model.entity.Coupon;
 import com.vscing.model.request.CouponDetailsRequest;
 import com.vscing.model.request.CouponRequest;
 import com.vscing.model.vo.CouponApiDetailsVo;
+
+import java.util.List;
 
 /**
  * CouponService
@@ -11,6 +15,11 @@ import com.vscing.model.vo.CouponApiDetailsVo;
  * @date 2025/3/22 17:07
  */
 public interface CouponService {
+
+  /**
+   * 优惠券列表
+   */
+  List<Coupon> selectApiList(CouponApiListDto data, Integer pageSize, Integer pageNum);
 
   /**
    * 新增优惠券
