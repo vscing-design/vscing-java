@@ -32,7 +32,7 @@ public interface CouponMapper {
   /**
    * 作废
   */
-  int updateCouponCancel(@Param("record") CouponCancelRequest record, @Param("updatedBy") Long by);
+  int updateCouponCancel(CouponCancelRequest record);
 
   /**
    * 创建

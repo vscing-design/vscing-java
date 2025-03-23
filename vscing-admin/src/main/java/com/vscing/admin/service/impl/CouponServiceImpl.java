@@ -9,6 +9,7 @@ import com.vscing.model.request.CouponCancelRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -31,7 +32,11 @@ public class CouponServiceImpl implements CouponService {
 
   @Override
   public boolean couponCancel(CouponCancelRequest data, Long by) {
-    int rowsAffected = couponMapper.updateCouponCancel(data, by);
+    // 设置作废时间
+    data.setCancelAt(LocalDateTime.now());
+    // 设置更新人
+    data.setUpdatedBy(by);
+    int rowsAffected = couponMapper.updateCouponCancel(data);
     return rowsAffected > 0;
   }
 

@@ -213,10 +213,23 @@
     <update id="updateCouponCancel" parameterType="map">
         UPDATE <include refid="tableName" />
         <set>
-            <if test="record.reason != null">reason = #{record.reason, jdbcType=TINYINT},</if>
-            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+            status = 4,
+            <if test="reason != null">
+                reason = #{reason, jdbcType=TINYINT},
+            </if>
+            <if test="cancelAt != null">
+                cancel_at = #{cancelAt, jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedBy != null">
+                updated_by = #{updatedBy, jdbcType=BIGINT}
+            </if>
         </set>
-        WHERE id = #{record.id, jdbcType=BIGINT}
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, jdbcType=BIGINT}
+        </foreach>
+        AND status = 1
+        AND deleted_at IS NULL
     </update>
 
     <!-- 过期 -->
