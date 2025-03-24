@@ -13,12 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.sql.SQLNonTransientConnectionException;
 
@@ -61,6 +64,28 @@ public class GlobalExceptionHandler {
     log.error("请求参数类型不匹配'{}',发生系统异常.", request.getRequestURI());
     // 返回自定义的错误消息和状态码
     return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "请求参数类型不匹配"), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  /**
+   * 找不到路由
+   */
+  @ExceptionHandler(NoHandlerFoundException.class)
+  public ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpServletRequest request) {
+    String requestURI = request.getRequestURI();
+    String errorMessage = "路由不存在: " + ex.getMessage();
+    log.error("请求地址'{}'不存在.", requestURI);
+    return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "路由不存在"), HttpStatusCode.valueOf(cn.hutool.http.HttpStatus.HTTP_NOT_FOUND));
+  }
+
+  /**
+   * 找不到资源
+   */
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
+    String requestURI = request.getRequestURI();
+    String errorMessage = "资源未找到: " + ex.getMessage();
+    log.error("请求资源'{}'未找到.", requestURI);
+    return new ResponseEntity<>(CommonResult.failed(appDebug ? errorMessage : "资源未找到"), HttpStatus.NOT_FOUND);
   }
 
   /**

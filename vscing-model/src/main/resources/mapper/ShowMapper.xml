@@ -163,7 +163,8 @@
             m.publish_status,
             m.grade,
             MIN(sa.user_price) AS minUserPrice,
-            MIN(sa.show_price) AS minShowPrice
+            MIN(sa.show_price) AS minShowPrice,
+            MAX(sa.show_price) AS maxPrice
         FROM <include refid="movieTableName" /> m
         INNER JOIN <include refid="tableName" /> s ON s.movie_id = m.id
         INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id

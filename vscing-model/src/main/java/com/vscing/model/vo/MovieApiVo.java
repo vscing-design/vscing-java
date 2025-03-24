@@ -51,6 +51,9 @@ public class MovieApiVo {
   @Schema(description = "上映类型，HOT为热映，WAIT为待上映")
   private String publishStatus;
 
+  @Schema(description = "最大场次价格（元）")
+  private BigDecimal maxPrice;
+
   @Schema(description = "最小场次价格（元）")
   private BigDecimal minShowPrice;
 
