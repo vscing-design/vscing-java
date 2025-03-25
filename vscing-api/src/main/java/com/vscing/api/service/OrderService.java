@@ -39,6 +39,11 @@ public interface OrderService {
   boolean verifyOrderSeat(OrderApiConfirmDetailsDto orderApiDetails);
 
   /**
+   * 校验优惠券是否可用
+  */
+  boolean verifyCoupon(Long userId, Long couponId);
+
+  /**
    * 下单确认页详情
    */
   OrderApiConfirmDetailsVo getConfirmDetails(OrderApiConfirmDetailsDto orderApiDetails);

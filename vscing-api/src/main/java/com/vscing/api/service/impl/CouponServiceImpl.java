@@ -1,6 +1,5 @@
 package com.vscing.api.service.impl;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.github.pagehelper.PageHelper;
@@ -14,15 +13,12 @@ import com.vscing.model.mapper.UserMapper;
 import com.vscing.model.request.CouponDetailsRequest;
 import com.vscing.model.request.CouponRequest;
 import com.vscing.model.vo.CouponApiDetailsVo;
-import com.vscing.mq.config.DelayRabbitMQConfig;
 import com.vscing.mq.service.RabbitMQService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,11 +92,6 @@ public class CouponServiceImpl implements CouponService {
       if (rowsAffected <= 0) {
         throw new ServiceException("创建优惠券失败");
       }
-      // 延迟取消优惠券
-      String msg = String.valueOf(couponId);
-      // 计算当前日期到优惠券过期时间的毫秒数
-      long delayMilliseconds = LocalDateTimeUtil.between(LocalDateTime.now(), data.getEndTime(), ChronoUnit.MILLIS);
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_COUPON_ROUTING_KEY, msg, delayMilliseconds);
       return true;
     } catch (Exception e) {
       throw new ServiceException("创建优惠券失败: " + e.getMessage());
@@ -173,15 +164,6 @@ public class CouponServiceImpl implements CouponService {
         if (couponsInserted != couponsToInsert.size()) {
           throw new ServiceException("批量插入优惠券失败");
         }
-      }
-
-      for (Coupon coupon : couponsToInsert) {
-        Long couponId = coupon.getId();
-        // 延迟取消优惠券
-        String msg = String.valueOf(couponId);
-        // 计算当前日期到优惠券过期时间的毫秒数
-        long delayMilliseconds = LocalDateTimeUtil.between(LocalDateTime.now(), coupon.getEndTime(), ChronoUnit.MILLIS);
-        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_COUPON_ROUTING_KEY, msg, delayMilliseconds);
       }
 
       return true;

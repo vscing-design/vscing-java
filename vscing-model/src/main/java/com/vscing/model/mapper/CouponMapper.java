@@ -30,6 +30,11 @@ public interface CouponMapper {
   Coupon selectById(@Param("id") Long id);
 
   /**
+   * 校验优惠券
+  */
+  Coupon verifyCoupon(@Param("userId") Long userId, @Param("couponId") Long couponId);
+
+  /**
    * 作废
   */
   int updateCouponCancel(CouponCancelRequest record);

@@ -18,6 +18,7 @@ import com.vscing.model.dto.OrderApiListDto;
 import com.vscing.model.dto.OrderApiScoreDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
+import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.OrderDetail;
 import com.vscing.model.entity.OrderScore;
@@ -28,6 +29,7 @@ import com.vscing.model.entity.UserAuth;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
+import com.vscing.model.mapper.CouponMapper;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.OrderScoreMapper;
@@ -81,6 +83,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private UserAuthMapper userAuthMapper;
+
+  @Autowired
+  private CouponMapper couponMapper;
 
   @Autowired
   private OrderMapper orderMapper;
@@ -185,6 +190,12 @@ public class OrderServiceImpl implements OrderService {
         .filter(seatId -> !seatId.trim().isEmpty())
         .collect(Collectors.toList());
     return orderMapper.checkOrderShowSeat(orderApiDetails.getShowId(), seatIds);
+  }
+
+  @Override
+  public boolean verifyCoupon(Long userId, Long couponId) {
+    Coupon coupon = couponMapper.verifyCoupon(userId, couponId);
+    return coupon != null;
   }
 
   @Override

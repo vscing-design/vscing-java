@@ -95,13 +95,13 @@
                 <choose>
                     <when test="statusType == 1">
                         AND status = 1
+                        AND end_time <![CDATA[ >= ]]> NOW()
                     </when>
                     <when test="statusType == 2">
-                        AND status in (2,3,4)
+                        AND ((status IN (2,3)) OR (status = 1 AND end_time <![CDATA[ < ]]> NOW()))
                     </when>
                 </choose>
             </if>
-            AND created_at <![CDATA[ >= ]]> CURDATE()
             AND deleted_at IS NULL
         </where>
         ORDER BY created_at DESC
@@ -245,6 +245,25 @@
     <!-- 根据 ID 查询 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" /> WHERE id = #{id, jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
+    </select>
+
+    <!-- 校验优惠券是否还存在 -->
+    <select id="verifyCoupon" parameterType="map" resultMap="BaseResultMap">
+        SELECT *
+        FROM <include refid="tableName" />
+        <where>
+            <if test="couponId != null">
+                AND id = #{couponId, jdbcType=BIGINT}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId, jdbcType=BIGINT}
+            </if>
+            AND status = 1
+            AND start_time <![CDATA[ <= ]]> NOW()
+            AND end_time <![CDATA[ >= ]]> NOW()
+            AND deleted_at IS NULL
+        </where>
+        LIMIT 1
     </select>
 
     <!-- 查询详情 -->

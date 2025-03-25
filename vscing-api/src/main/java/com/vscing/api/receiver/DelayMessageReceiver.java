@@ -12,7 +12,6 @@ import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.OrderUtils;
 import com.vscing.common.utils.StringUtils;
-import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.Order;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.http.HttpOrder;
@@ -274,42 +273,6 @@ public class DelayMessageReceiver {
       log.error("退款订单查询延迟队列成功");
     } catch (Exception e) {
       log.error("退款订单查询延迟队列异常: {}", e.getMessage());
-    } finally {
-      channel.basicAck(deliveryTag, false);
-    }
-  }
-
-  /**
-   * 取消优惠券延迟队列
-   */
-  @RabbitListener(queues = DelayRabbitMQConfig.CANCEL_COUPON_QUEUE, ackMode = "MANUAL")
-  public void receiveCancelCouponMessage(Message message, Channel channel,
-                                        @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
-    try {
-      // 处理队列消息
-      String msg = new String(message.getBody(), StandardCharsets.UTF_8);
-      log.error("取消优惠券延迟队列消息: {}", msg);
-      if(StringUtils.isEmpty(msg)) {
-        throw new Exception("消息体错误");
-      }
-      long couponId = Long.parseLong(msg);
-      log.error("取消优惠券延迟队列消息 couponId: {}", couponId);
-      // 查询订单信息
-      Coupon coupon = couponMapper.selectById(couponId);
-      if(coupon.getStatus() != 1) {
-        throw new Exception("优惠券状态错误");
-      }
-      // 修改订单状态
-      Coupon newCoupon = new Coupon();
-      newCoupon.setId(coupon.getId());
-      newCoupon.setStatus(3);
-      int rowsAffected = couponMapper.updateStatus(newCoupon);
-      if (rowsAffected <= 0) {
-        throw new Exception("取消优惠券失败");
-      }
-      log.error("取消优惠券延迟队列成功");
-    } catch (Exception e) {
-      log.error("取消优惠券延迟队列异常: {}", e.getMessage(), e);
     } finally {
       channel.basicAck(deliveryTag, false);
     }

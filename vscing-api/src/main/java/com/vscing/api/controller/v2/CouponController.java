@@ -1,7 +1,6 @@
 package com.vscing.api.controller.v2;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import com.vscing.api.annotate.WhiteListAnnotate;
 import com.vscing.api.service.CouponService;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.mapper.CouponMapper;
@@ -41,7 +40,7 @@ public class CouponController {
   private CouponMapper couponMapper;
 
   @PostMapping("/save")
-  @WhiteListAnnotate(type = "coupon")
+//  @WhiteListAnnotate(type = "coupon")
   @Operation(summary = "新增优惠券")
   public CommonResult<Boolean> save(@Validated @RequestBody CouponRequest data,
                                       BindingResult bindingResult) {
@@ -107,7 +106,7 @@ public class CouponController {
 //  }
 
   @PostMapping("/details")
-  @WhiteListAnnotate(type = "coupon")
+//  @WhiteListAnnotate(type = "coupon")
   @Operation(summary = "优惠券详情")
   public CommonResult<CouponApiDetailsVo> details(@Validated @RequestBody CouponDetailsRequest data,
                                                   BindingResult bindingResult) {

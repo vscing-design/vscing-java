@@ -27,7 +27,7 @@ public class RabbitMQServiceImpl implements RabbitMQService {
       msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
       return msg;
     });
-    log.info("已发送延迟消息: routingKey={}, message={}", routingKey, message);
+    log.info("已发送延迟消息: routingKey={}, message={}, delayMilliseconds={}", routingKey, message, delayMilliseconds);
   }
 
   @Override
