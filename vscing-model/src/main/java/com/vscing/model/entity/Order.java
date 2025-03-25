@@ -22,6 +22,9 @@ public class Order extends BaseEntity {
   @Schema(description = "用户ID")
   private Long userId;
 
+  @Schema(description = "优惠券ID")
+  private Long couponId;
+
   @Schema(description = "供应商ID")
   private Long supplierId;
 
@@ -90,6 +93,9 @@ public class Order extends BaseEntity {
 
   @Schema(description = "订单结算价")
   private BigDecimal settlementPrice;
+
+  @Schema(description = "优惠券抵扣价")
+  private BigDecimal couponPrice;
 
   @Schema(description = "三方接口返回")
   private String responseBody;

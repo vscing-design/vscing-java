@@ -111,11 +111,6 @@ public class OrderController {
       if(is) {
         return CommonResult.failed("当前选中座位已被选中");
       }
-      if(orderApiCreatedDto.getCouponId() != null) {
-        if(!orderService.verifyCoupon(userInfo.getUserId(), orderApiCreatedDto.getCouponId())) {
-          return CommonResult.failed("优惠券已失效");
-        }
-      }
       return CommonResult.success(orderService.create(userInfo.getUserId(), orderApiCreatedDto));
     } catch (Exception e) {
       log.error("请求错误: ", e);

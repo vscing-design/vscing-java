@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Order">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
         <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
         <result column="movie_id" property="movieId" jdbcType="BIGINT" />
@@ -30,6 +31,7 @@
         <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
         <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
         <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+        <result column="coupon_price" property="couponPrice" jdbcType="DECIMAL" />
         <result column="response_body" property="responseBody" jdbcType="VARCHAR" />
         <result column="memo" property="memo" jdbcType="VARCHAR" />
         <result column="stop_show_time" property="stopShowTime" jdbcType="TIMESTAMP" />

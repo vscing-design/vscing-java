@@ -3,6 +3,7 @@ package com.vscing.api.service.impl;
 import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
+import com.vscing.api.service.NotifyService;
 import com.vscing.api.service.OrderService;
 import com.vscing.common.api.ResultCode;
 import com.vscing.common.exception.ServiceException;
@@ -107,6 +108,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private RabbitMQService rabbitMQService;
+
+  @Autowired
+  private NotifyService notifyService;
 
   @Override
   public SeatMapVo getSeat(ShowSeatRequest showSeat) {
@@ -275,7 +279,28 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public OrderApiPaymentVo create(Long userId, OrderApiCreatedDto orderApiCreatedDto) {
-    // 发气支付平台
+    // 获取座位数量
+    int purchaseQuantity = orderApiCreatedDto.getSeatList().size();
+    // 判断是否使用优惠券
+    Long couponId = orderApiCreatedDto.getCouponId();
+    Coupon coupon = null;
+    if(couponId != null) {
+      coupon = couponMapper.verifyCoupon(userId, couponId);
+      if(coupon == null) {
+        throw new ServiceException("优惠券不可用");
+      }
+      int attr = coupon.getAttr();
+      if(attr == 3 && purchaseQuantity <= 2) {
+        throw new ServiceException("优惠券是多人券，不可非多人使用");
+      }
+      if(attr == 2 && purchaseQuantity > 2) {
+        throw new ServiceException("优惠券是双人券，不可非双人使用");
+      }
+      if(attr == 1 && purchaseQuantity > 1) {
+        throw new ServiceException("优惠券是单人券，不可非单人使用");
+      }
+    }
+    // 选择支付平台
     int platform = AppletTypeEnum.findByApplet(orderApiCreatedDto.getPlatform());
     Long showId = orderApiCreatedDto.getShowId();
     // 获取场次全局价格
@@ -318,6 +343,8 @@ public class OrderServiceImpl implements OrderService {
     BigDecimal officialPrice = BigDecimal.ZERO;
     // 订单结算价
     BigDecimal settlementPrice = BigDecimal.ZERO;
+    // 优惠券抵扣价
+    BigDecimal couponPrice = coupon != null ? coupon.getFaceAmount() : BigDecimal.ZERO;
     // 座位信息
     List<String> seatInfo = new ArrayList<>();
     // 遍历区域ID，填充最终结果
@@ -357,13 +384,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     try {
-      // 发起支付
-      AppletService appletService = appletServiceFactory.getAppletService(orderApiCreatedDto.getPlatform());
-      Map<String, Object> paymentData = new HashMap<>(3);
-      paymentData.put("outTradeNo", orderSn);
-      paymentData.put("totalAmount", totalPrice);
-      paymentData.put("openid", userAuth.getOpenid());
-      Map<String, String> paymentRes = appletService.getPayment(paymentData);
+      // 实际总价格 = 订单总价 - 优惠券抵扣价
+      totalPrice = totalPrice.subtract(couponPrice);
+      // 是否需要支付
+      boolean needPay = totalPrice.compareTo(BigDecimal.ZERO) > 0;
+      // 创建支付返回map
+      Map<String, String> paymentRes = new HashMap<>(10);
+      if(needPay) {
+        // 发起支付
+        AppletService appletService = appletServiceFactory.getAppletService(orderApiCreatedDto.getPlatform());
+        Map<String, Object> paymentData = new HashMap<>(3);
+        paymentData.put("outTradeNo", orderSn);
+        paymentData.put("totalAmount", totalPrice);
+        paymentData.put("openid", userAuth.getOpenid());
+        paymentRes = appletService.getPayment(paymentData);
+      }
       int rowsAffected = 0;
       // 创建订单数据
       Order order = new Order();
@@ -373,12 +408,18 @@ public class OrderServiceImpl implements OrderService {
       order.setCinemaId(show.getCinemaId());
       order.setMovieId(show.getMovieId());
       order.setShowId(show.getId());
+      // 优惠券信息
+      if(coupon != null) {
+        order.setCouponId(coupon.getId());
+      }
       // 支付订单号 支付宝直接写入，微信后期再改成订单号
       order.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
       // 手机号
       order.setPhone(orderApiCreatedDto.getPhone());
       // 状态
-      order.setStatus(1);
+      order.setStatus(needPay ? 1 : 2);
+      // 支付状态
+      order.setPaymentStatus(needPay ? 2 : 1);
       // 下单方式
       order.setOrderType(1);
       // 下单平台
@@ -388,6 +429,7 @@ public class OrderServiceImpl implements OrderService {
       order.setTotalPrice(totalPrice);
       order.setOfficialPrice(officialPrice);
       order.setSettlementPrice(settlementPrice);
+      order.setCouponPrice(couponPrice);
       // 场次信息
       order.setHallName(show.getHallName());
       // 座位信息
@@ -412,29 +454,32 @@ public class OrderServiceImpl implements OrderService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
-      // 发送mq消息
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15*60*1000);
-      // 下发支付参数
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
-      orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
-      orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
-      orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
-      orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
-      orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
-      orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
-      // 百度支付参数
-      BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
-      if(platform == AppletTypeEnum.BAIDU.getCode()) {
-        baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
-        baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
-        baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
-        baiduOrderInfoVo.setTotalAmount(String.valueOf(totalPrice.multiply(BigDecimal.valueOf(100))));
-        baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + orderSn);
-        baiduOrderInfoVo.setTpOrderId(orderSn);
-        baiduOrderInfoVo.setSignFieldsRange("1");
-        orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
+      if(needPay) {
+        // 发送mq消息
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.CANCEL_ORDER_ROUTING_KEY, orderId.toString(), 15*60*1000);
+        // 下发支付参数
+        orderApiPaymentVo.setTimeStamp(paymentRes.getOrDefault("timeStamp", ""));
+        orderApiPaymentVo.setNonceStr(paymentRes.getOrDefault("nonceStr", ""));
+        orderApiPaymentVo.setPackageStr(paymentRes.getOrDefault("packageStr", ""));
+        orderApiPaymentVo.setSignType(paymentRes.getOrDefault("signType", ""));
+        orderApiPaymentVo.setPaySign(paymentRes.getOrDefault("paySign", ""));
+        orderApiPaymentVo.setTradeNo(paymentRes.getOrDefault("tradeNo", ""));
+        // 百度支付参数
+        BaiduOrderInfoVo baiduOrderInfoVo = new BaiduOrderInfoVo();
+        if(platform == AppletTypeEnum.BAIDU.getCode()) {
+          baiduOrderInfoVo.setAppKey(paymentRes.getOrDefault("appKey", ""));
+          baiduOrderInfoVo.setDealId(paymentRes.getOrDefault("dealId", ""));
+          baiduOrderInfoVo.setRsaSign(paymentRes.getOrDefault("rsaSign", ""));
+          baiduOrderInfoVo.setTotalAmount(String.valueOf(totalPrice.multiply(BigDecimal.valueOf(100))));
+          baiduOrderInfoVo.setDealTitle("嗨呀电影票订单" + orderSn);
+          baiduOrderInfoVo.setTpOrderId(orderSn);
+          baiduOrderInfoVo.setSignFieldsRange("1");
+          orderApiPaymentVo.setOrderInfo(baiduOrderInfoVo);
+        }
+      } else {
+        notifyService.ticketOrder(orderSn);
       }
-
       return orderApiPaymentVo;
     } catch (Exception e) {
       log.error("下单异常：", e);
