@@ -16,6 +16,9 @@ public class OrderVo {
     @Schema(description = "主键ID")
     private Long id;
 
+    @Schema(description = "优惠券ID，存在就是优惠券订单")
+    private Long couponId;
+
     @Schema(description = "用户ID")
     private Long userId;
 
@@ -136,6 +139,9 @@ public class OrderVo {
 
     @Schema(description = "订单结算价")
     private BigDecimal settlementPrice;
+
+    @Schema(description = "优惠券抵扣价")
+    private BigDecimal couponPrice;
 
     @Schema(description = "创建时间")
     private LocalDateTime createdAt;

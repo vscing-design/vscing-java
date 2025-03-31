@@ -50,4 +50,7 @@ public class OrderListDto {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime endDate;
 
+  @Schema(description = "是否优惠券 0 全部 1 是 2 否")
+  private Integer isCoupon;
+
 }

@@ -20,6 +20,8 @@ public interface TaskService {
 
   void syncShow();
 
+  void syncCoupon();
+
   void syncTest();
 
   void syncPendingPaymentOrder();

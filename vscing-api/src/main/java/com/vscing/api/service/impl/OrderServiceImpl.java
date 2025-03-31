@@ -59,6 +59,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -220,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
     // 构建区域价格映射
     Map<String, ShowArea> areaPriceMap = new HashMap<>(0);
     // 计算价格
-    if(areas != null && !areas.isEmpty()) {
+    if(!areas.isEmpty()) {
       // 获取区域价格
       List<ShowArea> showAreaList = showAreaMapper.selectByShowIdAreas(orderApiDetails.getShowId(), areas);
       // 构建区域价格映射
@@ -384,8 +385,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     try {
-      // 实际总价格 = 订单总价 - 优惠券抵扣价
-      totalPrice = totalPrice.subtract(couponPrice);
+      if(coupon != null) {
+        // 实际总价格 = 订单总价 - 优惠券抵扣价
+        totalPrice = officialPrice.subtract(couponPrice);
+      }
       // 是否需要支付
       boolean needPay = totalPrice.compareTo(BigDecimal.ZERO) > 0;
       // 创建支付返回map
@@ -454,6 +457,16 @@ public class OrderServiceImpl implements OrderService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
+      // 核销优惠券
+      if(coupon != null) {
+        coupon.setStatus(2);
+        coupon.setVerifyAt(LocalDateTime.now());
+        rowsAffected = couponMapper.updateStatus(coupon);
+        if (rowsAffected <= 0) {
+          throw new ServiceException("优惠券核销失败");
+        }
+      }
+      // 结果集
       OrderApiPaymentVo orderApiPaymentVo = new OrderApiPaymentVo();
       if(needPay) {
         // 发送mq消息

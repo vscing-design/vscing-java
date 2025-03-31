@@ -78,19 +78,19 @@ public class CinemaApiDetailsShowVo {
     @Schema(description = "场次类型")
     private String showVersionType;
 
-    @Schema(description = "官方金额")
-    private BigDecimal maxPrice;
-
-    @Schema(description = "销售金额")
-    private BigDecimal minPrice;
-
     @Schema(description = "优惠金额")
     private BigDecimal discount;
 
-    @Schema(description = "临时值")
-    private BigDecimal showPrice;
+    @Schema(description = "最小场次官方价格（元）")
+    private BigDecimal minShowPrice;
 
-    @Schema(description = "临时值")
-    private BigDecimal userPrice;
+    @Schema(description = "最小场次结算价格（元）")
+    private BigDecimal minUserPrice;
+
+    @Schema(description = "最大出售价格")
+    private BigDecimal maxPrice;
+
+    @Schema(description = "最小出售价格")
+    private BigDecimal minPrice;
 
 }

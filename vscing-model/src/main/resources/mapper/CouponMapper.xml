@@ -232,7 +232,7 @@
         AND deleted_at IS NULL
     </update>
 
-    <!-- 过期 -->
+    <!-- 核销 -->
     <update id="updateStatus" parameterType="map">
         UPDATE <include refid="tableName" />
         <set>
@@ -240,6 +240,13 @@
             <if test="verifyAt != null">verify_at = #{verifyAt, jdbcType=TIMESTAMP}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 取消 -->
+    <update id="batchCancel">
+        UPDATE <include refid="tableName" />
+        SET status = 3
+        WHERE status = 1 AND end_time <![CDATA[ < ]]> NOW();
     </update>
 
     <!-- 根据 ID 查询 -->

@@ -72,9 +72,14 @@ public class CinemaServiceImpl implements CinemaService {
     // 循环计算实际售价
     cinemaApiVoList.forEach(cinemaApiVo -> {
       // 实际销售价格
-      BigDecimal price = PricingUtil.calculateActualPrice(cinemaApiVo.getMaxPrice(), cinemaApiVo.getMinPrice(), pricingRules);
-      // 实际售价
+      BigDecimal price = PricingUtil.calculateActualPrice(cinemaApiVo.getMinShowPrice(), cinemaApiVo.getMinUserPrice(), pricingRules);
+      // 实际最小出售价格
       cinemaApiVo.setMinPrice(price);
+      // 实际最大出售价格
+      cinemaApiVo.setMaxPrice(cinemaApiVo.getMinShowPrice());
+      // 重置其他数据
+//      cinemaApiVo.setMinShowPrice(null);
+//      cinemaApiVo.setMinUserPrice(null);
     });
 
     return cinemaApiVoList;
@@ -119,15 +124,15 @@ public class CinemaServiceImpl implements CinemaService {
     // 循环影片场次列表，并计算出最低价格和最高价格
     cinemaApiDetailsShowVoList.forEach(cinemaApiDetailsShowVo -> {
       ShowArea showArea = ShowAreaMinPrice.get(cinemaApiDetailsShowVo.getShowId());
-      BigDecimal showPrice = cinemaApiDetailsShowVo.getShowPrice();
-      BigDecimal userPrice = cinemaApiDetailsShowVo.getUserPrice();
+      BigDecimal showPrice = cinemaApiDetailsShowVo.getMinShowPrice();
+      BigDecimal userPrice = cinemaApiDetailsShowVo.getMinUserPrice();
       if(showArea != null) {
         showPrice = showArea.getShowPrice();
         userPrice = showArea.getUserPrice();
       }
       // 置空
-      cinemaApiDetailsShowVo.setShowPrice(null);
-      cinemaApiDetailsShowVo.setUserPrice(null);
+//      cinemaApiDetailsShowVo.setMinShowPrice(null);
+//      cinemaApiDetailsShowVo.setMinUserPrice(null);
       if(showPrice == null || userPrice == null) {
         return;
       }

@@ -79,6 +79,16 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="isCoupon != null and isCoupon != 0">
+                <choose>
+                    <when test="isCoupon == 1">
+                        AND `order`.coupon_id IS NOT NULL
+                    </when>
+                    <when test="isCoupon == 2">
+                        AND `order`.coupon_id IS NULL
+                    </when>
+                </choose>
+            </if>
             <if test="orderType != null and orderType != 0">
                 AND `order`.order_type = #{orderType}
             </if>

@@ -176,7 +176,7 @@ public class OrderController {
   @PostMapping("/payment/{id}")
   @Operation(summary = "去支付")
   public CommonResult<OrderApiPaymentVo> payment(@PathVariable("id") Long id,
-                                     @AuthenticationPrincipal UserDetails userInfo) {
+                                                 @AuthenticationPrincipal UserDetails userInfo) {
     try {
       return CommonResult.success(orderService.paymentOrder(userInfo.getUserId(), id));
     } catch (Exception e) {

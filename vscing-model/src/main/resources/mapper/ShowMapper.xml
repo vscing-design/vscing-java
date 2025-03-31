@@ -45,14 +45,14 @@
     <!-- 查询列表 -->
     <select id="getList" resultType="com.vscing.model.vo.ShowListVo">
         SELECT
-            s.*,
-            s1.name as supplierName,
-            m.name as movieName,
-            c.name as cinemaName,
-            c.province_name as provinceName,
-            c.city_name as cityName,
-            c.district_name as districtName,
-            c.address as address
+        s.*,
+        s1.name as supplierName,
+        m.name as movieName,
+        c.name as cinemaName,
+        c.province_name as provinceName,
+        c.city_name as cityName,
+        c.district_name as districtName,
+        c.address as address
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="supplierTableName" /> s1 ON s.supplier_id = s1.id
         LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
@@ -86,16 +86,16 @@
     <!-- 根据cinemaId、supplierId查询全部列表 -->
     <select id="getListByCinemaIdAndSupplierId" resultType="com.vscing.model.vo.ShowListVo">
         SELECT
-            s.supplier_id,
-            s.cinema_id,
-            s.movie_id,
-            s.id,
-            s.hall_name,
-            s.show_time,
-            s.duration,
-            s.show_version_type,
-            s.stop_sell_time,
-            m.name as movieName
+        s.supplier_id,
+        s.cinema_id,
+        s.movie_id,
+        s.id,
+        s.hall_name,
+        s.show_time,
+        s.duration,
+        s.show_version_type,
+        s.stop_sell_time,
+        m.name as movieName
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
@@ -113,29 +113,31 @@
     <!-- 根据cinemaId查询全部场次列表 -->
     <select id="selectByCinemaId" parameterType="long" resultType="com.vscing.model.vo.CinemaApiDetailsShowVo">
         SELECT
-            s.supplier_id as supplierId,
-            s.movie_id as movieId,
-            s.id as showId,
-            s.hall_name as hallName,
-            s.show_time as showTime,
-            s.duration,
-            s.show_version_type as showVersionType,
-            s.stop_sell_time as stopSellTime,
-            s.show_price as showPrice,
-            s.user_price as userPrice,
-            m.name as movieName,
-            m.publish_date as publishDate,
-            m.director,
-            m.cast,
-            m.intro,
-            m.version_type as versionType,
-            m.language,
-            m.movie_type as movieType,
-            m.poster_url as posterUrl,
-            m.plot_url as plotUrl,
-            m.grade,
-            m.like,
-            m.publish_status as publishStatus
+        s.supplier_id as supplierId,
+        s.movie_id as movieId,
+        s.id as showId,
+        s.hall_name as hallName,
+        s.show_time as showTime,
+        s.duration,
+        s.show_version_type as showVersionType,
+        s.stop_sell_time as stopSellTime,
+        s.show_price as showPrice,
+        s.user_price as userPrice,
+        s.show_price as minShowPrice,
+        s.user_price as minUserPrice,
+        m.name as movieName,
+        m.publish_date as publishDate,
+        m.director,
+        m.cast,
+        m.intro,
+        m.version_type as versionType,
+        m.language,
+        m.movie_type as movieType,
+        m.poster_url as posterUrl,
+        m.plot_url as plotUrl,
+        m.grade,
+        m.like,
+        m.publish_status as publishStatus
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
@@ -150,21 +152,20 @@
     <!-- 根据MovieApiListDto查询全部列表 -->
     <select id="selectByMovieApiList" resultType="com.vscing.model.vo.MovieApiVo">
         SELECT
-            m.id,
-            m.name,
-            m.movie_type,
-            m.poster_url,
-            m.like,
-            m.publish_date,
-            m.version_type,
-            m.language,
-            m.director,
-            m.cast,
-            m.publish_status,
-            m.grade,
-            MIN(sa.user_price) AS minUserPrice,
-            MIN(sa.show_price) AS minShowPrice,
-            MAX(sa.show_price) AS maxPrice
+        m.id,
+        m.name,
+        m.movie_type,
+        m.poster_url,
+        m.like,
+        m.publish_date,
+        m.version_type,
+        m.language,
+        m.director,
+        m.cast,
+        m.publish_status,
+        m.grade,
+        MIN(sa.user_price) AS minUserPrice,
+        MIN(sa.show_price) AS minShowPrice
         FROM <include refid="movieTableName" /> m
         INNER JOIN <include refid="tableName" /> s ON s.movie_id = m.id
         INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
@@ -192,44 +193,44 @@
             </if>
         </where>
         GROUP BY
-            m.id,
-            m.name,
-            m.movie_type,
-            m.poster_url,
-            m.like,
-            m.publish_date,
-            m.version_type,
-            m.language,
-            m.director,
-            m.cast,
-            m.publish_status,
-            m.grade
+        m.id,
+        m.name,
+        m.movie_type,
+        m.poster_url,
+        m.like,
+        m.publish_date,
+        m.version_type,
+        m.language,
+        m.director,
+        m.cast,
+        m.publish_status,
+        m.grade
         ORDER BY m.top DESC, m.grade DESC, m.like DESC, m.publish_date DESC
     </select>
 
     <!-- 根据CinemaApiListDto查询全部列表 -->
     <select id="selectByCinemaApiList" resultType="com.vscing.model.vo.CinemaApiVo">
         SELECT
-            c.id,
-            c.name,
-            c.province_name as provinceName,
-            c.city_name as cityName,
-            c.district_name as districtName,
-            c.address,
-            c.lng,
-            c.lat,
-            (
-                6371 * acos(
-                    cos(radians(#{lat})) *
-                    cos(radians(c.lat)) *
-                    cos(radians(c.lng) - radians(#{lng})) +
-                    sin(radians(#{lat})) *
-                    sin(radians(c.lat))
-                )
-            ) AS distance,
-            MIN(s.show_time) as showTime,
-            MIN(sa.user_price) as minPrice,
-            MIN(sa.show_price) as maxPrice
+        c.id,
+        c.name,
+        c.province_name as provinceName,
+        c.city_name as cityName,
+        c.district_name as districtName,
+        c.address,
+        c.lng,
+        c.lat,
+        (
+        6371 * acos(
+        cos(radians(#{lat})) *
+        cos(radians(c.lat)) *
+        cos(radians(c.lng) - radians(#{lng})) +
+        sin(radians(#{lat})) *
+        sin(radians(c.lat))
+        )
+        ) AS distance,
+        MIN(s.show_time) as showTime,
+        MIN(sa.user_price) AS minUserPrice,
+        MIN(sa.show_price) AS minShowPrice
         FROM <include refid="cinemaTableName" /> c
         INNER JOIN <include refid="tableName" /> s ON s.cinema_id = c.id
         INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
@@ -248,14 +249,14 @@
             </if>
         </where>
         GROUP BY
-            c.id,
-            c.name,
-            c.province_name,
-            c.city_name,
-            c.district_name,
-            c.address,
-            c.lng,
-            c.lat
+        c.id,
+        c.name,
+        c.province_name,
+        c.city_name,
+        c.district_name,
+        c.address,
+        c.lng,
+        c.lat
         <choose>
             <when test="orderBy == 1">
                 ORDER BY distance ASC, MIN(s.stop_sell_time) ASC
@@ -290,8 +291,8 @@
         )
         ) AS distance,
         s.show_time AS showTime,
-        MIN(sa.user_price) AS minPrice,
-        MIN(sa.show_price) AS maxPrice
+        MIN(sa.user_price) AS minUserPrice,
+        MIN(sa.show_price) AS minShowPrice
         FROM <include refid="tableName" /> s
         INNER JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
         INNER JOIN <include refid="showAreaTableName" /> sa ON sa.show_id = s.id
@@ -313,17 +314,17 @@
             </if>
         </where>
         GROUP BY
-            s.id,
-            c.id,
-            c.name,
-            c.province_name,
-            c.city_name,
-            c.district_name,
-            c.address,
-            c.lng,
-            c.lat,
-            s.show_time,
-            s.stop_sell_time
+        s.id,
+        c.id,
+        c.name,
+        c.province_name,
+        c.city_name,
+        c.district_name,
+        c.address,
+        c.lng,
+        c.lat,
+        s.show_time,
+        s.stop_sell_time
         <choose>
             <when test="orderBy == 1">
                 ORDER BY distance ASC, s.stop_sell_time ASC
@@ -350,16 +351,16 @@
     <!-- 根据 ID 查询 -->
     <select id="selectByOrderDetails" parameterType="long" resultType="com.vscing.model.vo.OrderApiConfirmDetailsVo">
         SELECT
-            s.id as showId,
-            s.hall_name as hallName,
-            s.show_time as showTime,
-            s.stop_sell_time as stopSellTime,
-            s.show_version_type as showVersionType,
-            s.show_price as showPrice,
-            s.user_price as userPrice,
-            c.name as cinemaName,
-            m.name as movieName,
-            m.poster_url as posterUrl
+        s.id as showId,
+        s.hall_name as hallName,
+        s.show_time as showTime,
+        s.stop_sell_time as stopSellTime,
+        s.show_version_type as showVersionType,
+        s.show_price as showPrice,
+        s.user_price as userPrice,
+        c.name as cinemaName,
+        m.name as movieName,
+        m.poster_url as posterUrl
         FROM <include refid="tableName" /> s
         LEFT JOIN <include refid="cinemaTableName" /> c ON s.cinema_id = c.id
         LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id

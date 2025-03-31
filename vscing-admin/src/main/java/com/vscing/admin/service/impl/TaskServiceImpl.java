@@ -21,15 +21,7 @@ import com.vscing.model.entity.Province;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.ShowArea;
 import com.vscing.model.http.HttpOrder;
-import com.vscing.model.mapper.CinemaMapper;
-import com.vscing.model.mapper.CityMapper;
-import com.vscing.model.mapper.DistrictMapper;
-import com.vscing.model.mapper.MovieMapper;
-import com.vscing.model.mapper.MovieProducerMapper;
-import com.vscing.model.mapper.OrderMapper;
-import com.vscing.model.mapper.ProvinceMapper;
-import com.vscing.model.mapper.ShowAreaMapper;
-import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.mapper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -82,6 +74,9 @@ public class TaskServiceImpl implements TaskService {
 
   @Autowired
   private CinemaMapper cinemaMapper;
+
+  @Autowired
+  private CouponMapper couponMapper;
 
   @Autowired
   private MovieMapper movieMapper;
@@ -693,6 +688,11 @@ public class TaskServiceImpl implements TaskService {
   }
 
   @Override
+  public void syncCoupon() {
+    couponMapper.batchCancel();
+  }
+
+  @Override
   public void syncTest() {
 //    try {
 //
@@ -852,9 +852,9 @@ public class TaskServiceImpl implements TaskService {
           }
           boolean res = orderService.supplierOrder(httpOrder);
           if(res) {
-            log.info("同步出票中订单成功", httpOrder);
+            log.info("同步出票中订单成功: {}", httpOrder);
           } else {
-            log.info("同步出票中订单失败", httpOrder);
+            log.info("同步出票中订单失败: {}", httpOrder);
           }
         }
       }

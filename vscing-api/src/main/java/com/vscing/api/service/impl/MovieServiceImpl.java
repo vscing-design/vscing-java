@@ -17,6 +17,7 @@ import com.vscing.model.mapper.PricingRuleMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import com.vscing.model.utils.PricingUtil;
+import com.vscing.model.vo.CinemaApiVo;
 import com.vscing.model.vo.MovieApiCinemaVo;
 import com.vscing.model.vo.MovieApiDetailsVo;
 import com.vscing.model.vo.MovieApiVo;
@@ -73,11 +74,13 @@ public class MovieServiceImpl implements MovieService {
     movieApiVoList.forEach(movieApiVo -> {
       // 实际销售价格
       BigDecimal price = PricingUtil.calculateActualPrice(movieApiVo.getMinShowPrice(), movieApiVo.getMinUserPrice(), pricingRules);
-      // 实际售价
+      // 实际最小出售价格
       movieApiVo.setMinPrice(price);
+      // 实际最大出售价格
+      movieApiVo.setMaxPrice(movieApiVo.getMinShowPrice());
       // 重置其他数据
 //      movieApiVo.setMinShowPrice(null);
-      movieApiVo.setMinUserPrice(null);
+//      movieApiVo.setMinUserPrice(null);
     });
 
     return movieApiVoList;
@@ -108,7 +111,22 @@ public class MovieServiceImpl implements MovieService {
     MovieApiCinemaVo movieApiCinemaVo = MapstructUtils.convert(movie, MovieApiCinemaVo.class);
     // 获取影院列表
     if (movieApiCinemaVo != null) {
-      movieApiCinemaVo.setCinemaList(showMapper.selectByMovieApiCinema(data));
+      List<CinemaApiVo> cinemaApiVoList = showMapper.selectByMovieApiCinema(data);
+      // 获取结算规则列表
+      List<PricingRule> pricingRules = pricingRuleMapper.getList(new PricingRuleListDto());
+      // 循环计算实际售价
+      cinemaApiVoList.forEach(cinemaApiVo -> {
+        // 实际销售价格
+        BigDecimal price = PricingUtil.calculateActualPrice(cinemaApiVo.getMinShowPrice(), cinemaApiVo.getMinUserPrice(), pricingRules);
+        // 实际最小出售价格
+        cinemaApiVo.setMinPrice(price);
+        // 实际最大出售价格
+        cinemaApiVo.setMaxPrice(cinemaApiVo.getMinShowPrice());
+        // 重置其他数据
+//      cinemaApiVo.setMinShowPrice(null);
+//      cinemaApiVo.setMinUserPrice(null);
+      });
+      movieApiCinemaVo.setCinemaList(cinemaApiVoList);
     }
     return movieApiCinemaVo;
   }

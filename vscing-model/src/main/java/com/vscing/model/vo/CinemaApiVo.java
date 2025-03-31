@@ -45,6 +45,12 @@ public class CinemaApiVo {
   @Schema(description = "距离km")
   private Double distance;
 
+  @Schema(description = "最小场次官方价格（元）")
+  private BigDecimal minShowPrice;
+
+  @Schema(description = "最小场次结算价格（元）")
+  private BigDecimal minUserPrice;
+
   @Schema(description = "最大出售价格")
   private BigDecimal maxPrice;
 
