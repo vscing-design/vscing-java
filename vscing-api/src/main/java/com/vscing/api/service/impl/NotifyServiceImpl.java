@@ -18,11 +18,13 @@ import com.vscing.model.dto.BaiduCreateNotifyDto;
 import com.vscing.model.dto.BaiduRefundNotifyDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
+import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.Show;
 import com.vscing.model.entity.UserWithdraw;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
+import com.vscing.model.mapper.CouponMapper;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowMapper;
@@ -74,6 +76,9 @@ public class NotifyServiceImpl implements NotifyService {
 
   @Autowired
   private ShowMapper showMapper;
+
+  @Autowired
+  private CouponMapper couponMapper;
 
   @Autowired
   private UserWithdrawMapper userWithdrawMapper;
@@ -289,6 +294,14 @@ public class NotifyServiceImpl implements NotifyService {
       // 处理退款结果
       if (res) {
         order.setStatus(7);
+        // 查看是否有优惠券
+        if(order.getCouponId() != null) {
+          Coupon coupon = new Coupon();
+          coupon.setId(order.getCouponId());
+          coupon.setStatus(1);
+          coupon.setVerifyAt(null);
+          couponMapper.updateStatus(coupon);
+        }
       } else {
         order.setStatus(8);
       }

@@ -280,6 +280,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public OrderApiPaymentVo create(Long userId, OrderApiCreatedDto orderApiCreatedDto) {
+    log.info("创建订单，userId: {}, orderApiCreatedDto: {}", userId, orderApiCreatedDto);
     // 获取座位数量
     int purchaseQuantity = orderApiCreatedDto.getSeatList().size();
     // 判断是否使用优惠券

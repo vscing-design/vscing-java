@@ -300,6 +300,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="userId != null">user_id,</if>
+            <if test="couponId != null">coupon_id,</if>
             <if test="supplierId != null">supplier_id,</if>
             <if test="cinemaId != null">cinema_id,</if>
             <if test="movieId != null">movie_id,</if>
@@ -323,6 +324,7 @@
             <if test="totalPrice != null">total_price,</if>
             <if test="officialPrice != null">official_price,</if>
             <if test="settlementPrice != null">settlement_price,</if>
+            <if test="couponPrice != null">coupon_price,</if>
             <if test="memo != null">memo,</if>
             <if test="stopShowTime != null">stop_show_time,</if>
             <if test="createdBy != null">created_by</if>
@@ -331,6 +333,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
+            <if test="couponId != null">#{couponId, jdbcType=BIGINT},</if>
             <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
             <if test="movieId != null">#{movieId, jdbcType=BIGINT},</if>
@@ -354,6 +357,7 @@
             <if test="totalPrice != null">#{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">#{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="couponPrice != null">#{couponPrice, jdbcType=DECIMAL},</if>
             <if test="memo != null">#{memo, jdbcType=VARCHAR},</if>
             <if test="stopShowTime != null">#{stopShowTime, jdbcType=TIMESTAMP},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>

@@ -237,6 +237,7 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="verifyAt == null">verify_at = NULL,</if>
             <if test="verifyAt != null">verify_at = #{verifyAt, jdbcType=TIMESTAMP}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}

@@ -12,6 +12,7 @@ import com.vscing.common.service.supplier.SupplierServiceFactory;
 import com.vscing.common.utils.JsonUtils;
 import com.vscing.common.utils.OrderUtils;
 import com.vscing.common.utils.StringUtils;
+import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.Order;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.http.HttpOrder;
@@ -157,6 +158,17 @@ public class DelayMessageReceiver {
       if (rowsAffected <= 0) {
         throw new Exception("取消订单失败");
       }
+      // 查看是否有优惠券
+      if(order.getCouponId() != null) {
+        Coupon coupon = new Coupon();
+        coupon.setId(order.getCouponId());
+        coupon.setStatus(1);
+        coupon.setVerifyAt(null);
+        rowsAffected = couponMapper.updateStatus(coupon);
+        if (rowsAffected <= 0) {
+          throw new Exception("退还优惠券失败");
+        }
+      }
       log.error("取消订单延迟队列成功");
     } catch (Exception e) {
       log.error("取消订单延迟队列异常: {}", e.getMessage());
@@ -260,13 +272,26 @@ public class DelayMessageReceiver {
       // 发送退款请求
       boolean res = appletService.queryRefund(queryData);
       log.error("退款订单查询延迟队列查询结果: {}", res);
+      // 标记
+      int rowsAffected = 0;
       // 处理退款结果
       if (res) {
         order.setStatus(7);
+        // 查看是否有优惠券
+        if(order.getCouponId() != null) {
+          Coupon coupon = new Coupon();
+          coupon.setId(order.getCouponId());
+          coupon.setStatus(1);
+          coupon.setVerifyAt(null);
+          rowsAffected = couponMapper.updateStatus(coupon);
+          if (rowsAffected <= 0) {
+            throw new Exception("退还优惠券失败");
+          }
+        }
       } else {
         order.setStatus(8);
       }
-      int rowsAffected = orderMapper.update(order);
+      rowsAffected = orderMapper.update(order);
       if (rowsAffected <= 0) {
         throw new Exception("数据更新失败");
       }

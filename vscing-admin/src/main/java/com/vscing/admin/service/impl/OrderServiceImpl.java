@@ -21,6 +21,7 @@ import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
+import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.OrderDetail;
 import com.vscing.model.entity.PricingRule;
@@ -31,6 +32,7 @@ import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
+import com.vscing.model.mapper.CouponMapper;
 import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.PricingRuleMapper;
@@ -90,6 +92,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private ShowMapper showMapper;
+
+  @Autowired
+  private CouponMapper couponMapper;
 
   @Autowired
   private ShowAreaMapper showAreaMapper;
@@ -172,6 +177,14 @@ public class OrderServiceImpl implements OrderService {
     // 处理退款结果
     if (res) {
       order.setStatus(7);
+      // 查看是否有优惠券
+      if(order.getCouponId() != null) {
+        Coupon coupon = new Coupon();
+        coupon.setId(order.getCouponId());
+        coupon.setStatus(1);
+        coupon.setVerifyAt(null);
+        couponMapper.updateStatus(coupon);
+      }
     } else {
       order.setStatus(8);
     }
