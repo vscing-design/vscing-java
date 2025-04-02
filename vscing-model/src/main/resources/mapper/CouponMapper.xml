@@ -47,39 +47,49 @@
 
     <!-- 列表 -->
     <select id="getList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" />
+        SELECT c.* FROM <include refid="tableName" /> AS c
+        LEFT JOIN <include refid="orderTableName" /> AS o ON c.id = o.coupon_id
         <where>
-            deleted_at IS NULL
+            <if test="orderSn != null">
+                AND o.order_sn = #{orderSn, jdbcType=VARCHAR}
+            </if>
+            <if test="createStartTime != null">
+                AND o.created_at <![CDATA[ >= ]]> #{createStartTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="createEndTime != null">
+                AND o.created_at <![CDATA[ <= ]]> #{createEndTime, jdbcType=TIMESTAMP}
+            </if>
             <if test="status != null">
-                AND status = #{status, jdbcType=TINYINT}
+                AND c.status = #{status, jdbcType=TINYINT}
             </if>
             <if test="attr != null">
-                AND attr = #{attr, jdbcType=TINYINT}
+                AND c.attr = #{attr, jdbcType=TINYINT}
             </if>
             <if test="reason != null">
-                AND reason = #{reason, jdbcType=TINYINT}
+                AND c.reason = #{reason, jdbcType=TINYINT}
             </if>
             <if test="title != null">
-                AND title LIKE CONCAT('%', #{title}, '%')
+                AND c.title LIKE CONCAT('%', #{title}, '%')
             </if>
             <if test="phone != null">
-                AND phone LIKE CONCAT('%', #{phone}, '%')
+                AND c.phone LIKE CONCAT('%', #{phone}, '%')
             </if>
             <if test="code != null">
-                AND code LIKE CONCAT('%', #{code}, '%')
+                AND c.code LIKE CONCAT('%', #{code}, '%')
             </if>
             <if test="startTime != null">
-                AND created_at <![CDATA[ >= ]]> #{startTime, jdbcType=TIMESTAMP}
+                AND c.created_at <![CDATA[ >= ]]> #{startTime, jdbcType=TIMESTAMP}
             </if>
             <if test="endTime != null">
-                AND created_at <![CDATA[ <= ]]> #{endTime, jdbcType=TIMESTAMP}
+                AND c.created_at <![CDATA[ <= ]]> #{endTime, jdbcType=TIMESTAMP}
             </if>
             <if test="cancelStartTime != null">
-                AND updated_at <![CDATA[ >= ]]> #{cancelStartTime, jdbcType=TIMESTAMP}
+                AND c.updated_at <![CDATA[ >= ]]> #{cancelStartTime, jdbcType=TIMESTAMP}
             </if>
             <if test="cancelEndTime != null">
-                AND updated_at <![CDATA[ <= ]]> #{cancelEndTime, jdbcType=TIMESTAMP}
+                AND c.updated_at <![CDATA[ <= ]]> #{cancelEndTime, jdbcType=TIMESTAMP}
             </if>
+            AND c.deleted_at IS NULL
         </where>
         ORDER BY created_at DESC
     </select>

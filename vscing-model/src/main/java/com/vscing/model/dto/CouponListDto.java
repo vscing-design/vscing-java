@@ -44,4 +44,13 @@ public class CouponListDto {
   @Schema(description = "作废结束日期")
   private LocalDateTime cancelEndTime;
 
+  @Schema(description = "订单号")
+  private String orderSn;
+
+  @Schema(description = "订单创建开始日期")
+  private LocalDateTime createStartTime;
+
+  @Schema(description = "订单创建结束日期")
+  private LocalDateTime createEndTime;
+
 }
