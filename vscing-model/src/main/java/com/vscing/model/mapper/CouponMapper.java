@@ -5,6 +5,7 @@ import com.vscing.model.dto.CouponListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.request.CouponCancelRequest;
 import com.vscing.model.vo.CouponApiDetailsVo;
+import com.vscing.model.vo.CouponListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,7 +23,7 @@ public interface CouponMapper {
   /**
    * 列表
    */
-  List<Coupon> getList(CouponListDto record);
+  List<CouponListVo> getList(CouponListDto record);
 
   /**
    * 详情

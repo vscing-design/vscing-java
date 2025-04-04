@@ -46,18 +46,18 @@
     </sql>
 
     <!-- 列表 -->
-    <select id="getList" resultMap="BaseResultMap">
-        SELECT c.* FROM <include refid="tableName" /> AS c
+    <select id="getList" resultType="com.vscing.model.vo.CouponListVo">
+        SELECT c.*, o.order_sn FROM <include refid="tableName" /> AS c
         LEFT JOIN <include refid="orderTableName" /> AS o ON c.id = o.coupon_id
         <where>
             <if test="orderSn != null">
                 AND o.order_sn = #{orderSn, jdbcType=VARCHAR}
             </if>
             <if test="createStartTime != null">
-                AND o.created_at <![CDATA[ >= ]]> #{createStartTime, jdbcType=TIMESTAMP}
+                AND c.created_at <![CDATA[ >= ]]> #{createStartTime, jdbcType=TIMESTAMP}
             </if>
             <if test="createEndTime != null">
-                AND o.created_at <![CDATA[ <= ]]> #{createEndTime, jdbcType=TIMESTAMP}
+                AND c.created_at <![CDATA[ <= ]]> #{createEndTime, jdbcType=TIMESTAMP}
             </if>
             <if test="status != null">
                 AND c.status = #{status, jdbcType=TINYINT}

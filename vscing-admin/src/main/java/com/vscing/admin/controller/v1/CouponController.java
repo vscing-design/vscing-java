@@ -5,8 +5,8 @@ import com.vscing.admin.service.CouponService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.CouponListDto;
-import com.vscing.model.entity.Coupon;
 import com.vscing.model.request.CouponCancelRequest;
+import com.vscing.model.vo.CouponListVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -41,10 +41,10 @@ public class CouponController {
 
   @GetMapping
   @Operation(summary = "优惠劵列表")
-  public CommonResult<CommonPage<Coupon>> lists(@ParameterObject CouponListDto queryParam,
-                                                @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
-    List<Coupon> list = couponService.getList(queryParam, pageSize, pageNum);
+  public CommonResult<CommonPage<CouponListVo>> lists(@ParameterObject CouponListDto queryParam,
+                                                      @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                      @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+    List<CouponListVo> list = couponService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }
 

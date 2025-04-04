@@ -3,9 +3,9 @@ package com.vscing.admin.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.CouponService;
 import com.vscing.model.dto.CouponListDto;
-import com.vscing.model.entity.Coupon;
 import com.vscing.model.mapper.CouponMapper;
 import com.vscing.model.request.CouponCancelRequest;
+import com.vscing.model.vo.CouponListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class CouponServiceImpl implements CouponService {
   private CouponMapper couponMapper;
 
   @Override
-  public List<Coupon> getList(CouponListDto data, Integer pageSize, Integer pageNum) {
+  public List<CouponListVo> getList(CouponListDto data, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return couponMapper.getList(data);
   }
