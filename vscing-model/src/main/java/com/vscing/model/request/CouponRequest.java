@@ -17,6 +17,10 @@ import java.time.LocalDateTime;
 @Data
 public class CouponRequest {
 
+  @NotNull(message = "签名不能为空")
+  @Schema(description = "签名")
+  private String sign;
+
   @NotNull(message = "优惠券名称不能为空")
   @Schema(description = "优惠券名称")
   private String title;

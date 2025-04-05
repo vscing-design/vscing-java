@@ -36,4 +36,8 @@ public interface CouponService {
   */
   CouponApiDetailsVo details(CouponDetailsRequest data);
 
+  /**
+   * 校验
+   */
+  boolean verify(String builderStr, String sign);
 }

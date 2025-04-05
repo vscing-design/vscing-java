@@ -3,6 +3,7 @@ package com.vscing.api.controller.v2;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.vscing.api.service.CouponService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.mapper.CouponMapper;
 import com.vscing.model.request.CouponDetailsRequest;
 import com.vscing.model.request.CouponRequest;
@@ -59,6 +60,11 @@ public class CouponController {
     if (delayMilliseconds <= 0) {
       return CommonResult.validateFailed("优惠券过期时间不能小于当前时间");
     }
+    // 校验
+    boolean is = couponService.verify(RequestUtil.encryptBodyWithoutSign(data), data.getSign());
+    if(!is) {
+      return CommonResult.failed("签名验证失败");
+    }
     return CommonResult.success(couponService.save(data));
   }
 
@@ -114,6 +120,11 @@ public class CouponController {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
+    }
+    // 校验
+    boolean is = couponService.verify(RequestUtil.encryptBodyWithoutSign(data), data.getSign());
+    if(!is) {
+      return CommonResult.failed("签名验证失败");
     }
     return CommonResult.success(couponService.details(data));
   }

@@ -1,5 +1,6 @@
 package com.vscing.common.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,9 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 请求工具类
@@ -71,6 +75,33 @@ public class RequestUtil {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 请求体中除sign外的参数转换
+     *
+     * @param request 请求体对象
+     * @return 转换后的字符串
+     */
+    public static <T> String encryptBodyWithoutSign(T request) {
+        // 将对象转换为Map
+        Map<String, Object> params = BeanUtil.beanToMap(request);
+
+        // 去除sign字段
+        params.remove("sign");
+
+        // 按字典顺序排序并拼接成字符串
+        List<Map.Entry<String, Object>> entries = new ArrayList<>(params.entrySet());
+        entries.sort(Map.Entry.comparingByKey());
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Object> entry : entries) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        if (!sb.isEmpty()) {
+            sb.setLength(sb.length() - 1); // 移除最后一个&
         }
         return sb.toString();
     }
