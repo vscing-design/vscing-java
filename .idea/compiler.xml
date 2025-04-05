@@ -14,7 +14,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.4.3/spring-boot-configuration-processor-3.4.3.jar" />
           <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
           <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
           <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />

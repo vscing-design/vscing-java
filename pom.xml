@@ -34,12 +34,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <resource.delimiter>@</resource.delimiter>
         <java.version>17</java.version>
-        <spring-boot.version>3.3.5</spring-boot.version>
+        <spring-boot.version>3.4.3</spring-boot.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <mysql-connector.version>8.0.33</mysql-connector.version>
+        <mysql-connector.version>9.2.0</mysql-connector.version>
         <mybatis-generator.version>1.4.2</mybatis-generator.version>
         <mybatis.version>3.5.14</mybatis.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
@@ -53,13 +53,13 @@
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <knife4j-openapi3-jakarta-spring-boot-starter.version>4.5.0</knife4j-openapi3-jakarta-spring-boot-starter.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
-        <hutool.version>5.8.24</hutool.version>
+        <hutool.version>5.8.35</hutool.version>
         <hutool-extra.version>5.8.35</hutool-extra.version>
         <pinyin4j.version>2.5.0</pinyin4j.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct-plus.version>1.4.4</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
-        <alipay-sdk.version>4.40.30.ALL</alipay-sdk.version>
+        <alipay-sdk.version>4.40.112.ALL</alipay-sdk.version>
         <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
         <fastjson.version>2.0.53</fastjson.version>
         <wechatpay-java.version>0.2.15</wechatpay-java.version>
