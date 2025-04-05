@@ -34,7 +34,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <resource.delimiter>@</resource.delimiter>
         <java.version>17</java.version>
-        <spring-boot.version>3.4.3</spring-boot.version>
+        <spring-boot.version>3.3.5</spring-boot.version>
+        <spring-data-commons.version>3.3.5</spring-data-commons.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -46,7 +47,6 @@
         <hibernate.validator.version>6.0.0.Final</hibernate.validator.version>
         <jakarta.validation.version>3.0.0</jakarta.validation.version>
         <pagehelper.version>2.1.0</pagehelper.version>
-        <spring-data-commons.version>3.3.5</spring-data-commons.version>
         <jjwt.version>0.12.5</jjwt.version>
         <okhttp.version>4.12.0</okhttp.version>
         <jackson.version>2.18.2</jackson.version>

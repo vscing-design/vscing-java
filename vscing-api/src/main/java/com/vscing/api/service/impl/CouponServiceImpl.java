@@ -5,7 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.CouponService;
 import com.vscing.common.exception.ServiceException;
-import com.vscing.common.utils.EncryptUtils;
+import com.vscing.common.utils.SignatureGenerator;
 import com.vscing.model.dto.CouponApiListDto;
 import com.vscing.model.entity.Coupon;
 import com.vscing.model.entity.User;
@@ -180,8 +180,8 @@ public class CouponServiceImpl implements CouponService {
 
   @Override
   public boolean verify(String builderStr, String sign) {
-    String password = "NbXu98umDR6JD9J1AZkQ75nJnhTKDs9z";
-    String vSign = EncryptUtils.encryptByAes(builderStr, password);
+//  String password = "NbXu98umDR6JD9J1AZkQ75nJnhTKDs9z";
+    String vSign = SignatureGenerator.sha256(builderStr + "&password=NbXu98umDR6JD9J1AZkQ75nJnhTKDs9z");
     return vSign.equals(sign);
   }
 
