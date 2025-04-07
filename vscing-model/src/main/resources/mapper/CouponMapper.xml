@@ -48,7 +48,7 @@
     <!-- 列表 -->
     <select id="getList" resultType="com.vscing.model.vo.CouponListVo">
         SELECT c.*, o.order_sn FROM <include refid="tableName" /> AS c
-        LEFT JOIN <include refid="orderTableName" /> AS o ON c.id = o.coupon_id
+        LEFT JOIN (SELECT id, order_sn, coupon_id FROM <include refid="orderTableName" /> where status = 4) AS o ON c.id = o.coupon_id
         <where>
             <if test="orderSn != null">
                 AND o.order_sn = #{orderSn, jdbcType=VARCHAR}
@@ -91,7 +91,7 @@
             </if>
             AND c.deleted_at IS NULL
         </where>
-        ORDER BY created_at DESC
+        ORDER BY verify_at DESC, created_at DESC
     </select>
 
     <!-- 我的优惠券列表 -->
