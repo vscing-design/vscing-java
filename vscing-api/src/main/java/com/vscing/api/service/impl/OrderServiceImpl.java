@@ -677,15 +677,20 @@ public class OrderServiceImpl implements OrderService {
       if (rowsAffected <= 0) {
         throw new ServiceException("改变订单状态失败");
       } else {
-        // 支付成功通知
-        String msg = String.valueOf(order.getId());
-        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.SYNC_ORDER_ROUTING_KEY, msg);
-        // 发送mq异步处理
-        RebateMq rebateMq = new RebateMq();
-        rebateMq.setUserId(order.getUserId());
-        rebateMq.setOrderId(order.getId());
-        msg = JsonUtils.toJsonString(rebateMq);
-        rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.REBATE_ROUTING_KEY, msg);
+        String msg;
+        if (order.getPlatform() == AppletTypeEnum.ALIPAY.getCode()) {
+          // 支付宝成功通知
+          msg = String.valueOf(order.getId());
+          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.SYNC_ORDER_ROUTING_KEY, msg);
+        }
+        if (order.getCouponId() != null) {
+          // 发送mq异步处理
+          RebateMq rebateMq = new RebateMq();
+          rebateMq.setUserId(order.getUserId());
+          rebateMq.setOrderId(order.getId());
+          msg = JsonUtils.toJsonString(rebateMq);
+          rabbitMQService.sendFanoutMessage(FanoutRabbitMQConfig.REBATE_ROUTING_KEY, msg);
+        }
       }
     } catch (Exception e) {
       throw new ServiceException(e.getMessage());

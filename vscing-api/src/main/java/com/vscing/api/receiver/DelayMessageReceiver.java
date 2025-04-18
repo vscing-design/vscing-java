@@ -110,6 +110,7 @@ public class DelayMessageReceiver {
       if(httpOrder == null || !ORDER_STATUS_GENERATE_SUCCESS.equals(httpOrder.getOrderStatus())){
         tag = 1;
       }
+      log.error("同步场次码延迟队列数据更新前: {}", httpOrder);
       // 更新数据
       boolean result = orderService.supplierOrder(httpOrder);
       log.error("同步场次码延迟队列数据更新结果：{}", result);
