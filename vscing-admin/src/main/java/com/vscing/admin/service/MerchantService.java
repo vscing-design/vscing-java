@@ -2,6 +2,7 @@ package com.vscing.admin.service;
 
 import com.vscing.model.dto.MerchantListDto;
 import com.vscing.model.entity.Merchant;
+import com.vscing.model.request.MerchantRefundRequest;
 
 import java.util.List;
 
@@ -21,11 +22,16 @@ public interface MerchantService {
   /**
    * 新增
    */
-  int created(Merchant merchant);
+  int created(Merchant record);
 
   /**
    * 编辑
    */
-  int updated(Merchant merchant);
+  int updated(Merchant record);
+
+  /**
+   * 退款
+   */
+  int refund(MerchantRefundRequest record);
 
 }

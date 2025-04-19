@@ -6,6 +6,7 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MerchantListDto;
 import com.vscing.model.entity.Merchant;
+import com.vscing.model.request.MerchantRefundRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,33 @@ public class MerchantController {
         return CommonResult.failed("编辑失败");
       } else {
         return CommonResult.success("编辑成功");
+      }
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/refund")
+  @Operation(summary = "退款")
+  public CommonResult<Object> refund(@Validated @RequestBody MerchantRefundRequest record,
+                                     BindingResult bindingResult,
+                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    // 操作人ID
+    if(userInfo != null && userInfo.getUserId() != null) {
+      record.setUpdatedBy(userInfo.getUserId());
+    }
+    try {
+      int rowsAffected = merchantService.refund(record);
+      if (rowsAffected <= 0) {
+        return CommonResult.success("退款成功");
+      } else {
+        return CommonResult.failed("退款失败");
       }
     } catch (Exception e) {
       log.error("请求错误: ", e);

@@ -44,4 +44,10 @@ public class MerchantBill extends BaseEntity {
   @Schema(description = "状态 1 进行中 2 成功 3 失败")
   private Integer status;
 
+  @Schema(description = "图片凭证")
+  private String pictureVoucher;
+
+  @Schema(description = "备注")
+  private String remark;
+
 }

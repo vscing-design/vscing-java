@@ -14,6 +14,8 @@
         <result column="product_type" property="productType" jdbcType="TINYINT" />
         <result column="change_type" property="changeType" jdbcType="TINYINT" />
         <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="picture_voucher" property="pictureVoucher" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -75,6 +77,8 @@
             <if test="productType != null">product_type,</if>
             <if test="changeType != null">change_type,</if>
             <if test="status != null">status,</if>
+            <if test="pictureVoucher != null">picture_voucher,</if>
+            <if test="remark != null">remark,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
@@ -88,6 +92,8 @@
             <if test="productType != null">#{productType, jdbcType=TINYINT},</if>
             <if test="changeType != null">#{changeType, jdbcType=TINYINT},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="pictureVoucher != null">#{pictureVoucher, jdbcType=VARCHAR},</if>
+            <if test="remark != null">#{remark, jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
@@ -105,6 +111,8 @@
             <if test="productType != null">product_type = #{productType, jdbcType=TINYINT},</if>
             <if test="changeType != null">change_type = #{changeType, jdbcType=TINYINT},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="pictureVoucher != null">picture_voucher = #{pictureVoucher, jdbcType=VARCHAR},</if>
+            <if test="remark != null">remark = #{remark, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
