@@ -19,6 +19,7 @@
     <modules>
         <module>vscing-admin</module>
         <module>vscing-api</module>
+        <module>vscing-merchant</module>
         <module>vscing-model</module>
         <module>vscing-common</module>
         <module>vscing-auth</module>

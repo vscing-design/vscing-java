@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.MerchantPriceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.MerchantPrice">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="markup_amount" property="markupAmount" jdbcType="DECIMAL" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_merchant_price
+    </sql>
+    <sql id="merchantTableName">
+        vscing_merchant
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT mp.id, mp.markup_id, mp.markup_amount, m.merchant_name, m.status FROM <include refid="tableName" /> mp
+        LEFT JOIN <include refid="merchantTableName" /> m ON mp.merchant_id = m.id
+        <where>
+            <if test="status != null and status != 0">
+                AND m.status = #{status}
+            </if>
+            <if test="merchantName != null">
+                AND m.merchant_name LIKE CONCAT('%', #{merchantName}, '%')
+            </if>
+            AND b.deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 根据ID查询详情 -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.MerchantPrice">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="merchantId != null">merchant_id,</if>
+            <if test="markupAmount != null">markup_amount,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
+            <if test="markupAmount != null">#{markupAmount, jdbcType=DECIMAL},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="update" parameterType="com.vscing.model.entity.MerchantPrice">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
+            <if test="markupAmount != null">markup_amount = #{markupAmount, jdbcType=DECIMAL},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

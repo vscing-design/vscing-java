@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.MerchantMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.Merchant">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="merchant_name" property="merchantName" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="balance" property="balance" jdbcType="DECIMAL" />
+        <result column="total_recharge" property="totalRecharge" jdbcType="DECIMAL" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+        <result column="business_license" property="businessLicense" jdbcType="VARCHAR" />
+        <result column="uscc" property="uscc" jdbcType="VARCHAR" />
+        <result column="legal_name" property="legalName" jdbcType="VARCHAR" />
+        <result column="id_card" property="idCard" jdbcType="VARCHAR" />
+        <result column="id_card_front" property="idCardFront" jdbcType="VARCHAR" />
+        <result column="id_card_back" property="idCardBack" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_merchant
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            <if test="status != null and status != 0">
+                AND status = #{status}
+            </if>
+            <if test="merchantName != null">
+                AND merchant_name LIKE CONCAT('%', #{merchantName}, '%')
+            </if>
+            AND b.deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 根据ID查询详情 -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Merchant">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="merchantName != null">merchant_name,</if>
+            <if test="password != null">password,</if>
+            <if test="status != null">status,</if>
+            <if test="balance != null">balance,</if>
+            <if test="totalRecharge != null">total_recharge,</if>
+            <if test="phone != null">phone,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="businessLicense != null">business_license,</if>
+            <if test="uscc != null">uscc,</if>
+            <if test="legalName != null">legal_name,</if>
+            <if test="idCard != null">id_card,</if>
+            <if test="idCardFront != null">id_card_front,</if>
+            <if test="idCardBack != null">id_card_back,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="merchantName != null">#{merchantName, jdbcType=VARCHAR},</if>
+            <if test="password != null">#{password, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="balance != null">#{balance, jdbcType=DECIMAL},</if>
+            <if test="totalRecharge != null">#{totalRecharge, jdbcType=DECIMAL},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">#{contacts, jdbcType=VARCHAR},</if>
+            <if test="businessLicense != null">#{businessLicense, jdbcType=VARCHAR},</if>
+            <if test="uscc != null">#{uscc, jdbcType=VARCHAR},</if>
+            <if test="legalName != null">#{legalName, jdbcType=VARCHAR},</if>
+            <if test="idCard != null">#{idCard, jdbcType=VARCHAR},</if>
+            <if test="idCardFront != null">#{idCardFront, jdbcType=VARCHAR},</if>
+            <if test="idCardBack != null">#{idCardBack, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="update" parameterType="com.vscing.model.entity.Merchant">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
+            <if test="merchantName != null">merchant_name = #{merchantName, jdbcType=VARCHAR},</if>
+            <if test="password != null">password = #{password, jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="balance != null">balance = #{balance, jdbcType=DECIMAL},</if>
+            <if test="totalRecharge != null">total_recharge = #{totalRecharge, jdbcType=DECIMAL},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">contacts = #{contacts, jdbcType=VARCHAR},</if>
+            <if test="businessLicense != null">business_license = #{businessLicense, jdbcType=VARCHAR},</if>
+            <if test="uscc != null">uscc = #{uscc, jdbcType=VARCHAR},</if>
+            <if test="legalName != null">legal_name = #{legalName, jdbcType=VARCHAR},</if>
+            <if test="idCard != null">id_card = #{idCard, jdbcType=VARCHAR},</if>
+            <if test="idCardFront != null">id_card_front = #{idCardFront, jdbcType=VARCHAR},</if>
+            <if test="idCardBack != null">id_card_back = #{idCardBack, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+
+</mapper>

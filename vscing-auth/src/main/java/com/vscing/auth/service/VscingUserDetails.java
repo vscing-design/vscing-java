@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @date 2024/12/14 22:14
  */
 public interface VscingUserDetails extends UserDetails {
+
   Long getUserId();
 
 }

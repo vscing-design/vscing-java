@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.MerchantBankMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.MerchantPrice">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="markup_amount" property="markupAmount" jdbcType="DECIMAL" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+</mapper>
