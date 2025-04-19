@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MerchantPriceListDto;
 import com.vscing.model.entity.MerchantPrice;
+import com.vscing.model.vo.MerchantPriceListVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface MerchantPriceMapper {
   /**
    * 管理端查询列表
    */
-  List<MerchantPrice> getList(MerchantPriceListDto record);
+  List<MerchantPriceListVo> getList(MerchantPriceListDto record);
 
   /**
    * 公用查询信息

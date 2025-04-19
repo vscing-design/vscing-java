@@ -4,11 +4,14 @@
 <mapper namespace="com.vscing.model.mapper.MerchantBankMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.vscing.model.entity.MerchantPrice">
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.MerchantBank">
         <id column="id" property="id" jdbcType="BIGINT" />
-        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
-        <result column="markup_amount" property="markupAmount" jdbcType="DECIMAL" />
+        <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+        <result column="branch_name" property="branchName" jdbcType="VARCHAR" />
+        <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+        <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -16,5 +19,82 @@
         <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
         <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
     </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_merchant_bank
+    </sql>
+    <sql id="merchantTableName">
+        vscing_merchant
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * <include refid="tableName" />
+        <where>
+            <if test="merchant_id != null">
+                AND merchant_id = #{merchantId}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 根据ID查询详情 -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.MerchantBank">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="merchantId != null">merchant_id,</if>
+            <if test="bankName != null">bank_name,</if>
+            <if test="branchName != null">branch_name,</if>
+            <if test="bankAccount != null">bank_account,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="phone != null">phone,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
+            <if test="bankName != null">#{bankName, jdbcType=VARCHAR},</if>
+            <if test="branchName != null">#{branchName, jdbcType=VARCHAR},</if>
+            <if test="bankAccount != null">#{bankAccount, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">#{contacts, jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="update" parameterType="com.vscing.model.entity.MerchantBank">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
+            <if test="bankName != null">bank_name = #{bankName, jdbcType=VARCHAR},</if>
+            <if test="branchName != null">branch_name = #{branchName, jdbcType=VARCHAR},</if>
+            <if test="bankAccount != null">bank_account = #{bankAccount, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">contacts = #{contacts, jdbcType=VARCHAR},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 软删除 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
 
 </mapper>
