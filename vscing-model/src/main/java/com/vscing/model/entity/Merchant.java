@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * Merchant
@@ -64,5 +65,14 @@ public class Merchant extends BaseEntity {
 
   @Schema(description = "法人身份证反面")
   private String idCardBack;
+
+  @Schema(description = "最后登陆IP")
+  private String lastIp;
+
+  @Schema(description = "最后登陆时间")
+  private LocalDateTime loginAt;
+
+  @Schema(description = "单点登陆token")
+  private String token;
 
 }

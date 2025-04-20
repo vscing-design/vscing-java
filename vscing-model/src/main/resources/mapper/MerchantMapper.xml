@@ -19,6 +19,8 @@
         <result column="id_card" property="idCard" jdbcType="VARCHAR" />
         <result column="id_card_front" property="idCardFront" jdbcType="VARCHAR" />
         <result column="id_card_back" property="idCardBack" jdbcType="VARCHAR" />
+        <result column="last_ip" property="lastIp" jdbcType="VARCHAR" />
+        <result column="login_at" property="loginAt" jdbcType="TIMESTAMP" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -51,6 +53,14 @@
         SELECT * FROM
         <include refid="tableName" />
         WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据ID查询详情 -->
+    <select id="selectByMerchantName" resultMap="BaseResultMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE merchant_name = #{MerchantName}
         AND deleted_at IS NULL
     </select>
 
@@ -112,6 +122,8 @@
             <if test="idCard != null">id_card = #{idCard, jdbcType=VARCHAR},</if>
             <if test="idCardFront != null">id_card_front = #{idCardFront, jdbcType=VARCHAR},</if>
             <if test="idCardBack != null">id_card_back = #{idCardBack, jdbcType=VARCHAR},</if>
+            <if test="lastIp != null">last_ip = #{lastIp, jdbcType=VARCHAR},</if>
+            <if test="loginAt != null">login_at = #{loginAt, jdbcType=TIMESTAMP},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}

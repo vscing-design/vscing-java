@@ -21,9 +21,14 @@ public interface MerchantMapper {
   List<Merchant> getList(MerchantListDto record);
 
   /**
-   * 公用查询信息
+   * 公用id查询信息
   */
   Merchant selectById(long id);
+
+  /**
+   * 公用merchantName查询信息
+  */
+  Merchant selectByMerchantName(String merchantName);
 
   /**
    * 公用插入信息

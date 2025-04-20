@@ -13,6 +13,7 @@ import com.vscing.model.mapper.MerchantMapper;
 import com.vscing.model.mapper.MerchantPriceMapper;
 import com.vscing.model.request.MerchantRefundRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,9 @@ import java.util.List;
  */
 @Service
 public class MerchantServiceImpl implements MerchantService {
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Autowired
   private MerchantMapper merchantMapper;
@@ -50,6 +54,7 @@ public class MerchantServiceImpl implements MerchantService {
     try {
       int rowsAffected = 1;
       merchant.setId(IdUtil.getSnowflakeNextId());
+      merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
       rowsAffected = merchantMapper.insert(merchant);
       if (rowsAffected <= 0) {
         throw new ServiceException("创建商户失败");
