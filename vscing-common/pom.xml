@@ -55,6 +55,10 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-extra</artifactId>
+        </dependency>
         <!--  支付宝小程序sdk -->
         <dependency>
             <groupId>com.alipay.sdk</groupId>

@@ -37,11 +37,113 @@
         <module name="vscing-netty" />
         <module name="vscing-mq" />
         <module name="vscing-elk" />
+      </profile>
+      <profile name="Annotation profile for vscing-admin" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
         <module name="vscing-admin" />
-        <module name="vscing-common" />
+      </profile>
+      <profile name="Annotation profile for vscing-api" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
         <module name="vscing-api" />
+      </profile>
+      <profile name="Annotation profile for vscing-auth" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
         <module name="vscing-auth" />
+      </profile>
+      <profile name="Annotation profile for vscing-common" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
+        <module name="vscing-common" />
+      </profile>
+      <profile name="Annotation profile for vscing-merchant" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
         <module name="vscing-merchant" />
+      </profile>
+      <profile name="Annotation profile for vscing-model" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.5/spring-boot-configuration-processor-3.3.5.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-processor/1.4.4/mapstruct-plus-processor-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus/1.4.4/mapstruct-plus-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/io/github/linpeilie/mapstruct-plus-object-convert/1.4.4/mapstruct-plus-object-convert-1.4.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/com/baidu/lbsyun/javapoet/1.9.0/javapoet-1.9.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/mapstruct/tools/gem/gem-api/1.0.0.Alpha3/gem-api-1.0.0.Alpha3.jar" />
+          <entry name="$PROJECT_DIR$/../../../tool/apache-maven-3.9.9/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+        </processorPath>
         <module name="vscing-model" />
       </profile>
     </annotationProcessing>
