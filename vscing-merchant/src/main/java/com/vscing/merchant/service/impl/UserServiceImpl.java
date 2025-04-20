@@ -92,4 +92,10 @@ public class UserServiceImpl implements UserService {
     return redisService.del(redisKey);
   }
 
+  @Override
+  public int updated(Merchant merchant) {
+    return merchantMapper.update(merchant);
+  }
+
+
 }

@@ -3,7 +3,9 @@ package com.vscing.merchant.controller.v1;
 import com.vscing.common.api.CommonResult;
 import com.vscing.merchant.po.MerchantDetails;
 import com.vscing.merchant.service.UserService;
+import com.vscing.model.entity.Merchant;
 import com.vscing.model.request.MerchantUserLoginRequest;
+import com.vscing.model.request.MerchantUserPasswordRequest;
 import com.vscing.model.vo.MerchantDetailVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,10 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +45,9 @@ public class UserController {
 
   @Value("${jwt.tokenHead}")
   private String tokenHead;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Autowired
   private UserService userService;
@@ -87,6 +94,39 @@ public class UserController {
       return CommonResult.success("登出成功");
     } else {
       return CommonResult.failed("登出失败");
+    }
+  }
+
+  @PutMapping("/password")
+  @Operation(summary = "修改用户密码")
+  public CommonResult<Object> users(@Validated @RequestBody MerchantUserPasswordRequest record,
+                                    BindingResult bindingResult,
+                                    @AuthenticationPrincipal MerchantDetails userInfo) {
+    if (bindingResult.hasErrors()) {
+      // 获取第一个错误信息，如果需要所有错误信息
+      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+      return CommonResult.validateFailed(errorMessage);
+    }
+    // 判断两次密码是否一致
+    if (record.getPassword().equals(record.getConfirmPassword())) {
+      return CommonResult.validateFailed("两次密码不一致");
+    }
+    Merchant merchant = new Merchant();
+    // 操作人ID
+    if (userInfo != null && userInfo.getUserId() != null) {
+      merchant.setId(userInfo.getUserId());
+      merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
+      merchant.setUpdatedBy(userInfo.getUserId());
+    }
+    int rowsAffected = userService.updated(merchant);
+    try {
+      if (rowsAffected > 0) {
+        return CommonResult.success("编辑成功");
+      }
+      return CommonResult.failed("编辑失败");
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("请求错误");
     }
   }
 

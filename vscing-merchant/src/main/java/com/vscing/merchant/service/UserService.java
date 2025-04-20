@@ -1,5 +1,6 @@
 package com.vscing.merchant.service;
 
+import com.vscing.model.entity.Merchant;
 import com.vscing.model.vo.MerchantDetailVo;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,5 +20,10 @@ public interface UserService {
    * 登出
    */
   boolean logout(MerchantDetailVo merchantDetailVo, String authToken);
+
+  /**
+   * 修改
+  */
+  int updated(Merchant merchant);
 
 }
