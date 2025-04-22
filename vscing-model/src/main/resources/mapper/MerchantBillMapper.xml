@@ -34,7 +34,7 @@
 
     <!-- 查询列表 -->
     <select id="getList" resultMap="BaseResultMap">
-        SELECT * <include refid="tableName" />
+        SELECT * FROM <include refid="tableName" />
         <where>
             <if test="status != null and status != 0">
                 AND status = #{status, jdbcType=TINYINT}

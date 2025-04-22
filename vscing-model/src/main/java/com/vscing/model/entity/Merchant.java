@@ -48,7 +48,7 @@ public class Merchant extends BaseEntity {
   @Schema(description = "联系人")
   private String contacts;
 
-  @Schema(description = "营业执照编号")
+  @Schema(description = "营业执照")
   private String businessLicense;
 
   @Schema(description = "统一社会信用代码")

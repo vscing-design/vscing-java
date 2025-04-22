@@ -32,4 +32,7 @@ public class MerchantBillListDto {
   @Schema(description = "变动类型 1 订单支付扣款 2 订单退款 3 账户充值 4 账户退款")
   private Integer changeType;
 
+  @Schema(description = "状态 1 进行中 2 成功 3 失败")
+  private Integer status;
+
 }

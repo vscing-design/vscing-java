@@ -27,7 +27,7 @@
 
     <!-- 查询列表 -->
     <select id="getList" resultType="com.vscing.model.vo.MerchantPriceListVo">
-        SELECT mp.id, mp.markup_id, mp.markup_amount, m.merchant_name, m.status FROM <include refid="tableName" /> mp
+        SELECT mp.id, mp.merchant_id, mp.markup_amount, m.merchant_name, m.status FROM <include refid="tableName" /> mp
         LEFT JOIN <include refid="merchantTableName" /> m ON mp.merchant_id = m.id
         <where>
             <if test="status != null and status != 0">
@@ -37,6 +37,7 @@
                 AND m.merchant_name LIKE CONCAT('%', #{merchantName}, '%')
             </if>
             AND mp.deleted_at IS NULL
+            AND m.deleted_at IS NULL
         </where>
     </select>
 
