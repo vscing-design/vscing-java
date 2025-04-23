@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class OrderListDto {
 
+  @Schema(description = "商户名称")
+  private String merchantName;
+
   @Schema(description = "影院名称")
   private String cinemaName;
 

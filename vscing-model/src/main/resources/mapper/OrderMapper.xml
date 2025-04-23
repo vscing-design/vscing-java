@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.Order">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
         <result column="coupon_id" property="couponId" jdbcType="BIGINT" />
         <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="cinema_id" property="cinemaId" jdbcType="BIGINT" />
@@ -14,6 +15,7 @@
         <result column="show_id" property="showId" jdbcType="BIGINT" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
         <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+        <result column="ext_order_sn" property="extOrderSn" jdbcType="VARCHAR" />
         <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
         <result column="refund_no" property="refundNo" jdbcType="VARCHAR" />
         <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
@@ -53,6 +55,9 @@
     </sql>
     <sql id="userTableName">
         vscing_user
+    </sql>
+    <sql id="merchantTableName">
+        vscing_merchant
     </sql>
     <sql id="supplierTableName">
         vscing_supplier
@@ -104,6 +109,9 @@
             <if test="phone != null and phone != ''">
                 AND `order`.phone = #{phone}
             </if>
+            <if test="merchantName != null and merchantName.trim().length() > 0">
+                AND merchant.name LIKE CONCAT('%', #{merchantName}, '%')
+            </if>
             <if test="cinemaName != null and cinemaName.trim().length() > 0">
                 AND cinema.name LIKE CONCAT('%', #{cinemaName}, '%')
             </if>
@@ -140,6 +148,7 @@
         `order`.*,
         `user`.username AS username,
         `user`.phone AS userPhone,
+        merchant.name AS merchantName,
         supplier.name AS supplierName,
         cinema.name AS cinemaName,
         cinema.province_id AS provinceId,
@@ -158,6 +167,7 @@
         `show`.hall_name AS hallName
         FROM <include refid="tableName" /> `order`
         LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="merchantTableName" /> merchant ON `order`.merchant_id = merchant.id
         LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
         LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
         LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id

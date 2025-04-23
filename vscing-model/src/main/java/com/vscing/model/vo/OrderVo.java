@@ -31,6 +31,12 @@ public class OrderVo {
     @Schema(description = "下单手机号")
     private String phone;
 
+    @Schema(description = "商户ID")
+    private Long merchantId;
+
+    @Schema(description = "商户名称")
+    private String merchantName;
+
     @Schema(description = "供应商ID")
     private Long supplierId;
 
@@ -94,6 +100,9 @@ public class OrderVo {
     @Schema(description = "订单号")
     private String orderSn;
 
+    @Schema(description = "外部订单号")
+    private String extOrderSn;
+
     @Schema(description = "三方订单号")
     private String supplierOrderSn;
 
@@ -107,7 +116,7 @@ public class OrderVo {
     @Schema(description = "订单状态 1 待付款 2 待出票 3 出票中 4 已出票 5 已取消 6 退款中 7 退款完成 8 退款失败")
     private Integer status;
 
-    @Schema(description = "订单类型 1 用户下单 2 手动下单")
+    @Schema(description = "订单类型 1 用户下单 2 手动下单 3 商户订单")
     private Integer orderType;
 
     @Schema(description = "下单平台 1 微信小程序 2 支付宝小程序 3 百度小程序 21 淘宝 22 咸鱼 23 拼多多 24 微信")

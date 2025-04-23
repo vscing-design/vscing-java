@@ -1,7 +1,9 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MerchantBillListDto;
+import com.vscing.model.dto.MerchantBillRechargeListDto;
 import com.vscing.model.entity.MerchantBill;
+import com.vscing.model.vo.MerchantBillRechargeListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,6 +22,11 @@ public interface MerchantBillMapper {
    * 管理端查询列表
    */
   List<MerchantBill> getList(MerchantBillListDto record);
+
+  /**
+   * 管理端查询充值列表
+   */
+  List<MerchantBillRechargeListVo> getRechargeList(MerchantBillRechargeListDto record);
 
   /**
    * 公用查询商户信息

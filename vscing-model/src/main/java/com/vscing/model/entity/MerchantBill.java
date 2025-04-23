@@ -23,6 +23,9 @@ public class MerchantBill extends BaseEntity {
   @Schema(description = "商户ID")
   private Long merchantId;
 
+  @Schema(description = "关联对公户ID")
+  private Long bankId;
+
   @Schema(description = "平台订单号")
   private String platformOrderNo;
 
@@ -49,5 +52,11 @@ public class MerchantBill extends BaseEntity {
 
   @Schema(description = "备注")
   private String remark;
+
+  @Schema(description = "开户支行名称")
+  private String branchName;
+
+  @Schema(description = "银行账户")
+  private String bankAccount;
 
 }

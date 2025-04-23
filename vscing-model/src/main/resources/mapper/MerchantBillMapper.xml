@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.vscing.model.entity.MerchantBill">
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="bank_id" property="bankId" jdbcType="BIGINT" />
         <result column="platform_order_no" property="platformOrderNo" jdbcType="VARCHAR" />
         <result column="external_order_no" property="externalOrderNo" jdbcType="VARCHAR" />
         <result column="change_amount" property="changeAmount" jdbcType="DECIMAL" />
@@ -16,6 +17,8 @@
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="picture_voucher" property="pictureVoucher" jdbcType="VARCHAR" />
         <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="branch_name" property="branchName" jdbcType="VARCHAR" />
+        <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -59,6 +62,22 @@
         order by updated_at desc
     </select>
 
+    <!-- 查询充值列表 -->
+    <select id="getRechargeList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            change_type = 3
+            <if test="status != null and status != 0">
+                AND status = #{status, jdbcType=TINYINT}
+            </if>
+            <if test="merchantName != null and merchantName.trim() != ''">
+                AND merchant_name LIKE CONCAT('%', #{merchantName}, '%')
+            </if>
+            AND deleted_at IS NULL
+        </where>
+        order by status asc
+    </select>
+
     <!-- 根据ID查询详情 -->
     <select id="selectById" resultMap="BaseResultMap" parameterType="long">
         SELECT * FROM
@@ -73,6 +92,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="merchantId != null">merchant_id,</if>
+            <if test="bankId != null">bank_id,</if>
             <if test="platformOrderNo != null">platform_order_no,</if>
             <if test="externalOrderNo != null">external_order_no,</if>
             <if test="changeAmount != null">change_amount,</if>
@@ -82,12 +102,15 @@
             <if test="status != null">status,</if>
             <if test="pictureVoucher != null">picture_voucher,</if>
             <if test="remark != null">remark,</if>
+            <if test="branchName != null">branch_name,</if>
+            <if test="bankAccount != null">bank_account,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
+            <if test="bankId != null">#{bankId, jdbcType=BIGINT},</if>
             <if test="platformOrderNo != null">#{platformOrderNo, jdbcType=VARCHAR},</if>
             <if test="externalOrderNo != null">#{externalOrderNo, jdbcType=VARCHAR},</if>
             <if test="changeAmount != null">#{changeAmount, jdbcType=DECIMAL},</if>
@@ -97,6 +120,8 @@
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="pictureVoucher != null">#{pictureVoucher, jdbcType=VARCHAR},</if>
             <if test="remark != null">#{remark, jdbcType=VARCHAR},</if>
+            <if test="branchName != null">#{branchName, jdbcType=VARCHAR},</if>
+            <if test="bankAccount != null">#{bankAccount, jdbcType=VARCHAR},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
         </trim>
     </insert>
@@ -107,6 +132,7 @@
         <set>
             <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
             <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
+            <if test="bankId != null">bank_id = #{bankId, jdbcType=BIGINT},</if>
             <if test="platformOrderNo != null">platform_order_no = #{platformOrderNo, jdbcType=VARCHAR},</if>
             <if test="externalOrderNo != null">external_order_no = #{branchName, jdbcType=VARCHAR},</if>
             <if test="changeAmount != null">change_amount = #{changeAmount, jdbcType=DECIMAL},</if>
@@ -116,6 +142,8 @@
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="pictureVoucher != null">picture_voucher = #{pictureVoucher, jdbcType=VARCHAR},</if>
             <if test="remark != null">remark = #{remark, jdbcType=VARCHAR},</if>
+            <if test="branchName != null">branch_name = #{branchName, jdbcType=VARCHAR},</if>
+            <if test="bankAccount != null">bank_account = #{bankAccount, jdbcType=VARCHAR},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
