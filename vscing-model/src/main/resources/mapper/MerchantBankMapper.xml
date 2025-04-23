@@ -30,9 +30,9 @@
 
     <!-- 查询列表 -->
     <select id="getList" resultMap="BaseResultMap">
-        SELECT * <include refid="tableName" />
+        SELECT * FROM <include refid="tableName" />
         <where>
-            <if test="merchant_id != null">
+            <if test="merchantId != null">
                 AND merchant_id = #{merchantId}
             </if>
             AND deleted_at IS NULL

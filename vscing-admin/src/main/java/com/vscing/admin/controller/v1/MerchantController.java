@@ -5,6 +5,7 @@ import com.vscing.admin.service.MerchantService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MerchantListDto;
+import com.vscing.model.entity.Menu;
 import com.vscing.model.entity.Merchant;
 import com.vscing.model.request.MerchantRefundRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,13 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,6 +42,16 @@ public class MerchantController {
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<Merchant> list = merchantService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @GetMapping("/{id}")
+  @Operation(summary = "详情")
+  public CommonResult<Merchant> details(@PathVariable("id") Long id) {
+    Merchant merchant = merchantService.getDetails(id);
+    if (merchant == null) {
+      return CommonResult.failed("信息不存在");
+    }
+    return CommonResult.success(merchant);
   }
 
   @PostMapping
@@ -122,15 +127,11 @@ public class MerchantController {
       record.setUpdatedBy(userInfo.getUserId());
     }
     try {
-      int rowsAffected = merchantService.refund(record);
-      if (rowsAffected <= 0) {
-        return CommonResult.success("退款成功");
-      } else {
-        return CommonResult.failed("退款失败");
-      }
+      merchantService.refund(record);
+      return CommonResult.success("退款成功");
     } catch (Exception e) {
-      log.error("请求错误: ", e);
-      return CommonResult.failed("请求错误");
+      log.error("退款失败: {}", e.getMessage());
+      return CommonResult.failed("退款失败");
     }
   }
 

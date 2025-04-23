@@ -20,6 +20,11 @@ public interface MerchantService {
   List<Merchant> getList(MerchantListDto record, Integer pageSize, Integer pageNum);
 
   /**
+   * 详情
+   */
+  Merchant getDetails(Long id);
+
+  /**
    * 新增
    */
   int created(Merchant record);

@@ -49,6 +49,11 @@ public class MerchantServiceImpl implements MerchantService {
   }
 
   @Override
+  public Merchant getDetails(Long id) {
+    return merchantMapper.selectById(id);
+  }
+
+  @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public int created(Merchant merchant) {
     try {

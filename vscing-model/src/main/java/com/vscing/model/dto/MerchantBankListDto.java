@@ -1,5 +1,6 @@
 package com.vscing.model.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
 @Data
 public class MerchantBankListDto {
 
-
+  @Schema(description = "商户ID")
+  private Long merchantId;
 
 }

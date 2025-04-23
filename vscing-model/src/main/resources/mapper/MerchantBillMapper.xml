@@ -36,6 +36,9 @@
     <select id="getList" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
         <where>
+            <if test="merchantId != null">
+                AND merchant_id = #{merchantId}
+            </if>
             <if test="status != null and status != 0">
                 AND status = #{status, jdbcType=TINYINT}
             </if>

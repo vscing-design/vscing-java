@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class MerchantBillListDto {
 
+  @Schema(description = "商户ID")
+  private Long merchantId;
+
   @Schema(description = "开始变动日期")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime startDate;
