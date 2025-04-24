@@ -671,10 +671,7 @@ public class TaskServiceImpl implements TaskService {
                   log.error(cinema.getName() + "场次数据异常: {}", e);
                 }
               }
-
-              boolean res = showService.initShow(showList, showAreaList);
-
-              log.info(cinema.getName() + "同步场次结束 res: {}", res);
+              showService.initShow(showList, showAreaList);
             }
           } catch (Exception e) {
             log.error(cinema.getName() + "同步场次异常: {}", e);

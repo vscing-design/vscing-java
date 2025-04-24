@@ -64,18 +64,19 @@
 
     <!-- 查询充值列表 -->
     <select id="getRechargeList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" />
+        SELECT * FROM <include refid="tableName" /> mb
+        LEFT JOIN <include refid="merchantTableName" /> m ON mb.merchant_id = m.id
         <where>
-            change_type = 3
+            mb.change_type = 3
             <if test="status != null and status != 0">
-                AND status = #{status, jdbcType=TINYINT}
+                AND mb.status = #{status, jdbcType=TINYINT}
             </if>
             <if test="merchantName != null and merchantName.trim() != ''">
-                AND merchant_name LIKE CONCAT('%', #{merchantName}, '%')
+                AND m.merchant_name LIKE CONCAT('%', #{merchantName}, '%')
             </if>
-            AND deleted_at IS NULL
+            AND mb.deleted_at IS NULL
         </where>
-        order by status asc
+        order by mb.`status` asc
     </select>
 
     <!-- 根据ID查询详情 -->

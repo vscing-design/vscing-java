@@ -110,7 +110,7 @@
                 AND `order`.phone = #{phone}
             </if>
             <if test="merchantName != null and merchantName.trim().length() > 0">
-                AND merchant.name LIKE CONCAT('%', #{merchantName}, '%')
+                AND merchant.merchant_name LIKE CONCAT('%', #{merchantName}, '%')
             </if>
             <if test="cinemaName != null and cinemaName.trim().length() > 0">
                 AND cinema.name LIKE CONCAT('%', #{cinemaName}, '%')
@@ -135,6 +135,7 @@
         SUM(`order`.settlement_price) as settlementPrice
         FROM <include refid="tableName" /> `order`
         LEFT JOIN <include refid="userTableName" /> `user` ON `order`.user_id = `user`.id
+        LEFT JOIN <include refid="merchantTableName" /> merchant ON `order`.merchant_id = merchant.id
         LEFT JOIN <include refid="supplierTableName" /> supplier ON `order`.supplier_id = supplier.id
         LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
         LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
@@ -148,7 +149,7 @@
         `order`.*,
         `user`.username AS username,
         `user`.phone AS userPhone,
-        merchant.name AS merchantName,
+        merchant.merchant_name AS merchantName,
         supplier.name AS supplierName,
         cinema.name AS cinemaName,
         cinema.province_id AS provinceId,
