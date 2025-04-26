@@ -97,6 +97,19 @@ public class UserController {
     }
   }
 
+  @GetMapping("/self")
+  @Operation(summary = "登陆用户信息")
+  public CommonResult<MerchantDetailVo> self(@AuthenticationPrincipal MerchantDetails userInfo) {
+    if(userInfo == null) {
+      return CommonResult.failed("上下文异常");
+    }
+    MerchantDetailVo merchantDetailVo = userInfo.getMerchant();
+    if (merchantDetailVo == null) {
+      return CommonResult.failed("用户不存在");
+    }
+    return CommonResult.success(merchantDetailVo);
+  }
+
   @PutMapping("/password")
   @Operation(summary = "修改用户密码")
   public CommonResult<Object> users(@Validated @RequestBody MerchantUserPasswordRequest record,

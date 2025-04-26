@@ -75,4 +75,7 @@ public class Merchant extends BaseEntity {
   @Schema(description = "单点登陆token")
   private String token;
 
+  @Schema(description = "乐观锁版本号")
+  private Integer version;
+
 }

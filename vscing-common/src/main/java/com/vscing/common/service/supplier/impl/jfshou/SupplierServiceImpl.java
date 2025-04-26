@@ -41,7 +41,7 @@ public class SupplierServiceImpl implements SupplierService {
     params.put("timestamp", String.valueOf(timestamp));
     // 日志记录：打印请求参数
     String signingString = JSONUtil.toJsonStr(params);
-    log.info("signingString: {}", signingString);
+//    log.info("signingString: {}", signingString);
     // 生成签名
     params.put("sign", SignatureGenerator.generateSignature(params, supplierProperties.getKey()));
     // 判断是否需要URL编码的子段
@@ -51,7 +51,7 @@ public class SupplierServiceImpl implements SupplierService {
     }
     // 日志记录：打印请求参数
     String requestString = JSONUtil.toJsonStr(params);
-    log.info("Request Parameters: {}", requestString);
+//    log.info("Request Parameters: {}", requestString);
     // 构建 multipart/form-data 请求体
     MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
     for (Map.Entry<String, String> entry : params.entrySet()) {

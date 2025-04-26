@@ -38,6 +38,7 @@
         <result column="memo" property="memo" jdbcType="VARCHAR" />
         <result column="stop_show_time" property="stopShowTime" jdbcType="TIMESTAMP" />
         <result column="baidu_user_id" property="baiduUserId" jdbcType="BIGINT" />
+        <result column="product_type" property="productType" jdbcType="INTEGER" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />

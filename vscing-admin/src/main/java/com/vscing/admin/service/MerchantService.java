@@ -37,6 +37,6 @@ public interface MerchantService {
   /**
    * 退款
    */
-  int refund(MerchantRefundRequest record);
+  void refund(MerchantRefundRequest record);
 
 }

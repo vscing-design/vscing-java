@@ -22,6 +22,11 @@ public interface MerchantBankMapper {
   List<MerchantBank> getList(MerchantBankListDto record);
 
   /**
+   * 商户管理端查询列表
+   */
+  List<MerchantBank> getBankList(@Param("merchantId") long merchantId);
+
+  /**
    * 公用查询商户信息
    */
   MerchantBank selectById(long id);

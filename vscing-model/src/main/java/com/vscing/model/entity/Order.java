@@ -115,4 +115,7 @@ public class Order extends BaseEntity {
   @Schema(description = "百度订单userId")
   private Long baiduUserId;
 
+  @Schema(description = "商品类型 1 电影票")
+  private Integer productType;
+
 }

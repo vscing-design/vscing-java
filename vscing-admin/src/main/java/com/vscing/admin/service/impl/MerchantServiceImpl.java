@@ -86,7 +86,7 @@ public class MerchantServiceImpl implements MerchantService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-  public int refund(MerchantRefundRequest record) {
+  public void refund(MerchantRefundRequest record) {
     try {
       Merchant merchant = merchantMapper.selectById(record.getId());
       if (merchant == null) {
@@ -95,7 +95,7 @@ public class MerchantServiceImpl implements MerchantService {
       if (merchant.getBalance().compareTo(record.getRefundAmount()) < 0) {
         throw new ServiceException("商户余额不够");
       }
-      int rowsAffected = 1;
+      int rowsAffected;
       // 变更商户余额
       BigDecimal newBalance = merchant.getBalance().subtract(record.getRefundAmount());
       merchant.setBalance(newBalance);
@@ -106,8 +106,9 @@ public class MerchantServiceImpl implements MerchantService {
       MerchantBill merchantBill = new MerchantBill();
       merchantBill.setId(IdUtil.getSnowflakeNextId());
       merchantBill.setMerchantId(merchant.getId());
-      merchantBill.setChangeType(1);
-      merchantBill.setChangeAmount(record.getRefundAmount());
+      merchantBill.setChangeType(4);
+      BigDecimal changeAmount = record.getRefundAmount().negate();
+      merchantBill.setChangeAmount(changeAmount);
       merchantBill.setChangeAfterBalance(newBalance);
       merchantBill.setStatus(2);
       merchantBill.setPictureVoucher(record.getPictureVoucher());
@@ -116,7 +117,6 @@ public class MerchantServiceImpl implements MerchantService {
       if (rowsAffected <= 0) {
         throw new ServiceException("创建商户账单失败");
       }
-      return rowsAffected;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

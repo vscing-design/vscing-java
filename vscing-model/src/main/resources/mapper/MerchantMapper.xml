@@ -21,6 +21,7 @@
         <result column="id_card_back" property="idCardBack" jdbcType="VARCHAR" />
         <result column="last_ip" property="lastIp" jdbcType="VARCHAR" />
         <result column="login_at" property="loginAt" jdbcType="TIMESTAMP" />
+        <result column="version" property="version" jdbcType="INTEGER" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -32,6 +33,15 @@
     <!-- 定义一个SQL片段，用于指定表名 -->
     <sql id="tableName">
         vscing_merchant
+    </sql>
+    <sql id="orderTableName">
+        vscing_order
+    </sql>
+    <sql id="cinemaTableName">
+        vscing_cinema
+    </sql>
+    <sql id="movieTableName">
+        vscing_movie
     </sql>
 
     <!-- 查询列表 -->
@@ -124,10 +134,119 @@
             <if test="idCardBack != null">id_card_back = #{idCardBack, jdbcType=VARCHAR},</if>
             <if test="lastIp != null">last_ip = #{lastIp, jdbcType=VARCHAR},</if>
             <if test="loginAt != null">login_at = #{loginAt, jdbcType=TIMESTAMP},</if>
+            <if test="version != null">version = #{version, jdbcType=INTEGER},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 更新记录乐关锁 -->
+    <update id="updateVersion" parameterType="com.vscing.model.entity.Merchant">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
+            <if test="merchantName != null">merchant_name = #{merchantName, jdbcType=VARCHAR},</if>
+            <if test="password != null">password = #{password, jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="balance != null">balance = #{balance, jdbcType=DECIMAL},</if>
+            <if test="totalRecharge != null">total_recharge = #{totalRecharge, jdbcType=DECIMAL},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
+            <if test="contacts != null">contacts = #{contacts, jdbcType=VARCHAR},</if>
+            <if test="businessLicense != null">business_license = #{businessLicense, jdbcType=VARCHAR},</if>
+            <if test="uscc != null">uscc = #{uscc, jdbcType=VARCHAR},</if>
+            <if test="legalName != null">legal_name = #{legalName, jdbcType=VARCHAR},</if>
+            <if test="idCard != null">id_card = #{idCard, jdbcType=VARCHAR},</if>
+            <if test="idCardFront != null">id_card_front = #{idCardFront, jdbcType=VARCHAR},</if>
+            <if test="idCardBack != null">id_card_back = #{idCardBack, jdbcType=VARCHAR},</if>
+            <if test="lastIp != null">last_ip = #{lastIp, jdbcType=VARCHAR},</if>
+            <if test="loginAt != null">login_at = #{loginAt, jdbcType=TIMESTAMP},</if>
+            <if test="version != null">version = version + 1,</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT} AND version = #{version, jdbcType=INTEGER}
+    </update>
+
+    <!-- 商户端查询订单列表 -->
+    <select id="selectByOrderList" parameterType="com.vscing.model.dto.MerchantOrderListDto" resultType="com.vscing.model.vo.MerchantOrderListVo">
+        SELECT
+        `order`.id as orderId,
+        `order`merchant_id,
+        `order`.created_at,
+        `order`.status,
+        `order`.order_sn,
+        `order`.ext_order_sn,
+        `order`.product_type,
+        movie.name AS movieName,
+        `order`.purchase_quantity,
+        `order`.total_price,
+        `order`.phone,
+        `order`.hall_name,
+        `order`.seat_info,
+        `order`.ticket_code,
+        cinema.province_name AS provinceName,
+        cinema.city_name AS cityName,
+        cinema.district_name AS districtName,
+        cinema.address AS address
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        <where>
+            <if test="merchantId != null">
+                AND `order`.merchant_id = #{merchantId, jdbcType=BIGINT}
+            </if>
+            <if test="status != null and status != 0">
+                AND `order`.status = #{status, jdbcType=TINYINT}
+            </if>
+            <if test="orderSn != null">
+                AND `order`.order_sn LIKE CONCAT('%', #{orderSn, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="extOrderSn != null">
+                AND `order`.ext_order_sn LIKE CONCAT('%', #{extOrderSn, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="phone != null">
+                AND `order`.phone LIKE CONCAT('%', #{phone, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="startDate != null">
+                AND `order`.created_at <![CDATA[ >= ]]> #{startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                AND `order`.created_at <![CDATA[ <= ]]> #{endDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="productType != null and productType != 0">
+                AND `order`.product_type = #{productType, jdbcType=TINYINT}
+            </if>
+            AND `order`.deleted_at IS NULL
+        </where>
+        ORDER BY `order`.created_at DESC
+    </select>
+
+    <!-- 商户端查询订单列表 -->
+    <select id="selectByOrderCount" parameterType="com.vscing.model.dto.MerchantOrderCountDto" resultType="com.vscing.model.vo.MerchantOrderCountVo">
+        SELECT
+            id as orderId,
+            merchant_id,
+            created_at,
+            product_type,
+            SUM(purchase_quantity) as purchaseQuantity,
+            SUM(total_price) as totalPrice
+        FROM <include refid="tableName" />
+        <where>
+            <if test="merchantId != null">
+                AND merchant_id = #{merchantId, jdbcType=BIGINT} AND status = 4
+            </if>
+            <if test="startOrderDate != null">
+                AND created_at <![CDATA[ >= ]]> #{startOrderDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="endOrderDate != null">
+                AND created_at <![CDATA[ <= ]]> #{endOrderDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="productType != null and productType != 0">
+                AND product_type = #{productType, jdbcType=TINYINT}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+        GROUP BY id, merchant_id, created_at, product_type
+        ORDER BY created_at DESC
+    </select>
 
 </mapper>

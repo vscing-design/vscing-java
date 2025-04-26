@@ -1,7 +1,11 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MerchantListDto;
+import com.vscing.model.dto.MerchantOrderCountDto;
+import com.vscing.model.dto.MerchantOrderListDto;
 import com.vscing.model.entity.Merchant;
+import com.vscing.model.vo.MerchantOrderCountVo;
+import com.vscing.model.vo.MerchantOrderListVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -39,5 +43,20 @@ public interface MerchantMapper {
    * 公用编辑信息
   */
   int update(Merchant merchant);
+
+  /**
+   * 公用编辑信息 乐观锁
+   */
+  int updateVersion(Merchant merchant);
+
+  /**
+   * 商户端查询订单列表
+  */
+  List<MerchantOrderListVo> selectByOrderList(MerchantOrderListDto record);
+
+  /**
+   * 商户端统计订单列表
+   */
+  List<MerchantOrderCountVo> selectByOrderCount(MerchantOrderCountDto record);
 
 }
