@@ -66,11 +66,19 @@
         AND deleted_at IS NULL
     </select>
 
-    <!-- 根据ID查询详情 -->
+    <!-- 根据merchant_name查询详情 -->
     <select id="selectByMerchantName" resultMap="BaseResultMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE merchant_name = #{MerchantName}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据phone查询详情 -->
+    <select id="selectByMerchantPhone" resultMap="BaseResultMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE phone = #{phone}
         AND deleted_at IS NULL
     </select>
 

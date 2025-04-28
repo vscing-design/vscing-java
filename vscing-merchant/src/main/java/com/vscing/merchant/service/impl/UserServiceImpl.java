@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
     //密码需要客户端加密后传递
     try {
       // 获取用户信息
-      Merchant merchant = merchantMapper.selectByMerchantName(username);
+      Merchant merchant = merchantMapper.selectByMerchantPhone(username);
       if (merchant == null) {
         throw new ServiceException("商户不存在");
       }
@@ -79,7 +78,7 @@ public class UserServiceImpl implements UserService {
       redisService.set(cachePrefix + merchant.getId() + ":" + token, merchant, expiration);
       // 更新表数据
       merchantMapper.update(merchant);
-    } catch (AuthenticationException e) {
+    } catch (Exception e) {
       log.warn("登录异常:{}", e.getMessage());
     }
     return token;

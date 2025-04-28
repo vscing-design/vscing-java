@@ -35,6 +35,11 @@ public interface MerchantMapper {
   Merchant selectByMerchantName(String merchantName);
 
   /**
+   * 公用phone查询信息
+   */
+  Merchant selectByMerchantPhone(String phone);
+
+  /**
    * 公用插入信息
    */
   int insert(Merchant merchant);
