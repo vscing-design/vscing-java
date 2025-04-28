@@ -42,7 +42,7 @@
     <!-- 商户管理端查询列表 -->
     <select id="getBankList" parameterType="long" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
-        WHERE merchant_id = #{id}
+        WHERE merchant_id = #{merchantId}
         AND deleted_at IS NULL
     </select>
 

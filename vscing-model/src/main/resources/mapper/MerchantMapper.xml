@@ -195,7 +195,7 @@
         cinema.city_name AS cityName,
         cinema.district_name AS districtName,
         cinema.address AS address
-        FROM <include refid="tableName" /> `order`
+        FROM <include refid="orderTableName" /> `order`
         LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
         LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
         <where>
@@ -237,7 +237,7 @@
             product_type,
             SUM(purchase_quantity) as purchaseQuantity,
             SUM(total_price) as totalPrice
-        FROM <include refid="tableName" />
+        FROM <include refid="orderTableName" />
         <where>
             <if test="merchantId != null">
                 AND merchant_id = #{merchantId, jdbcType=BIGINT} AND status = 4

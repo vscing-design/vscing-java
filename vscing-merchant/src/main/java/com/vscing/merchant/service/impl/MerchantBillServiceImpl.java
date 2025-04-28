@@ -58,11 +58,14 @@ public class MerchantBillServiceImpl implements MerchantBillService {
       MerchantBill merchantBill = new MerchantBill();
       merchantBill.setId(IdUtil.getSnowflakeNextId());
       merchantBill.setMerchantId(merchant.getId());
+      merchantBill.setBankId(record.getBankId());
       merchantBill.setChangeType(3);
       BigDecimal changeAmount = record.getChangeAmount();
       merchantBill.setChangeAmount(changeAmount);
       merchantBill.setChangeAfterBalance(newBalance);
       merchantBill.setStatus(1);
+      merchantBill.setBranchName(record.getBranchName());
+      merchantBill.setBankAccount(record.getBankAccount());
       rowsAffected = merchantBillMapper.insert(merchantBill);
       if (rowsAffected <= 0) {
         throw new ServiceException("创建商户账单失败");
