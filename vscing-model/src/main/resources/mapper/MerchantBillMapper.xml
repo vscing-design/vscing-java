@@ -63,8 +63,8 @@
     </select>
 
     <!-- 查询充值列表 -->
-    <select id="getRechargeList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> mb
+    <select id="getRechargeList" resultType="com.vscing.model.vo.MerchantBillRechargeListVo">
+        SELECT mb.*, m.merchant_name FROM <include refid="tableName" /> mb
         LEFT JOIN <include refid="merchantTableName" /> m ON mb.merchant_id = m.id
         <where>
             mb.change_type = 3

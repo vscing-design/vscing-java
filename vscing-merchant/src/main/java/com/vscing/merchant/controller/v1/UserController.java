@@ -128,7 +128,8 @@ public class UserController {
     // 操作人ID
     if (userInfo != null && userInfo.getUserId() != null) {
       merchant.setId(userInfo.getUserId());
-      merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
+      String newPassword = passwordEncoder.encode(record.getPassword());
+      merchant.setPassword(newPassword);
       merchant.setUpdatedBy(userInfo.getUserId());
     }
     int rowsAffected = userService.updated(merchant);
