@@ -81,6 +81,7 @@ public class MerchantServiceImpl implements MerchantService {
 
   @Override
   public int updated(Merchant merchant) {
+    merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
     return merchantMapper.update(merchant);
   }
 
@@ -99,7 +100,8 @@ public class MerchantServiceImpl implements MerchantService {
       // 变更商户余额
       BigDecimal newBalance = merchant.getBalance().subtract(record.getRefundAmount());
       merchant.setBalance(newBalance);
-      rowsAffected = merchantMapper.update(merchant);
+      merchant.setVersion(merchant.getVersion());
+      rowsAffected = merchantMapper.updateVersion(merchant);
       if (rowsAffected <= 0) {
         throw new ServiceException("变更商户余额失败");
       }

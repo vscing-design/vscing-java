@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author vscing
  * @date 2025/3/8 18:25
-*/
+ */
 @Slf4j
 @Component
 public class DelayMessageReceiver {
@@ -107,13 +107,16 @@ public class DelayMessageReceiver {
         tag = 1;
       }
       HttpOrder httpOrder = objectMapper.convertValue(data, HttpOrder.class);
+      log.error("同步场次码延迟队列数据更新前: {}", httpOrder);
       if(httpOrder == null || !ORDER_STATUS_GENERATE_SUCCESS.equals(httpOrder.getOrderStatus())){
         tag = 1;
       }
-      log.error("同步场次码延迟队列数据更新前: {}", httpOrder);
-      // 更新数据
-      boolean result = orderService.supplierOrder(httpOrder);
-      log.error("同步场次码延迟队列数据更新结果：{}", result);
+      // 如果成功了，就执行更新数据
+      if (tag == 0) {
+        // 更新数据
+        boolean result = orderService.supplierOrder(httpOrder);
+        log.error("同步场次码延迟队列数据更新结果：{}", result);
+      }
       // 判断是否需要重试
       if(tag == 1 && syncCodeMq.getNum() >= 20) {
         // 发送mq异步处理 退款

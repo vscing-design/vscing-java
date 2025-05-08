@@ -16,7 +16,7 @@ import java.util.List;
 public interface MerchantBillService {
 
   /**
-   * 充值
+   * 账单记录
    */
   List<MerchantBill> getList(MerchantBillListDto record, Integer pageSize, Integer pageNum);
 

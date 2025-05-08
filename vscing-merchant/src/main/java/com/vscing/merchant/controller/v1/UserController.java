@@ -121,7 +121,7 @@ public class UserController {
       return CommonResult.validateFailed(errorMessage);
     }
     // 判断两次密码是否一致
-    if (record.getPassword().equals(record.getConfirmPassword())) {
+    if (!record.getPassword().equals(record.getConfirmPassword())) {
       return CommonResult.validateFailed("两次密码不一致");
     }
     Merchant merchant = new Merchant();

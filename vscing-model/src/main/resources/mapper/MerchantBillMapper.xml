@@ -42,9 +42,10 @@
             <if test="merchantId != null">
                 AND merchant_id = #{merchantId}
             </if>
-            <if test="status != null and status != 0">
-                AND status = #{status, jdbcType=TINYINT}
-            </if>
+            AND status in (1,2)
+            <!--            <if test="status != null and status != 0">-->
+            <!--                AND status = #{status, jdbcType=TINYINT}-->
+            <!--            </if>-->
             <if test="startDate != null">
                 AND updated_at <![CDATA[ >= ]]> #{startDate, jdbcType=TIMESTAMP}
             </if>
@@ -76,7 +77,7 @@
             </if>
             AND mb.deleted_at IS NULL
         </where>
-        order by mb.`status` asc
+        order by mb.`status` ASC, mb.created_at DESC
     </select>
 
     <!-- 根据ID查询详情 -->
