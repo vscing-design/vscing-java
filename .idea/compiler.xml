@@ -29,6 +29,7 @@
         <module name="vscing-elk" />
         <module name="vscing-admin" />
         <module name="vscing-common" />
+        <module name="vscing-platform" />
         <module name="vscing-api" />
         <module name="vscing-auth" />
         <module name="vscing-merchant" />
@@ -48,6 +49,7 @@
       <module name="vscing-model" options="-parameters" />
       <module name="vscing-mq" options="-parameters" />
       <module name="vscing-netty" options="-parameters" />
+      <module name="vscing-platform" options="-parameters" />
     </option>
   </component>
 </project>
