@@ -186,4 +186,40 @@
         district_name = VALUES(district_name)
     </insert>
 
+    <!-- 开放平台影院列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryCinema">
+        SELECT
+        id as cinema_id,
+        name as cinema_name,
+        address as cinema_address,
+        phone as cinema_phone,
+        province_id,
+        city_id,
+        district_id,
+        lng as longitude,
+        lat as latitude
+        FROM <include refid="tableName" />
+        <where>
+            <if test="record.cityId != null">
+                AND city_id = #{record.cityId}
+            </if>
+            <if test="record.districtId != null">
+                AND district_id = #{record.districtId}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 开放平台影院详情 -->
+    <select id="getPlatformInfo" parameterType="long" resultType="com.vscing.model.platform.QueryCinemaShow">
+        SELECT
+        id as cinema_id,
+        name as cinema_name,
+        address as cinema_address,
+        lng as longitude,
+        lat as latitude
+        FROM <include refid="tableName" />
+        WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
 </mapper>

@@ -3,6 +3,9 @@ package com.vscing.model.mapper;
 import com.vscing.model.dto.CinemaApiDetailsDto;
 import com.vscing.model.dto.CinemaListDto;
 import com.vscing.model.entity.Cinema;
+import com.vscing.model.platform.QueryCinema;
+import com.vscing.model.platform.QueryCinemaDto;
+import com.vscing.model.platform.QueryCinemaShow;
 import com.vscing.model.vo.CinemaApiDetailsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -36,5 +39,15 @@ public interface CinemaMapper {
    * 批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
    */
   int batchUpsert(@Param("list") List<Cinema> list);
-  
+
+  /**
+   * 开放平台影院列表
+   */
+  List<QueryCinema> getPlatformList(QueryCinemaDto record);
+
+  /**
+   * 开放平台影院详情
+   */
+  QueryCinemaShow getPlatformInfo(long id);
+
 }

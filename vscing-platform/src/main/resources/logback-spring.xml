@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- debug="true" scan="true" scanPeriod="10 seconds" 扫描配置 -->
+<configuration debug="false" scan="false">
+
+    <!-- 上下文名称 %contextName  -->
+    <contextName>vscing-platform</contextName>
+
+    <!-- 使用 Spring 属性 -->
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="appName" />
+    <springProperty scope="context" name="logLevel" source="logging.level.com.vscing" defaultValue="INFO"/>
+
+    <!-- 定义变量 -->
+    <!-- 定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
+    <property name="LOG_HOME" value="/www/wwwlogs/java/platform_logs"/>
+    <property name="STANDARD_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss}){cyan} %clr([%thread]){green} %-5level %clr(%logger{36}){magenta,bold} - %msg%n"/>
+    <property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>
+    <!--    <property name="STANDARD_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|%p|%t|%c|%M|%L|%X{local_ip}|%X{TRACE_ID}|${appName}|%m%n"/>-->
+    <!--    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint}|%clr(${LOG_LEVEL_PATTERN:-%p})|%clr(${PID}){magenta}|${appName}|%clr(%t){faint}|%clr(%logger{39}){cyan}|%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>-->
+    <!--    <property name="CONSOLE_CUSTOM_LOG_PATTERN" value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint}|%clr(${LOG_LEVEL_PATTERN:-%p})|%clr(${PID}){magenta}|${appName}|%clr(%t){faint}|%clr(%F|%M|%L){cyan}|%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>-->
+
+    <!-- 转换规则 -->
+    <!--<include resource="org/springframework/boot/logging/logback/defaults.xml" />-->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+    <!-- 测试环境 -->
+    <springProfile name="dev">
+
+        <!-- 简单格式的控制台输出 -->
+        <!--        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+        <!--                <pattern>${STANDARD_LOG_PATTERN}</pattern>-->
+        <!--            </encoder>-->
+        <!--        </appender>-->
+
+        <!-- 自定义控制台输出 -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>${CONSOLE_LOG_CHARSET}</charset>
+            </encoder>
+        </appender>
+
+        <!-- 日志输出级别 -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 正式环境 -->
+    <springProfile name="prod">
+
+        <!-- 简单格式的控制台输出 -->
+        <!--        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+        <!--                <pattern>${STANDARD_LOG_PATTERN}</pattern>-->
+        <!--            </encoder>-->
+        <!--        </appender>-->
+
+        <!--自定义控制台输出 -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>${CONSOLE_LOG_CHARSET}</charset>
+            </encoder>
+        </appender>
+
+        <!-- 按照每天生成INFO日志文件 -->
+        <appender name="INFO_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+            <!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则
+            如果同时有<File>和<FileNamePattern>，那么当天日志是<File>，明天会自动把今天
+            的日志改名为今天的日期。即，<File> 的日志都是当天的。
+            -->
+            <file>${LOG_HOME}/info.log</file>
+
+            <!--滚动策略，按照大小时间滚动 SizeAndTimeBasedRollingPolicy-->
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!--日志文件输出的文件名-->
+                <FileNamePattern>${LOG_HOME}/info.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+                <!--只保留最近120天的日志-->
+                <MaxHistory>120</MaxHistory>
+                <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
+                <totalSizeCap>10GB</totalSizeCap>
+                <MaxFileSize>5MB</MaxFileSize>
+            </rollingPolicy>
+
+            <!--日志输出编码格式化-->
+            <encoder>
+                <charset>UTF-8</charset>
+                <pattern>${STANDARD_LOG_PATTERN}</pattern>
+            </encoder>
+
+            <!-- 过滤器，只允许 INFO 和 WARN 级别的日志 -->
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <!-- 按照每天生成ERROR日志文件 -->
+        <appender name="ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则
+             如果同时有<File>和<FileNamePattern>，那么当天日志是<File>，明天会自动把今天
+             的日志改名为今天的日期。即，<File> 的日志都是当天的。
+            -->
+            <file>${LOG_HOME}/error.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!--日志文件输出的文件名-->
+                <FileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+                <MaxHistory>120</MaxHistory>
+                <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
+                <totalSizeCap>10GB</totalSizeCap>
+                <MaxFileSize>10MB</MaxFileSize>
+            </rollingPolicy>
+            <encoder>
+                <charset>UTF-8</charset>
+                <pattern>${STANDARD_LOG_PATTERN}</pattern>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender>
+
+        <!-- INFO日志异步输出 -->
+        <appender name="ASYNC_INFO_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+            <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+            <discardingThreshold>0</discardingThreshold>
+            <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+            <queueSize>512</queueSize>
+            <!-- 添加附加的appender,最多只能添加一个 -->
+            <appender-ref ref="INFO_APPENDER"/>
+        </appender>
+
+        <!-- ERROR日志异步输出 -->
+        <appender name="ASYNC_ERROR_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+            <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+            <discardingThreshold>0</discardingThreshold>
+            <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+            <queueSize>512</queueSize>
+            <!-- 添加附加的appender,最多只能添加一个 -->
+            <appender-ref ref="ERROR_APPENDER"/>
+        </appender>
+
+        <!--指定最基础的日志输出级别-->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_INFO_APPENDER"/>
+            <appender-ref ref="ASYNC_ERROR_APPENDER"/>
+        </root>
+
+    </springProfile>
+
+    <!--三方库日志-->
+    <!--    <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>-->
+    <!--    <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>-->
+    <!--    <logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN"/>-->
+    <!--    <logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN"/>-->
+    <!--    <logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN"/>-->
+    <!--    <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>-->
+    <!--    <logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>-->
+    <!--    <logger name="org.springframework.boot.actuate.endpoint.jmx" level="WARN"/>-->
+
+
+</configuration>

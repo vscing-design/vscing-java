@@ -158,4 +158,16 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 开放平台影片演员列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryMovieProducer">
+        SELECT
+        movie_id,
+        `type`,
+        avatar,
+        en_name,
+        sc_name,
+        act_name
+        FROM <include refid="tableName" /> WHERE deleted_at IS NULL
+    </select>
+
 </mapper>

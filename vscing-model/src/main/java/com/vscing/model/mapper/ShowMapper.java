@@ -6,6 +6,8 @@ import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.ShowAllDto;
 import com.vscing.model.dto.ShowListDto;
 import com.vscing.model.entity.Show;
+import com.vscing.model.platform.QueryShow;
+import com.vscing.model.platform.QueryShowDto;
 import com.vscing.model.vo.CinemaApiDetailsShowVo;
 import com.vscing.model.vo.CinemaApiVo;
 import com.vscing.model.vo.MovieApiVo;
@@ -55,5 +57,15 @@ public interface ShowMapper {
    * 批量新增或更新。INSERT ... ON DUPLICATE KEY UPDATE 语句来实现 UPSERT 操作
    */
   int batchUpsert(@Param("list") List<Show> list);
+
+  /**
+   * 开放平台查询列表
+   */
+  List<QueryShow> getPlatformList(QueryShowDto record);
+
+  /**
+   * 开放平台查询详情
+   */
+  Show getPlatformInfo(long id);
 
 }

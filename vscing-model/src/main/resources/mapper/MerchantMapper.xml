@@ -22,6 +22,8 @@
         <result column="last_ip" property="lastIp" jdbcType="VARCHAR" />
         <result column="login_at" property="loginAt" jdbcType="TIMESTAMP" />
         <result column="version" property="version" jdbcType="INTEGER" />
+        <result column="token" property="token" jdbcType="VARCHAR" />
+        <result column="secret_key" property="secretKey" jdbcType="VARCHAR" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -231,12 +233,12 @@
     <!-- 商户端查询订单列表 -->
     <select id="selectByOrderCount" parameterType="com.vscing.model.dto.MerchantOrderCountDto" resultType="com.vscing.model.vo.MerchantOrderCountVo">
         SELECT
-            id as orderId,
-            merchant_id,
-            created_at,
-            product_type,
-            SUM(purchase_quantity) as purchaseQuantity,
-            SUM(total_price) as totalPrice
+        id as orderId,
+        merchant_id,
+        created_at,
+        product_type,
+        SUM(purchase_quantity) as purchaseQuantity,
+        SUM(total_price) as totalPrice
         FROM <include refid="orderTableName" />
         <where>
             <if test="merchantId != null">

@@ -3,6 +3,7 @@ package com.vscing.model.mapper;
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.dto.CinemaApiDistrictDto;
 import com.vscing.model.entity.District;
+import com.vscing.model.platform.QueryDistrict;
 import com.vscing.model.vo.CinemaApiDistrictVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -48,4 +49,9 @@ public interface DistrictMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(District record);
+
+  /**
+   * 开放平台查区县列表
+   */
+  List<QueryDistrict> getPlatformList();
 }

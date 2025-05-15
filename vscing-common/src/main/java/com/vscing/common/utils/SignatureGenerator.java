@@ -79,7 +79,7 @@ public class SignatureGenerator {
      * @author vscing (vscing@foxmail.com)
      * @date 2024-12-11 01:01:55
     */
-    private static String md5(String input) {
+    public static String md5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes(StandardCharsets.UTF_8));

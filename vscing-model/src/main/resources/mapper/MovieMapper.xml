@@ -201,4 +201,25 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 开放平台影院列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryMovie">
+        SELECT
+        id as movieId,
+        name as movieName,
+        duration,
+        publish_date,
+        director,
+        `cast`,
+        intro,
+        version_type,
+        `language`,
+        movie_type,
+        poster_url,
+        plot_url,
+        grade,
+        `like`,
+        publish_status
+        FROM <include refid="tableName" /> WHERE deleted_at IS NULL
+    </select>
+
 </mapper>

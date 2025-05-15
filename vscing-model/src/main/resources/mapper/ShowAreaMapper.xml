@@ -175,4 +175,19 @@
         user_price = VALUES(user_price)
     </insert>
 
+    <!-- 开放平台场次集合查场次区域 -->
+    <select id="getPlatformShowIds" parameterType="java.util.List" resultType="com.vscing.model.platform.QueryShowArea">
+        SELECT
+        show_id,
+        id as show_area_id,
+        show_price,
+        user_price
+        FROM <include refid="tableName" />
+        WHERE show_id IN
+        <foreach item="showId" collection="list" open="(" separator="," close=")">
+            #{showId,jdbcType=BIGINT}
+        </foreach>
+        AND deleted_at IS NULL
+    </select>
+
 </mapper>

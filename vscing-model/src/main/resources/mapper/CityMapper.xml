@@ -28,6 +28,9 @@
     <sql id="tableName">
         vscing_city
     </sql>
+    <sql id="provinceTableName">
+        vscing_province
+    </sql>
 
     <!-- 查询全部列表 -->
     <select id="getAllList" resultMap="BaseResultMap">
@@ -120,5 +123,22 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 开放平台城市列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryCity">
+        SELECT
+            city.id as city_id,
+            city.name as city_name,
+            city.full_letter,
+            city.hot,
+            city.province_id,
+            province.name as province_name
+        FROM <include refid="tableName" /> `city`
+        LEFT JOIN <include refid="provinceTableName" /> `province` ON `city`.province_id = `province`.id
+        <where>
+            `city`.s1_city_id IS NOT NULL
+            AND `city`.deleted_at IS NULL
+        </where>
+    </select>
 
 </mapper>

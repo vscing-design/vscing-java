@@ -2,6 +2,8 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MovieProducerListDto;
 import com.vscing.model.entity.MovieProducer;
+import com.vscing.model.platform.QueryMovieDto;
+import com.vscing.model.platform.QueryMovieProducer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,5 +36,10 @@ public interface MovieProducerMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(MovieProducer record);
+
+  /**
+   * 开放平台查询列表
+   */
+  List<QueryMovieProducer> getPlatformList(QueryMovieDto record);
 
 }

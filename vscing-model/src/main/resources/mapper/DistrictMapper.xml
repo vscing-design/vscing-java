@@ -122,4 +122,17 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 开放平台区县列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryDistrict">
+        SELECT
+            id as district_id,
+            `name` as district_name,
+            city_id
+        FROM <include refid="tableName" />
+        <where>
+            s1_city_id IS NOT NULL
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
 </mapper>

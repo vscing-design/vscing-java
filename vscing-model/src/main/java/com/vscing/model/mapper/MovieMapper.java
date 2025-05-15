@@ -4,6 +4,8 @@ import com.vscing.model.dto.MovieApiListDto;
 import com.vscing.model.dto.MovieListDto;
 import com.vscing.model.dto.MovieTopDto;
 import com.vscing.model.entity.Movie;
+import com.vscing.model.platform.QueryMovie;
+import com.vscing.model.platform.QueryMovieDto;
 import com.vscing.model.vo.MovieApiVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -68,5 +70,10 @@ public interface MovieMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(Movie record);
+
+  /**
+   * 开放平台查询列表
+   */
+  List<QueryMovie> getPlatformList(QueryMovieDto record);
   
 }

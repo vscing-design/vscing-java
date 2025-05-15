@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.AddressListDto;
 import com.vscing.model.entity.City;
+import com.vscing.model.platform.QueryCity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -40,5 +41,10 @@ public interface CityMapper {
   int softDeleteById(@Param("id") long id, @Param("deleterId") long deleterId);
 
   int update(City record);
+
+  /**
+   * 开放平台查城市列表
+   */
+  List<QueryCity> getPlatformList();
 
 }

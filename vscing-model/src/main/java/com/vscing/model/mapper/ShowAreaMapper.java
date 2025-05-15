@@ -2,6 +2,7 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MovieShowAreaListDto;
 import com.vscing.model.entity.ShowArea;
+import com.vscing.model.platform.QueryShowArea;
 import com.vscing.model.vo.MinPriceVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -42,4 +43,8 @@ public interface ShowAreaMapper {
 
   void truncateTable();
 
+  /**
+   * 开放平台场次集合查场次区域
+   */
+  List<QueryShowArea> getPlatformShowIds(@Param("list") List<Long> showIds);
 }

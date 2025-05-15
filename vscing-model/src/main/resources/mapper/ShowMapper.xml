@@ -452,4 +452,33 @@
         user_price = VALUES(user_price)
     </insert>
 
+    <!-- 开放平台查询列表 -->
+    <select id="getPlatformList" resultType="com.vscing.model.platform.QueryShow">
+        SELECT
+        id as show_id,
+        movie_id,
+        hall_name,
+        duration,
+        show_time,
+        stop_sell_time,
+        show_version_type
+        `show_price`,
+        user_price
+        FROM <include refid="tableName" />
+        <where>
+            <if test="record.cinemaId != null">
+                AND cinema_id = #{record.cinemaId}
+            </if>
+            <if test="record.endTime != null">
+                AND stop_sell_time BETWEEN NOW() AND #{record.endTime}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="getPlatformInfo" parameterType="long" resultMap="BaseResultMap">
+        SELECT id, tp_show_id FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
 </mapper>

@@ -26,6 +26,7 @@
         <module>vscing-elk</module>
         <module>vscing-mq</module>
         <module>vscing-netty</module>
+        <module>vscing-platform</module>
     </modules>
 
     <!--  配置管理  -->
