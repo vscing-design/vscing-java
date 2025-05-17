@@ -29,7 +29,7 @@ public class UserEarn extends BaseEntity {
   @Schema(description = "关联用户ID")
   private Long withUserId;
 
-  @Schema(description = "平台 1 微信小程序 2 支付宝小程序 3 百度小程序")
+  @Schema(description = "下单平台 1 微信小程序 2 支付宝小程序 3 百度小程序 21 淘宝 22 咸鱼 23 拼多多 24 微信 25 抖音 50 开放平台商户")
   private Integer platform;
 
   @Schema(description = "推广类型：1 邀请好友 2 电影票订单")

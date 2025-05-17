@@ -82,4 +82,16 @@
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
 
+    <!-- 商户加价详细 -->
+    <select id="getPlatformInfo" resultMap="BaseResultMap" parameterType="long">
+        SELECT
+        id,
+        supplier_id,
+        merchant_id,
+        markup_amount
+        FROM <include refid="tableName" />
+        WHERE merchant_id = #{merchantId}
+        AND deleted_at IS NULL
+    </select>
+
 </mapper>

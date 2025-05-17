@@ -200,11 +200,11 @@
         lat as latitude
         FROM <include refid="tableName" />
         <where>
-            <if test="record.cityId != null">
-                AND city_id = #{record.cityId}
+            <if test="cityId != null">
+                AND city_id = #{cityId}
             </if>
-            <if test="record.districtId != null">
-                AND district_id = #{record.districtId}
+            <if test="districtId != null">
+                AND district_id = #{districtId}
             </if>
             AND deleted_at IS NULL
         </where>

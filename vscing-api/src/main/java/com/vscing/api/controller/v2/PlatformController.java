@@ -3,7 +3,18 @@ package com.vscing.api.controller.v2;
 import com.vscing.api.service.PlatformService;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.utils.RequestUtil;
-import com.vscing.model.platform.*;
+import com.vscing.model.platform.QueryCinema;
+import com.vscing.model.platform.QueryCinemaDto;
+import com.vscing.model.platform.QueryCinemaShow;
+import com.vscing.model.platform.QueryCity;
+import com.vscing.model.platform.QueryCityDto;
+import com.vscing.model.platform.QueryMovie;
+import com.vscing.model.platform.QueryMovieDto;
+import com.vscing.model.platform.QueryOrder;
+import com.vscing.model.platform.QuerySeat;
+import com.vscing.model.platform.QuerySeatDto;
+import com.vscing.model.platform.QueryShowDto;
+import com.vscing.model.platform.QuerySubmitOrderDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +127,13 @@ public class PlatformController {
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
-    return CommonResult.success(platformService.seat(record));
+    try {
+      QuerySeat querySeat = platformService.seat(record);
+      return CommonResult.success(querySeat);
+    } catch (RuntimeException e) {
+      String errorMessage = e.getMessage();
+      return CommonResult.failed(errorMessage);
+    }
   }
 
   @PostMapping("/submit/order")
@@ -134,7 +151,13 @@ public class PlatformController {
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
-    return CommonResult.success(platformService.submitOrder(record));
+    try {
+      QueryOrder queryOrder = platformService.submitOrder(record);
+      return CommonResult.success(queryOrder);
+    } catch (RuntimeException e) {
+      String errorMessage = e.getMessage();
+      return CommonResult.failed(errorMessage);
+    }
   }
 
 }

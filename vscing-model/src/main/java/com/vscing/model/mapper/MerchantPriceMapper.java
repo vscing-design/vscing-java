@@ -36,4 +36,9 @@ public interface MerchantPriceMapper {
    */
   int update(MerchantPrice merchantPrice);
 
+  /**
+   * 商户加价详细
+  */
+  MerchantPrice getPlatformInfo(long merchantId);
+
 }

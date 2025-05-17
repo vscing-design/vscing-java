@@ -130,7 +130,7 @@
             city_id
         FROM <include refid="tableName" />
         <where>
-            s1_city_id IS NOT NULL
+            (s1_city_id IS NOT NULL OR s1_region_id)
             AND deleted_at IS NULL
         </where>
     </select>

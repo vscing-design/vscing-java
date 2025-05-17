@@ -461,16 +461,16 @@
         duration,
         show_time,
         stop_sell_time,
-        show_version_type
+        show_version_type,
         `show_price`,
         user_price
         FROM <include refid="tableName" />
         <where>
-            <if test="record.cinemaId != null">
-                AND cinema_id = #{record.cinemaId}
+            <if test="cinemaId != null">
+                AND cinema_id = #{cinemaId}
             </if>
-            <if test="record.endTime != null">
-                AND stop_sell_time BETWEEN NOW() AND #{record.endTime}
+            <if test="endTime != null">
+                AND stop_sell_time BETWEEN NOW() AND #{endTime}
             </if>
             AND deleted_at IS NULL
         </where>

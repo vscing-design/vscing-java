@@ -13,7 +13,6 @@ public class QueryCinemaDto extends QueryDto {
   @Schema(description = "城市id")
   private Long cityId;
 
-  @NotNull(message = "区县id未传入")
   @Schema(description = "区县id")
   private Long districtId;
 
