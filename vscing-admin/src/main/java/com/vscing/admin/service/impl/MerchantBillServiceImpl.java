@@ -2,14 +2,20 @@ package com.vscing.admin.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.MerchantBillService;
+import com.vscing.common.exception.ServiceException;
 import com.vscing.model.dto.MerchantBillListDto;
 import com.vscing.model.dto.MerchantBillRechargeListDto;
+import com.vscing.model.entity.Merchant;
 import com.vscing.model.entity.MerchantBill;
 import com.vscing.model.mapper.MerchantBillMapper;
+import com.vscing.model.mapper.MerchantMapper;
 import com.vscing.model.vo.MerchantBillRechargeListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,6 +26,9 @@ import java.util.List;
  */
 @Service
 public class MerchantBillServiceImpl implements MerchantBillService {
+
+  @Autowired
+  private MerchantMapper merchantMapper;
 
   @Autowired
   private MerchantBillMapper merchantBillMapper;
@@ -37,8 +46,33 @@ public class MerchantBillServiceImpl implements MerchantBillService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public int updated(MerchantBill record) {
-    return merchantBillMapper.update(record);
+    try {
+      Merchant merchant = merchantMapper.selectById(record.getMerchantId());
+      if (merchant == null) {
+        throw new ServiceException("商户不存在");
+      }
+      int rowsAffected;
+      // 充值成功
+      if(record.getStatus() == 2){
+        // 变更商户余额
+        BigDecimal newBalance = merchant.getBalance().add(record.getChangeAmount());
+        merchant.setBalance(newBalance);
+        merchant.setVersion(merchant.getVersion());
+        rowsAffected = merchantMapper.updateVersion(merchant);
+        if (rowsAffected <= 0) {
+          throw new ServiceException("变更商户余额失败");
+        }
+      }
+      rowsAffected = merchantBillMapper.update(record);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("变更商户账单失败");
+      }
+      return rowsAffected;
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage());
+    }
   }
 
 }

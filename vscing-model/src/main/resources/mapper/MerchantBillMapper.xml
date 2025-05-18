@@ -42,7 +42,7 @@
             <if test="merchantId != null">
                 AND merchant_id = #{merchantId}
             </if>
-            AND status in (1,2)
+            AND status = 2
             <!--            <if test="status != null and status != 0">-->
             <!--                AND status = #{status, jdbcType=TINYINT}-->
             <!--            </if>-->
