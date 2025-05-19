@@ -6,7 +6,6 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.MerchantBillListDto;
 import com.vscing.model.dto.MerchantBillRechargeListDto;
-import com.vscing.model.entity.Merchant;
 import com.vscing.model.entity.MerchantBill;
 import com.vscing.model.vo.MerchantBillRechargeListVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,17 +58,17 @@ public class MerchantBillController {
   }
 
   @PutMapping
-  @Operation(summary = "编辑")
+  @Operation(summary = "审批编辑")
   public CommonResult<Object> save(@Validated @RequestBody MerchantBill record,
-                                   BindingResult bindingResult,
                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
     if (record.getId() == null) {
       return CommonResult.validateFailed("ID不能为空");
     }
-    if (bindingResult.hasErrors()) {
-      // 获取第一个错误信息，如果需要所有错误信息
-      String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
-      return CommonResult.validateFailed(errorMessage);
+    if (record.getMerchantId() == null) {
+      return CommonResult.validateFailed("商户ID不能为空");
+    }
+    if (record.getStatus() == null) {
+      return CommonResult.validateFailed("状态不能为空");
     }
     if(userInfo != null) {
       // 操作人ID

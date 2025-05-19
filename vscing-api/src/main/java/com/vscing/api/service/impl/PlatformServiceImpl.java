@@ -44,6 +44,8 @@ import com.vscing.model.platform.QueryMovie;
 import com.vscing.model.platform.QueryMovieDto;
 import com.vscing.model.platform.QueryMovieProducer;
 import com.vscing.model.platform.QueryOrder;
+import com.vscing.model.platform.QueryOrderTicket;
+import com.vscing.model.platform.QueryOrderTicketDto;
 import com.vscing.model.platform.QuerySeat;
 import com.vscing.model.platform.QuerySeatDto;
 import com.vscing.model.platform.QuerySeatList;
@@ -468,5 +470,9 @@ public class PlatformServiceImpl implements PlatformService {
     }
   }
 
+  @Override
+  public QueryOrderTicket orderTicket(QueryOrderTicketDto record) {
+    return orderMapper.getPlatformInfo(record);
+  }
 
 }

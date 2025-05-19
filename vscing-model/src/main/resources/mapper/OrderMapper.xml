@@ -464,4 +464,39 @@
         ) as existsOccupied
     </select>
 
+    <!-- 开放平台查订单详情 -->
+    <select id="getPlatformInfo" resultType="com.vscing.model.platform.QueryOrderTicket">
+        SELECT
+        `order`.order_sn AS orderNo,
+        `order`.ext_order_sn AS tradeNo,
+        `order`.created_at AS orderTime,
+        `order`.phone AS phoneNumber,
+        `order`.total_price AS amount,
+        `order`.seat_info AS seatInfo,
+        `order`.ticket_code AS ticketCodeStr,
+        `order`.status AS orderStatus,
+        movie.name AS movieName,
+        movie.poster_url AS posterUrl,
+        cinema.name AS cinemaName,
+        cinema.`address` AS cinemaAddress,
+        `show`.hall_name AS hallName,
+        `show`.duration AS duration,
+        `show`.show_time AS showTime,
+        `show`.show_version_type AS showVersionType
+        FROM <include refid="tableName" /> `order`
+        LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
+        LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
+        LEFT JOIN <include refid="showTableName" /> `show` ON `order`.show_id = `show`.id
+        <where>
+            <if test="orderNo != null">
+                AND `order`.order_sn LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="tradeNo != null">
+                AND `order`.ext_order_sn LIKE CONCAT('%', #{tradeNo}, '%')
+            </if>
+            AND `order`.deleted_at IS NULL
+        </where>
+        limit 1
+    </select>
+
 </mapper>

@@ -2,6 +2,8 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.entity.Order;
+import com.vscing.model.platform.QueryOrderTicket;
+import com.vscing.model.platform.QueryOrderTicketDto;
 import com.vscing.model.vo.OrderApiDetailsVo;
 import com.vscing.model.vo.OrderApiListVo;
 import com.vscing.model.vo.OrderDetailVo;
@@ -52,5 +54,10 @@ public interface OrderMapper {
   List<Order> getPendingTicketOrders();
 
   boolean checkOrderShowSeat(@Param("showId") Long showId, @Param("seatIds") List<String> seatIds);
+
+  /**
+   * 开放平台查订单详情
+   */
+  QueryOrderTicket getPlatformInfo(QueryOrderTicketDto record);
 
 }

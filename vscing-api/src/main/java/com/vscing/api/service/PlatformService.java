@@ -41,4 +41,9 @@ public interface PlatformService {
    */
   QueryOrder submitOrder(QuerySubmitOrderDto record);
 
+  /**
+   * 查询订单
+   */
+  QueryOrderTicket orderTicket(QueryOrderTicketDto record);
+
 }
