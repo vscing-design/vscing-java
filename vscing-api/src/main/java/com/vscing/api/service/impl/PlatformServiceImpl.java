@@ -209,34 +209,39 @@ public class PlatformServiceImpl implements PlatformService {
     BigDecimal markupAmount = merchantPrice.getMarkupAmount();
     // 获取影院场次列表
     List<QueryShow> showList = showMapper.getPlatformList(record);
+    if(showList == null) {
+      showList = Collections.emptyList();
+    }
     // 获取影院场次id集合
     List<Long> showIds = showList.stream().map(QueryShow::getShowId).toList();
-    List<QueryShowArea> showAreaList = showAreaMapper.getPlatformShowIds(showIds);
-    for (QueryShow show : showList) {
-      // 售价
-      BigDecimal newShowPrice = show.getShowPrice();
-      if(newShowPrice != null && markupAmount != null) {
-        show.setShowPrice(newShowPrice.add(markupAmount));
+    if(!showIds.isEmpty()) {
+      List<QueryShowArea> showAreaList = showAreaMapper.getPlatformShowIds(showIds);
+      for (QueryShow show : showList) {
+        // 售价
+        BigDecimal newShowPrice = show.getShowPrice();
+        if(newShowPrice != null && markupAmount != null) {
+          show.setShowPrice(newShowPrice.add(markupAmount));
+        }
+        // 结算价
+        BigDecimal newUserPrice = show.getUserPrice();
+        if(newUserPrice != null && markupAmount != null) {
+          show.setUserPrice(newUserPrice.add(markupAmount));
+        }
+        // 场次价格
+        show.setShowAreaList(showAreaList.stream()
+            .filter(showArea -> showArea.getShowId().equals(show.getShowId()))
+            .peek(showArea -> {
+              // 售价
+              if (showArea.getUserPrice() != null && markupAmount != null) {
+                showArea.setUserPrice(showArea.getUserPrice().add(markupAmount));
+              }
+              // 结算价
+              if (showArea.getShowPrice() != null && markupAmount != null) {
+                showArea.setShowPrice(showArea.getShowPrice().add(markupAmount));
+              }
+            })
+            .toList());
       }
-      // 结算价
-      BigDecimal newUserPrice = show.getUserPrice();
-      if(newUserPrice != null && markupAmount != null) {
-        show.setUserPrice(newUserPrice.add(markupAmount));
-      }
-      // 场次价格
-      show.setShowAreaList(showAreaList.stream()
-          .filter(showArea -> showArea.getShowId().equals(show.getShowId()))
-          .peek(showArea -> {
-            // 售价
-            if (showArea.getUserPrice() != null && markupAmount != null) {
-              showArea.setUserPrice(showArea.getUserPrice().add(markupAmount));
-            }
-            // 结算价
-            if (showArea.getShowPrice() != null && markupAmount != null) {
-              showArea.setShowPrice(showArea.getShowPrice().add(markupAmount));
-            }
-          })
-          .toList());
     }
     cinemaShow.setShowList(showList);
     return cinemaShow;
