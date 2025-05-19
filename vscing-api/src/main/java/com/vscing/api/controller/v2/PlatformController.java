@@ -3,6 +3,7 @@ package com.vscing.api.controller.v2;
 import com.vscing.api.service.PlatformService;
 import com.vscing.common.api.CommonResult;
 import com.vscing.common.utils.RequestUtil;
+import com.vscing.model.entity.Merchant;
 import com.vscing.model.platform.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,9 +36,14 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
@@ -54,9 +60,14 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
@@ -73,9 +84,14 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
@@ -92,13 +108,18 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
-    return CommonResult.success(platformService.show(record));
+    return CommonResult.success(platformService.show(record, merchant));
   }
 
   @PostMapping("/seat")
@@ -110,9 +131,14 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
@@ -134,14 +160,19 @@ public class PlatformController {
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
       return CommonResult.validateFailed(errorMessage);
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }
     try {
-      QueryOrder queryOrder = platformService.submitOrder(record);
+      QueryOrder queryOrder = platformService.submitOrder(record, merchant);
       return CommonResult.success(queryOrder);
     } catch (RuntimeException e) {
       String errorMessage = e.getMessage();
@@ -155,9 +186,14 @@ public class PlatformController {
     if (record.getOrderNo() == null && record.getTradeNo() == null) {
       return CommonResult.validateFailed("平台订单号、商户唯一订单号，必须传一个");
     }
+    // 商户信息
+    Merchant merchant = platformService.getMerchant(record);
+    if (merchant == null) {
+      return CommonResult.failed("商户验证失败");
+    }
     // 签名校验
     String builderStr = RequestUtil.encryptBodyWithoutSign(record);
-    boolean is = platformService.verify(builderStr, record);
+    boolean is = platformService.verify(builderStr, record, merchant);
     if(!is && !record.getSign().equals("HY")) {
       return CommonResult.failed("签名验证失败");
     }

@@ -1,5 +1,6 @@
 package com.vscing.api.service;
 
+import com.vscing.model.entity.Merchant;
 import com.vscing.model.platform.*;
 
 import java.util.List;
@@ -7,9 +8,14 @@ import java.util.List;
 public interface PlatformService {
 
   /**
+   * 获取商户信息
+   */
+  Merchant getMerchant(QueryDto record);
+
+  /**
    * 验证签名
    */
-  boolean verify(String builderStr, QueryDto record);
+  boolean verify(String builderStr, QueryDto record, Merchant merchant);
 
   /**
    * 城市列表
@@ -29,7 +35,7 @@ public interface PlatformService {
   /**
    * 场次列表
    */
-  QueryCinemaShow show(QueryShowDto record);
+  QueryCinemaShow show(QueryShowDto record, Merchant merchant);
 
   /**
    * 座位图
@@ -39,7 +45,7 @@ public interface PlatformService {
   /**
    * 提交订单
    */
-  QueryOrder submitOrder(QuerySubmitOrderDto record);
+  QueryOrder submitOrder(QuerySubmitOrderDto record, Merchant merchant);
 
   /**
    * 查询订单

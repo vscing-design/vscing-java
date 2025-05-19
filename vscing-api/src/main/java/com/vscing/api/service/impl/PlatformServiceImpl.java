@@ -123,7 +123,13 @@ public class PlatformServiceImpl implements PlatformService {
   private Merchant merchant;
 
   @Override
-  public boolean verify(String builderStr, QueryDto record) {
+  public Merchant getMerchant(QueryDto record) {
+    // 查询商户信息
+    return merchantMapper.selectById(record.getUserId());
+  }
+
+  @Override
+  public boolean verify(String builderStr, QueryDto record, Merchant merchant) {
     // 获取当前时间戳
     long currentTimeMillis = System.currentTimeMillis();
     // 假设允许的时间差为1分钟（60000毫秒）
@@ -133,8 +139,6 @@ public class PlatformServiceImpl implements PlatformService {
       return false;
     }
     // 验证签名
-    Merchant merchant = merchantMapper.selectById(record.getUserId());
-    this.merchant = merchant;
     String vSign = SignatureGenerator.md5(builderStr + "&key=" + merchant.getSecretKey()).toUpperCase();
     return vSign.equals(record.getSign());
   }
@@ -193,14 +197,12 @@ public class PlatformServiceImpl implements PlatformService {
   }
 
   @Override
-  public QueryCinemaShow show(QueryShowDto record) {
+  public QueryCinemaShow show(QueryShowDto record, Merchant merchant) {
     // 获取影院信息
     QueryCinemaShow cinemaShow = cinemaMapper.getPlatformInfo(record.getCinemaId());
     if (cinemaShow == null) {
       return null;
     }
-    // 商户详情
-    Merchant merchant = this.merchant;
     // 商户加价详情
     MerchantPrice merchantPrice = merchantPriceMapper.getPlatformInfo(merchant.getId());
     // 加价
@@ -294,7 +296,7 @@ public class PlatformServiceImpl implements PlatformService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-  public QueryOrder submitOrder(QuerySubmitOrderDto record) {
+  public QueryOrder submitOrder(QuerySubmitOrderDto record, Merchant merchant) {
     try {
       QueryOrder queryOrder = new QueryOrder();
       // 查询场次信息
@@ -302,8 +304,6 @@ public class PlatformServiceImpl implements PlatformService {
       if(show == null) {
         throw new ServiceException("场次信息错误");
       }
-      // 商户详情
-      Merchant merchant = this.merchant;
       // 商户加价详情
       MerchantPrice merchantPrice = merchantPriceMapper.getPlatformInfo(merchant.getId());
       // 加价
