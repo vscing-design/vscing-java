@@ -53,11 +53,15 @@ public class MerchantBillServiceImpl implements MerchantBillService {
       if (merchant == null) {
         throw new ServiceException("商户不存在");
       }
+      MerchantBill merchantBill = merchantBillMapper.selectById(record.getId());
+      if(merchantBill == null) {
+        throw new ServiceException("商户账单不存在");
+      }
       int rowsAffected;
       // 充值成功
       if(record.getStatus() == 2){
         // 变更商户余额
-        BigDecimal newBalance = merchant.getBalance().add(record.getChangeAmount());
+        BigDecimal newBalance = merchant.getBalance().add(merchantBill.getChangeAmount());
         merchant.setBalance(newBalance);
         merchant.setVersion(merchant.getVersion());
         rowsAffected = merchantMapper.updateVersion(merchant);
