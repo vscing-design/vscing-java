@@ -312,6 +312,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="userId != null">user_id,</if>
+            <if test="merchantId != null">merchant_id,</if>
             <if test="couponId != null">coupon_id,</if>
             <if test="supplierId != null">supplier_id,</if>
             <if test="cinemaId != null">cinema_id,</if>
@@ -319,6 +320,7 @@
             <if test="showId != null">show_id,</if>
             <if test="phone != null">phone,</if>
             <if test="orderSn != null">order_sn,</if>
+            <if test="extOrderSn != null">ext_order_sn,</if>
             <if test="tradeNo != null">trade_no,</if>
             <if test="refundNo != null">refund_no,</if>
             <if test="supplierOrderSn != null">supplier_order_sn,</if>
@@ -345,6 +347,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="userId != null">#{userId, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
             <if test="couponId != null">#{couponId, jdbcType=BIGINT},</if>
             <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="cinemaId != null">#{cinemaId, jdbcType=BIGINT},</if>
@@ -352,6 +355,7 @@
             <if test="showId != null">#{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
+            <if test="extOrderSn != null">#{extOrderSn, jdbcType=VARCHAR},</if>
             <if test="tradeNo != null">#{tradeNo, jdbcType=VARCHAR},</if>
             <if test="refundNo != null">#{refundNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
@@ -381,12 +385,14 @@
         UPDATE <include refid="tableName" />
         <set>
             <if test="userId != null">user_id = #{userId, jdbcType=BIGINT},</if>
+            <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
             <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
             <if test="cinemaId != null">cinema_id = #{cinemaId, jdbcType=BIGINT},</if>
             <if test="movieId != null">movie_id = #{movieId, jdbcType=BIGINT},</if>
             <if test="showId != null">show_id = #{showId, jdbcType=BIGINT},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
             <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
+            <if test="extOrderSn != null">ext_order_sn = #{extOrderSn, jdbcType=VARCHAR},</if>
             <if test="tradeNo != null">trade_no = #{tradeNo, jdbcType=VARCHAR},</if>
             <if test="refundNo != null">refund_no = #{refundNo, jdbcType=VARCHAR},</if>
             <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>

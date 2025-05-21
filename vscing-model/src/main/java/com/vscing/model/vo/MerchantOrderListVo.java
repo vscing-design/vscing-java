@@ -21,6 +21,9 @@ public class MerchantOrderListVo {
   @Schema(description = "商户ID")
   private Long merchantId;
 
+  @Schema(description = "商户名称")
+  private String merchantName;
+
   @Schema(description = "创建时间")
   private LocalDateTime createdAt;
 

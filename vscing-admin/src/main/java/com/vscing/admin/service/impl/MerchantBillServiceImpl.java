@@ -60,6 +60,9 @@ public class MerchantBillServiceImpl implements MerchantBillService {
       int rowsAffected;
       // 充值成功
       if(record.getStatus() == 2){
+        // 变更商户累计充值
+        BigDecimal newTotalRecharge = merchant.getTotalRecharge().add(record.getChangeAmount());
+        merchant.setTotalRecharge(newTotalRecharge);
         // 变更商户余额
         BigDecimal newBalance = merchant.getBalance().add(merchantBill.getChangeAmount());
         merchant.setBalance(newBalance);

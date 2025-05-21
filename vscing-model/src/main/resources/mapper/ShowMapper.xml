@@ -478,7 +478,19 @@
 
     <!-- 根据 ID 查询 -->
     <select id="getPlatformInfo" parameterType="long" resultMap="BaseResultMap">
-        SELECT id, tp_show_id FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+        SELECT
+        id,
+        tp_show_id,
+        supplier_id,
+        cinema_id,
+        movie_id,
+        show_price,
+        user_price,
+        hall_name,
+        show_time,
+        duration
+        FROM <include refid="tableName" />
+        WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
 
 </mapper>

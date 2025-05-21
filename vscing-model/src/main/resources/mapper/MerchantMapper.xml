@@ -186,6 +186,7 @@
         `order`.order_sn,
         `order`.ext_order_sn,
         `order`.product_type,
+        merchant.name AS merchantName,
         movie.name AS movieName,
         `order`.purchase_quantity,
         `order`.total_price,
@@ -196,8 +197,9 @@
         cinema.province_name AS provinceName,
         cinema.city_name AS cityName,
         cinema.district_name AS districtName,
-        cinema.address AS address
+        cinema.`address` AS address
         FROM <include refid="orderTableName" /> `order`
+        LEFT JOIN <include refid="tableName" /> merchant ON `order`.merchant_id = merchant.id
         LEFT JOIN <include refid="movieTableName" /> movie ON `order`.movie_id = movie.id
         LEFT JOIN <include refid="cinemaTableName" /> cinema ON `order`.cinema_id = cinema.id
         <where>
