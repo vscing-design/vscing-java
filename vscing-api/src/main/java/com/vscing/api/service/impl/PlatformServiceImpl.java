@@ -439,8 +439,11 @@ public class PlatformServiceImpl implements PlatformService {
           throw new ServiceException("创建订单详情数据失败");
         }
       }
+      // 商户余额
+      BigDecimal merchantBalance = merchant.getBalance();
+      merchantBalance = merchantBalance.subtract(totalPrice);
       // 商户扣款
-      merchant.setBalance(merchant.getBalance().subtract(totalPrice));
+      merchant.setBalance(merchantBalance);
       merchant.setVersion(merchant.getVersion());
       rowsAffected = merchantMapper.updateVersion(merchant);
       if (rowsAffected != orderDetailList.size()) {
@@ -453,10 +456,8 @@ public class PlatformServiceImpl implements PlatformService {
       merchantBill.setPlatformOrderNo(orderSn);
       merchantBill.setExternalOrderNo(record.getTradeNo());
       merchantBill.setChangeType(1);
-      merchantBill.setChangeAmount(totalPrice);
-      BigDecimal newBalance = merchant.getBalance();
-      newBalance = newBalance.subtract(totalPrice);
-      merchantBill.setChangeAfterBalance(newBalance);
+      merchantBill.setChangeAmount(totalPrice.negate());
+      merchantBill.setChangeAfterBalance(merchantBalance);
       merchantBill.setStatus(2);
       rowsAffected = merchantBillMapper.insert(merchantBill);
       if (rowsAffected != orderDetailList.size()) {

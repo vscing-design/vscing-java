@@ -39,7 +39,7 @@ public class MerchantOrderServiceImpl implements MerchantOrderService {
 
   @Override
   public List<MerchantOrderCountVo> getCountList(MerchantOrderCountDto record, Integer pageSize, Integer pageNum) {
-    PageHelper.startPage(pageNum, pageSize);
+//    PageHelper.startPage(pageNum, pageSize);
     return merchantMapper.selectByOrderCount(record);
   }
 

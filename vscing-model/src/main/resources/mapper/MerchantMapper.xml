@@ -180,7 +180,7 @@
     <select id="selectByOrderList" parameterType="com.vscing.model.dto.MerchantOrderListDto" resultType="com.vscing.model.vo.MerchantOrderListVo">
         SELECT
         `order`.id as orderId,
-        `order`merchant_id,
+        `order`.merchant_id,
         `order`.created_at,
         `order`.status,
         `order`.order_sn,
@@ -233,14 +233,12 @@
     </select>
 
     <!-- 商户端查询订单列表 -->
-    <select id="selectByOrderCount" parameterType="com.vscing.model.dto.MerchantOrderCountDto" resultType="com.vscing.model.vo.MerchantOrderCountVo">
+    <select id="selectByOrderCount" resultType="com.vscing.model.vo.MerchantOrderCountVo">
         SELECT
-        id as orderId,
-        merchant_id,
-        created_at,
+        created_at AS orderDate, -- 使用DATE函数获取日期部分，避免时间部分影响GROUP BY
         product_type,
-        SUM(purchase_quantity) as purchaseQuantity,
-        SUM(total_price) as totalPrice
+        SUM(purchase_quantity) AS orderQuantity,
+        SUM(total_price) AS orderAmount
         FROM <include refid="orderTableName" />
         <where>
             <if test="merchantId != null">
@@ -257,8 +255,8 @@
             </if>
             AND deleted_at IS NULL
         </where>
-        GROUP BY id, merchant_id, created_at, product_type
-        ORDER BY created_at DESC
+        GROUP BY orderDate, product_type -- 确保GROUP BY使用与SELECT一致的表达式
+        ORDER BY orderDate DESC
     </select>
 
 </mapper>

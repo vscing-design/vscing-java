@@ -3,6 +3,7 @@ package com.vscing.model.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -14,12 +15,6 @@ import java.time.LocalDateTime;
 @Data
 public class MerchantOrderCountVo {
 
-  @Schema(description = "商户ID")
-  private Long merchantId;
-
-  @Schema(description = "订单ID")
-  private Long orderId;
-
   @Schema(description = "订单日期")
   private LocalDateTime orderDate;
 
@@ -27,9 +22,9 @@ public class MerchantOrderCountVo {
   private Integer productType;
 
   @Schema(description = "订单数量")
-  private LocalDateTime orderQuantity;
+  private Integer orderQuantity;
 
   @Schema(description = "订单金额")
-  private LocalDateTime orderAmount;
+  private BigDecimal orderAmount;
 
 }
