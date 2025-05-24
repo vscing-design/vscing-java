@@ -186,7 +186,7 @@
         `order`.order_sn,
         `order`.ext_order_sn,
         `order`.product_type,
-        merchant.name AS merchantName,
+        merchant.merchant_name,
         movie.name AS movieName,
         `order`.purchase_quantity,
         `order`.total_price,
@@ -235,7 +235,7 @@
     <!-- 商户端查询订单列表 -->
     <select id="selectByOrderCount" resultType="com.vscing.model.vo.MerchantOrderCountVo">
         SELECT
-        created_at AS orderDate, -- 使用DATE函数获取日期部分，避免时间部分影响GROUP BY
+        DATE(created_at) AS orderDate, -- 使用DATE函数获取日期部分，避免时间部分影响GROUP BY
         product_type,
         SUM(purchase_quantity) AS orderQuantity,
         SUM(total_price) AS orderAmount
