@@ -59,7 +59,4 @@ public class AppletProperties {
    * 商户APIV3密钥
    */
   private String apiV3Key;
-
-
-
 }

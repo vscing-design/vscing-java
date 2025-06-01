@@ -44,21 +44,7 @@ public class MerchantBillServiceImpl implements MerchantBillService {
   public void recharge(MerchantBillRechargeDto record, MerchantDetailVo merchant) {
     try {
       int rowsAffected;
-//      // 变更商户余额
-//      Merchant updatedMerchant = new Merchant();
-//      updatedMerchant.setId(merchant.getId());
-//      // 余额
       BigDecimal newBalance = merchant.getBalance().add(record.getChangeAmount());
-//      updatedMerchant.setBalance(newBalance);
-//      // 累计充值
-//      BigDecimal newTotalRecharge = merchant.getTotalRecharge().add(record.getChangeAmount());
-//      updatedMerchant.setTotalRecharge(newTotalRecharge);
-//      // 版本号乐观锁
-//      updatedMerchant.setVersion(merchant.getVersion());
-//      rowsAffected = merchantMapper.updateVersion(updatedMerchant);
-//      if (rowsAffected <= 0) {
-//        throw new ServiceException("变更商户余额失败");
-//      }
       MerchantBill merchantBill = new MerchantBill();
       merchantBill.setId(IdUtil.getSnowflakeNextId());
       merchantBill.setMerchantId(merchant.getId());

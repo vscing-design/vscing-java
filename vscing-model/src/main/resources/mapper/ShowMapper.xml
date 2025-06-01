@@ -180,10 +180,10 @@
             <if test="publishStatus != null and publishStatus != ''">
                 <choose>
                     <when test="publishStatus == 'HOT'">
-                        AND m.publish_date <![CDATA[ <= ]]> CURDATE()
+                        AND DATE(m.publish_date) <![CDATA[ <= ]]> CURDATE()
                     </when>
                     <when test="publishStatus == 'WAIT'">
-                        AND m.publish_date <![CDATA[ > ]]> CURDATE()
+                        AND DATE(m.publish_date) <![CDATA[ > ]]> CURDATE()
                     </when>
                 </choose>
             </if>
