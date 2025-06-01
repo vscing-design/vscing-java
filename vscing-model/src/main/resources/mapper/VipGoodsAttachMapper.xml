@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.VipGoodsAttachMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.VipGoodsAttach">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="vip_goods_id" property="vipGoodsId" jdbcType="BIGINT" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="tip" property="tip" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_vip_goods_attach
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="name != null">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Menu">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="vipGoodsId != null">vip_goods_id,</if>
+            <if test="title != null">`title`,</if>
+            <if test="tip != null">`tip`,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="vipGoodsId != null">#{vipGoodsId, jdbcType=BIGINT},</if>
+            <if test="title != null">#{title, jdbcType=VARCHAR},</if>
+            <if test="tip != null">#{tip, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].vipGoodsId != null">vip_goods_id,</if>
+            <if test="list[0].title != null">`title`,</if>
+            <if test="list[0].tip != null">`tip`,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.vipGoodsId != null">#{item.vipGoodsId, jdbcType=BIGINT},</if>
+                <if test="item.title != null">#{item.title, jdbcType=VARCHAR},</if>
+                <if test="item.tip != null">#{item.tip,jdbcType=VARCHAR},</if>
+                <if test="item.createdBy != null">#{item.createdBy,jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Menu">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="vipGoodsId != null">vip_goods_id = #{vipGoodsId, jdbcType=BIGINT},</if>
+            <if test="title != null">`title` = #{title, jdbcType=VARCHAR},</if>
+            <if test="tip != null">`tip` = #{tip, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

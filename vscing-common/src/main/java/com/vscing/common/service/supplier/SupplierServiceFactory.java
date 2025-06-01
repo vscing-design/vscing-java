@@ -18,6 +18,8 @@ public class SupplierServiceFactory {
 
   public static final String LAIYIPIAO = "laiyipiao";
 
+  public static final String KKY = "kky";
+
   private final Map<String, SupplierService> supplierServices;
 
   @Autowired
@@ -28,7 +30,9 @@ public class SupplierServiceFactory {
   public SupplierService getSupplierService(String type) {
     if (JFSHOU.equalsIgnoreCase(type)) {
       return this.supplierServices.get("jfshouSupplierService");
-    } else if (LAIYIPIAO.equalsIgnoreCase(type)) {
+    } else if (KKY.equalsIgnoreCase(type)) {
+      return this.supplierServices.get("kkySupplierService");
+    }  else if (LAIYIPIAO.equalsIgnoreCase(type)) {
       return this.supplierServices.get("laiyipiaoSupplierService");
     } else {
       throw new IllegalArgumentException("Unknown payment type: " + type);

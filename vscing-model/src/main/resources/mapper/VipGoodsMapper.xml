@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.VipGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.VipGoods">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="tp_goods_id" property="tpGoodsId" jdbcType="BIGINT" />
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+        <result column="group_id" property="groupId" jdbcType="BIGINT" />
+        <result column="tp_group_id" property="tpGroupId" jdbcType="BIGINT" />
+        <result column="stock" property="stock" jdbcType="INTEGER" />
+        <result column="old_goods_price" property="oldGoodsPrice" jdbcType="DECIMAL" />
+        <result column="goods_price" property="goodsPrice" jdbcType="DECIMAL" />
+        <result column="old_market_price" property="oldMarketPrice" jdbcType="DECIMAL" />
+        <result column="market_price" property="marketPrice" jdbcType="DECIMAL" />
+        <result column="goods_status" property="goodsStatus" jdbcType="TINYINT" />
+        <result column="goods_logo" property="goodsLogo" jdbcType="VARCHAR" />
+        <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+        <result column="min_buy" property="minBuy" jdbcType="INTEGER" />
+        <result column="max_buy" property="maxBuy" jdbcType="INTEGER" />
+        <result column="details" property="details" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_vip_goods
+    </sql>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="name != null">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectByTpGoodsId" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].supplierId != null">supplier_id,</if>
+            <if test="list[0].tpGoodsId != null">tp_goods_id,</if>
+            <if test="list[0].goodsName != null">`goods_name`,</if>
+            <if test="list[0].groupId != null">group_id,</if>
+            <if test="list[0].tpGroupId != null">tp_group_id,</if>
+            <if test="list[0].stock != null">stock,</if>
+            <if test="list[0].oldGoodsPrice != null">old_goods_price,</if>
+            <if test="list[0].goodsPrice != null">goods_price,</if>
+            <if test="list[0].oldMarketPrice != null">old_market_price,</if>
+            <if test="list[0].marketPrice != null">market_price,</if>
+            <if test="list[0].goodsStatus != null">goods_status,</if>
+            <if test="list[0].goodsLogo != null">goods_logo,</if>
+            <if test="list[0].goodsType != null">goods_type,</if>
+            <if test="list[0].minBuy != null">min_buy,</if>
+            <if test="list[0].maxBuy != null">max_buy,</if>
+            <if test="list[0].details != null">details,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.supplierId != null">#{item.supplierId, jdbcType=BIGINT},</if>
+                <if test="item.tpGoodsId != null">#{item.tpGoodsId, jdbcType=BIGINT},</if>
+                <if test="item.goodsName != null">#{item.goodsName, jdbcType=VARCHAR},</if>
+                <if test="item.groupId != null">#{item.groupId, jdbcType=BIGINT},</if>
+                <if test="item.tpGroupId != null">#{item.tpGroupId, jdbcType=BIGINT},</if>
+                <if test="item.stock != null">#{item.stock, jdbcType=INTEGER},</if>
+                <if test="item.oldGoodsPrice != null">#{item.oldGoodsPrice, jdbcType=DECIMAL},</if>
+                <if test="item.goodsPrice != null">#{item.goodsPrice, jdbcType=DECIMAL},</if>
+                <if test="item.oldMarketPrice != null">#{item.oldMarketPrice, jdbcType=DECIMAL},</if>
+                <if test="item.marketPrice != null">#{item.marketPrice, jdbcType=DECIMAL},</if>
+                <if test="item.goodsStatus != null">#{item.goodsStatus, jdbcType=TINYINT},</if>
+                <if test="item.goodsLogo != null">#{item.goodsLogo, jdbcType=VARCHAR},</if>
+                <if test="item.goodsType != null">#{item.goodsType, jdbcType=TINYINT},</if>
+                <if test="item.minBuy != null">#{item.minBuy, jdbcType=INTEGER},</if>
+                <if test="item.maxBuy != null">#{item.maxBuy, jdbcType=INTEGER},</if>
+                <if test="item.details != null">#{item.details, jdbcType=VARCHAR},</if>
+                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="list[0].id != null">id = VALUES(id),</if>
+            <if test="list[0].supplierId != null">supplier_id = VALUES(supplier_id),</if>
+            <if test="list[0].goodsName != null">`goods_name` = VALUES(`goods_name`),</if>
+            <if test="list[0].groupId != null">group_id = VALUES(group_id),</if>
+            <if test="list[0].tpGroupId != null">tp_group_id = VALUES(tp_group_id),</if>
+            <if test="list[0].stock != null">stock = VALUES(stock),</if>
+            <if test="list[0].oldGoodsPrice != null">old_goods_price = VALUES(old_goods_price),</if>
+            <if test="list[0].goodsPrice != null">goods_price = VALUES(goods_price),</if>
+            <if test="list[0].oldMarketPrice != null">old_market_price = VALUES(old_market_price),</if>
+            <if test="list[0].marketPrice != null">market_price = VALUES(market_price),</if>
+            <if test="list[0].goodsStatus != null">goods_status = VALUES(goods_status),</if>
+            <if test="list[0].goodsType != null">goods_type = VALUES(goods_type),</if>
+            <if test="list[0].minBuy != null">min_buy = VALUES(min_buy),</if>
+            <if test="list[0].maxBuy != null">max_buy = VALUES(max_buy)</if>
+        </trim>
+    </insert>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.Menu">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="tpGoodsId != null">tp_goods_id,</if>
+            <if test="goodsName != null">`goods_name`,</if>
+            <if test="groupId != null">group_id,</if>
+            <if test="tpGroupId != null">tp_group_id,</if>
+            <if test="stock != null">stock,</if>
+            <if test="oldGoodsPrice != null">old_goods_price,</if>
+            <if test="goodsPrice != null">goods_price,</if>
+            <if test="oldMarketPrice != null">old_market_price,</if>
+            <if test="marketPrice != null">market_price,</if>
+            <if test="goodsStatus != null">goods_status,</if>
+            <if test="goodsLogo != null">goods_logo,</if>
+            <if test="goodsType != null">goods_type,</if>
+            <if test="minBuy != null">min_buy,</if>
+            <if test="maxBuy != null">max_buy,</if>
+            <if test="details != null">details,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
+            <if test="tpGoodsId != null">#{tpGoodsId, jdbcType=BIGINT},</if>
+            <if test="goodsName != null">#{goodsName, jdbcType=VARCHAR},</if>
+            <if test="groupId != null">#{groupId, jdbcType=BIGINT},</if>
+            <if test="tpGroupId != null">#{tpGroupId, jdbcType=BIGINT},</if>
+            <if test="stock != null">#{stock, jdbcType=INTEGER},</if>
+            <if test="oldGoodsPrice != null">#{oldGoodsPrice, jdbcType=DECIMAL},</if>
+            <if test="goodsPrice != null">#{goodsPrice, jdbcType=DECIMAL},</if>
+            <if test="oldMarketPrice != null">#{oldMarketPrice, jdbcType=DECIMAL},</if>
+            <if test="marketPrice != null">#{marketPrice, jdbcType=DECIMAL},</if>
+            <if test="goodsStatus != null">#{goodsStatus, jdbcType=TINYINT},</if>
+            <if test="goodsLogo != null">#{goodsLogo, jdbcType=VARCHAR},</if>
+            <if test="goodsType != null">#{goodsType, jdbcType=TINYINT},</if>
+            <if test="minBuy != null">#{minBuy, jdbcType=INTEGER},</if>
+            <if test="maxBuy != null">#{maxBuy, jdbcType=INTEGER},</if>
+            <if test="details != null">#{details, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.Menu">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
+            <if test="tpGoodsId != null">tp_goods_id = #{tpGoodsId, jdbcType=BIGINT},</if>
+            <if test="goodsName != null">`goods_name` = #{goodsName, jdbcType=VARCHAR},</if>
+            <if test="groupId != null">group_id = #{groupId, jdbcType=BIGINT},</if>
+            <if test="tpGroupId != null">tp_group_id = #{tpGroupId, jdbcType=BIGINT},</if>
+            <if test="stock != null">stock = #{stock, jdbcType=INTEGER},</if>
+            <if test="oldGoodsPrice != null">old_goods_price = #{oldGoodsPrice, jdbcType=DECIMAL},</if>
+            <if test="goodsPrice != null">goods_price = #{goodsPrice, jdbcType=DECIMAL},</if>
+            <if test="oldMarketPrice != null">old_market_price = #{oldMarketPrice, jdbcType=DECIMAL},</if>
+            <if test="marketPrice != null">market_price = #{marketPrice, jdbcType=DECIMAL},</if>
+            <if test="goodsStatus != null">goods_status = #{goodsStatus, jdbcType=TINYINT},</if>
+            <if test="goodsLogo != null">goods_logo = #{goodsLogo, jdbcType=VARCHAR},</if>
+            <if test="goodsType != null">goods_type = #{goodsType, jdbcType=TINYINT},</if>
+            <if test="minBuy != null">min_buy = #{minBuy, jdbcType=INTEGER},</if>
+            <if test="maxBuy != null">max_buy = #{maxBuy, jdbcType=INTEGER},</if>
+            <if test="details != null">details = #{details, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.VipGroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.VipGroup">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="tp_group_id" property="tpGroupId" jdbcType="BIGINT" />
+        <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+        <result column="group_alias" property="groupAlias" jdbcType="VARCHAR" />
+        <result column="group_logo" property="groupLogo" jdbcType="VARCHAR" />
+        <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+        <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+        <result column="brand_logo" property="brandLogo" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_vip_group
+    </sql>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.VipGroup">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="tpGroupId != null">tp_group_id,</if>
+            <if test="groupName != null">`group_name`,</if>
+            <if test="groupAlias != null">`group_alias`,</if>
+            <if test="groupLogo != null">group_logo,</if>
+            <if test="brandId != null">brand_id,</if>
+            <if test="brandName != null">`brand_name`,</if>
+            <if test="brandLogo != null">brand_logo,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
+            <if test="tpGroupId != null">#{tpGroupId, jdbcType=BIGINT},</if>
+            <if test="groupName != null">#{groupName, jdbcType=VARCHAR},</if>
+            <if test="groupAlias != null">#{groupAlias, jdbcType=VARCHAR},</if>
+            <if test="groupLogo != null">#{groupLogo, jdbcType=VARCHAR},</if>
+            <if test="brandId != null">#{brandId, jdbcType=BIGINT},</if>
+            <if test="brandName != null">#{brandName, jdbcType=VARCHAR},</if>
+            <if test="brandLogo != null">#{brandLogo, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].supplierId != null">supplier_id,</if>
+            <if test="list[0].tpGroupId != null">tp_group_id,</if>
+            <if test="list[0].groupName != null">`group_name`,</if>
+            <if test="list[0].groupAlias != null">`group_alias`,</if>
+            <if test="list[0].groupLogo != null">group_logo,</if>
+            <if test="list[0].brandId != null">brand_id,</if>
+            <if test="list[0].brandName != null">`brand_name`,</if>
+            <if test="list[0].brandLogo != null">brand_logo,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.supplierId != null">#{item.supplierId, jdbcType=BIGINT},</if>
+                <if test="item.tpGroupId != null">#{item.tpGroupId, jdbcType=BIGINT},</if>
+                <if test="item.groupName != null">#{item.groupName, jdbcType=VARCHAR},</if>
+                <if test="item.groupAlias != null">#{item.groupAlias, jdbcType=VARCHAR},</if>
+                <if test="item.groupLogo != null">#{item.groupLogo, jdbcType=VARCHAR},</if>
+                <if test="item.brandId != null">#{item.brandId, jdbcType=BIGINT},</if>
+                <if test="item.brandName != null">#{item.brandName, jdbcType=VARCHAR},</if>
+                <if test="item.brandLogo != null">#{item.brandLogo, jdbcType=VARCHAR},</if>
+                <if test="item.createdBy != null">#{item.createdBy,jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.VipGroup">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
+            <if test="tpGroupId != null">tp_group_id = #{tpGroupId, jdbcType=BIGINT},</if>
+            <if test="groupName != null">`group_name` = #{groupName, jdbcType=VARCHAR},</if>
+            <if test="groupAlias != null">`group_alias` = #{groupAlias, jdbcType=VARCHAR},</if>
+            <if test="groupLogo != null">group_logo = #{groupLogo, jdbcType=VARCHAR},</if>
+            <if test="brandId != null">brand_id = #{brandId, jdbcType=BIGINT},</if>
+            <if test="brandName != null">`brand_name` = #{brandName, jdbcType=VARCHAR},</if>
+            <if test="brandLogo != null">brand_logo = #{brandLogo, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 查询用户列表 -->
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        <where>
+            deleted_at IS NULL
+            <if test="name != null">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectByTpGroupId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT id FROM <include refid="tableName" />
+        WHERE tp_group_id = #{tpGroupId, jdbcType=BIGINT}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

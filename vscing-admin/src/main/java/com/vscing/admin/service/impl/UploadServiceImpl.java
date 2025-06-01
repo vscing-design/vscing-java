@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 
 /**
@@ -29,12 +30,29 @@ public class UploadServiceImpl implements UploadService {
   @Autowired
   StorageServiceFactory storageServiceFactory;
 
-  public String put(MultipartFile file, String module) {
+  public String put(MultipartFile file, String module) throws IOException {
     try {
       StorageService storageService = storageServiceFactory.getStorageService("aliyun");
       // 文件后缀名
       String suffix = FileUtil.extName(file.getOriginalFilename());
       InputStream inputStream = file.getInputStream();
+      // 生成新的文件名（使用UUID确保唯一性）
+      String newFileName = IdUtil.getSnowflakeNextId() + "." + suffix;
+      String key = module + "/" + DateUtil.format(LocalDateTime.now(), "yyyyMMdd") + "/" + newFileName;
+      return storageService.put(key, inputStream);
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  public String put(String url, String module) throws IOException {
+    try {
+      StorageService storageService = storageServiceFactory.getStorageService("aliyun");
+      // 从 URL 获取输入流
+      InputStream inputStream = new URL(url).openStream();
+      // 从 URL 获取文件后缀
+      String suffix = FileUtil.extName(url.substring(url.lastIndexOf(".")));
       // 生成新的文件名（使用UUID确保唯一性）
       String newFileName = IdUtil.getSnowflakeNextId() + "." + suffix;
       String key = module + "/" + DateUtil.format(LocalDateTime.now(), "yyyyMMdd") + "/" + newFileName;

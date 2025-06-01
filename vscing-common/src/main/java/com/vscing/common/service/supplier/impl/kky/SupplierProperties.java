@@ -1,4 +1,4 @@
-package com.vscing.common.service.supplier.impl.jfshou;
+package com.vscing.common.service.supplier.impl.kky;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
  * @date 2025/1/7 16:05
  */
 @Data
-@Component("jfshouSupplierProperties")
-@ConfigurationProperties(prefix = "supplier-jfshou")
+@Component("kkySupplierProperties")
+@ConfigurationProperties(prefix = "supplier-kky")
 public class SupplierProperties {
 
   /**

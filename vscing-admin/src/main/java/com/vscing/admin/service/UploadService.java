@@ -17,4 +17,9 @@ public interface UploadService {
   */
   String put(MultipartFile file, String module) throws IOException;
 
+  /**
+   * 上传文件
+   */
+  String put(String url, String module) throws IOException;
+
 }

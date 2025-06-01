@@ -56,6 +56,40 @@ public class SignatureGenerator {
     }
 
     /**
+     * 生成签名
+     * @param param 提交数据（键值对，值必须为字符串）
+     * @param token 商户密钥
+     * @return 签名字符串
+     */
+    public static String getKkySign(Map<String, String> param, String token) {
+        // 1. 按键排序
+        TreeMap<String, String> sortedParam = new TreeMap<>(param);
+
+        // 2. 构建签名字符串
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Map.Entry<String, String> entry : sortedParam.entrySet()) {
+            String key = entry.getKey();
+            String val = entry.getValue();
+
+            // 3. 跳过空值、null值、sign字段
+            if (val == null || key.equals("sign") || val.trim().isEmpty()) {
+                continue;
+            }
+
+            // 4. 拼接参数（首项不加 &）
+            if (!stringBuilder.isEmpty()) {
+                stringBuilder.append("&");
+            }
+            stringBuilder.append(key).append("=").append(val);
+        }
+
+        // 5. 生成 MD5 签名
+        String signText = stringBuilder + token;
+
+        return md5(signText).toLowerCase();
+    }
+    /**
      * 参数转换
      * @author vscing (vscing@foxmail.com)
      * @date 2024-12-11 01:00:39
