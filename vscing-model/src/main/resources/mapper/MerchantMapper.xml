@@ -246,8 +246,9 @@
         FROM <include refid="orderTableName" />
         <where>
             <if test="merchantId != null">
-                AND merchant_id = #{merchantId, jdbcType=BIGINT} AND status = 4
+                AND merchant_id = #{merchantId, jdbcType=BIGINT}
             </if>
+            AND status = 4
             <if test="startOrderDate != null">
                 AND created_at <![CDATA[ >= ]]> #{startOrderDate, jdbcType=TIMESTAMP}
             </if>
@@ -328,8 +329,9 @@
         FROM <include refid="vipOrderTableName" />
         <where>
             <if test="merchantId != null">
-                AND merchant_id = #{merchantId, jdbcType=BIGINT} AND status = 4
+                AND merchant_id = #{merchantId, jdbcType=BIGINT}
             </if>
+            AND status = 3
             <if test="startOrderDate != null">
                 AND created_at <![CDATA[ >= ]]> #{startOrderDate, jdbcType=TIMESTAMP}
             </if>
