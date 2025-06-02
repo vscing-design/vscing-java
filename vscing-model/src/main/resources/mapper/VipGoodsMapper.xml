@@ -17,6 +17,7 @@
         <result column="goods_price" property="goodsPrice" jdbcType="DECIMAL" />
         <result column="old_market_price" property="oldMarketPrice" jdbcType="DECIMAL" />
         <result column="market_price" property="marketPrice" jdbcType="DECIMAL" />
+        <result column="markup_price" property="markupPrice" jdbcType="DECIMAL" />
         <result column="goods_status" property="goodsStatus" jdbcType="TINYINT" />
         <result column="goods_logo" property="goodsLogo" jdbcType="VARCHAR" />
         <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
@@ -103,6 +104,11 @@
     </select>
 
     <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+    </select>
+
+    <!-- 根据 tp_goods_id 查询 -->
     <select id="selectByTpGoodsId" parameterType="long" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} and deleted_at IS NULL
     </select>
@@ -232,6 +238,7 @@
             <if test="goodsPrice != null">goods_price = #{goodsPrice, jdbcType=DECIMAL},</if>
             <if test="oldMarketPrice != null">old_market_price = #{oldMarketPrice, jdbcType=DECIMAL},</if>
             <if test="marketPrice != null">market_price = #{marketPrice, jdbcType=DECIMAL},</if>
+            <if test="markupPrice != null">markup_price = #{markupPrice, jdbcType=DECIMAL},</if>
             <if test="goodsStatus != null">goods_status = #{goodsStatus, jdbcType=TINYINT},</if>
             <if test="goodsLogo != null">goods_logo = #{goodsLogo, jdbcType=VARCHAR},</if>
             <if test="goodsType != null">goods_type = #{goodsType, jdbcType=TINYINT},</if>

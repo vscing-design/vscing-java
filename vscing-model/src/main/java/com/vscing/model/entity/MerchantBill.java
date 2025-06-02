@@ -38,7 +38,7 @@ public class MerchantBill extends BaseEntity {
   @Schema(description = "变动后的账户余额")
   private BigDecimal changeAfterBalance;
 
-  @Schema(description = "商品类型 1 电影票")
+  @Schema(description = "商品类型 1 电影票 2 会员")
   private Integer productType;
 
   @Schema(description = "变动类型 1 订单支付扣款 2 订单退款 3 账户充值 4 账户退款")
