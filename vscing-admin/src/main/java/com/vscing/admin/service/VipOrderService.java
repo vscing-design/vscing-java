@@ -2,6 +2,7 @@ package com.vscing.admin.service;
 
 import com.vscing.model.dto.AdminVipOrderDto;
 import com.vscing.model.vo.AdminVipOrderVo;
+import com.vscing.model.vo.OrderPriceVo;
 
 import java.util.List;
 
@@ -14,8 +15,13 @@ import java.util.List;
 public interface VipOrderService {
 
   /**
-   * 会员商品分组列表
+   * 会员卡商品订单列表
    */
   List<AdminVipOrderVo> getList(AdminVipOrderDto record, Integer pageSize, Integer pageNum);
+
+  /**
+   * 会员卡商品金额统计
+  */
+  OrderPriceVo getCountAmount(AdminVipOrderDto record);
 
 }

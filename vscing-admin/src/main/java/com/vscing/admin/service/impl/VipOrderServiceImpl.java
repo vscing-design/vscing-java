@@ -5,6 +5,7 @@ import com.vscing.admin.service.VipOrderService;
 import com.vscing.model.dto.AdminVipOrderDto;
 import com.vscing.model.mapper.VipOrderMapper;
 import com.vscing.model.vo.AdminVipOrderVo;
+import com.vscing.model.vo.OrderPriceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +27,10 @@ public class VipOrderServiceImpl implements VipOrderService {
   public List<AdminVipOrderVo> getList(AdminVipOrderDto record, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return vipOrderMapper.getAdminList(record);
+  }
+
+  @Override
+  public OrderPriceVo getCountAmount(AdminVipOrderDto record) {
+    return vipOrderMapper.getCountAmount(record);
   }
 }

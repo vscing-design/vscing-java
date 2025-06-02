@@ -50,7 +50,7 @@ public class VipGoods extends BaseEntity {
   @Schema(description = "市场价格 元")
   private BigDecimal marketPrice;
 
-  @Schema(description = "增加价格 元")
+  @Schema(description = "加价价格 元")
   private BigDecimal markupPrice;
 
   @Schema(description = "商品状态 1 出售 2 下架")

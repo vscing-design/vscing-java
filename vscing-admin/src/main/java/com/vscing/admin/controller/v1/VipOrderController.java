@@ -5,6 +5,7 @@ import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
 import com.vscing.model.dto.AdminVipOrderDto;
 import com.vscing.model.vo.AdminVipOrderVo;
+import com.vscing.model.vo.OrderPriceVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +34,18 @@ public class VipOrderController {
   private VipOrderService vipOrderService;
 
   @GetMapping
-  @Operation(summary = "会员商品分组列表")
+  @Operation(summary = "会员卡商品订单列表")
   public CommonResult<CommonPage<AdminVipOrderVo>> lists(@ParameterObject AdminVipOrderDto queryParam,
                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<AdminVipOrderVo> list = vipOrderService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
+  }
+
+  @GetMapping("/amount")
+  @Operation(summary = "会员卡商品金额统计")
+  public CommonResult<OrderPriceVo> amount(@ParameterObject AdminVipOrderDto queryParam) {
+    return CommonResult.success(vipOrderService.getCountAmount(queryParam));
   }
 
 }

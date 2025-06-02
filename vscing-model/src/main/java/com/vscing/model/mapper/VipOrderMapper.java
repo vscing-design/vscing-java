@@ -3,6 +3,7 @@ package com.vscing.model.mapper;
 import com.vscing.model.dto.AdminVipOrderDto;
 import com.vscing.model.entity.VipGroup;
 import com.vscing.model.vo.AdminVipOrderVo;
+import com.vscing.model.vo.OrderPriceVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,6 +21,11 @@ public interface VipOrderMapper {
    * 管理端查询列表
    */
   List<AdminVipOrderVo> getAdminList(AdminVipOrderDto record);
+
+  /**
+   * 管理端金额统计
+   */
+  OrderPriceVo getCountAmount(AdminVipOrderDto record);
 
   /**
    * 插入数据源
