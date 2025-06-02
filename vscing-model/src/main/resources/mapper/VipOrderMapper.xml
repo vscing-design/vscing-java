@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vscing.model.mapper.VipOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.vscing.model.entity.VipOrder">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+        <result column="ext_order_sn" property="extOrderSn" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="refund_status" property="refundStatus" jdbcType="TINYINT" />
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+        <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
+        <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+        <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="vip_goods_id" property="vipGoodsId" jdbcType="BIGINT" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="buy_num" property="buyNum" jdbcType="INTEGER" />
+        <result column="card_list" property="cardList" jdbcType="VARCHAR" />
+        <result column="vip_goods_name" property="vipGoodsName" jdbcType="VARCHAR" />
+        <result column="vip_goods_type" property="vipGoodsType" jdbcType="TINYINT" />
+        <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+        <result column="supplier_order_sn" property="supplierOrderSn" jdbcType="VARCHAR" />
+        <result column="settle_status" property="settleStatus" jdbcType="TINYINT" />
+        <result column="order_response_body" property="orderResponseBody" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP" />
+        <result column="deleted_by" property="deletedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <!-- 定义一个SQL片段，用于指定表名 -->
+    <sql id="tableName">
+        vscing_vip_order
+    </sql>
+    <sql id="supplierTableName">
+        vscing_supplier
+    </sql>
+
+    <!-- 管理端查询列表 -->
+    <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipOrderDto" resultType="com.vscing.model.vo.AdminVipOrderVo">
+        SELECT
+        vo.id,
+        vo.order_sn,
+        vo.ext_order_sn,
+        vo.status,
+        vo.refund_status,
+        vo.total_price,
+        vo.official_price,
+        vo.settlement_price,
+        vo.merchant_id,
+        vo.vip_goods_id,
+        vo.phone,
+        vo.buy_num,
+        vo.card_list,
+        vo.vip_goods_name,
+        vo.vip_goods_type,
+        vo.supplier_id,
+        vo.supplier_order_sn,
+        vo.created_at,
+        vo.updated_at,
+        s.merchant_name
+        FROM <include refid="tableName" /> vo
+        LEFT JOIN <include refid="supplierTableName" /> s ON vo.supplier_id = s.id
+        <where>
+            <if test="vipGoodsId != null">
+                AND vo.vip_goods_id = #{vipGoodsId, jdbcType=BIGINT}
+            </if>
+            <if test="status != null">
+                AND vo.status = #{status, jdbcType=BIGINT}
+            </if>
+            <if test="refundStatus != null">
+                AND vo.refund_status = #{refundStatus, jdbcType=BIGINT}
+            </if>
+            <if test="createdAt != null">
+                AND DATE(vo.created_at) <![CDATA[ = ]]> CURDATE()
+            </if>
+            <if test="orderSn != null">
+                AND vo.order_sn LIKE CONCAT('%', #{orderSn, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="extOrderSn != null">
+                AND vo.ext_order_sn LIKE CONCAT('%', #{extOrderSn, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="phone != null">
+                AND vo.phone LIKE CONCAT('%', #{phone, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="merchantName != null">
+                AND s.merchant_name LIKE CONCAT('%', #{merchantName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="vipGoodsName != null">
+                AND vo.vip_goods_name LIKE CONCAT('%', #{vipGoodsName, jdbcType=VARCHAR}, '%')
+            </if>
+            AND vo.deleted_at IS NULL
+        </where>
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insert" parameterType="com.vscing.model.entity.VipOrder">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="orderSn != null">order_sn,</if>
+            <if test="extOrderSn != null">ext_order_sn,</if>
+            <if test="status != null">status,</if>
+            <if test="refundStatus != null">refund_status,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="officialPrice != null">official_price,</if>
+            <if test="settlementPrice != null">settlement_price,</if>
+            <if test="merchantId != null">merchant_id,</if>
+            <if test="vipGoodsId != null">vip_goods_id,</if>
+            <if test="phone != null">phone,</if>
+            <if test="buyNum != null">buy_num,</if>
+            <if test="cardList != null">card_list,</if>
+            <if test="vipGoodsName != null">`vip_goods_name`,</if>
+            <if test="vipGoodsType != null">vip_goods_type,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="supplierOrderSn != null">supplier_order_sn,</if>
+            <if test="settleStatus != null">settle_status,</if>
+            <if test="orderResponseBody != null">order_response_body,</if>
+            <if test="createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id, jdbcType=BIGINT},</if>
+            <if test="orderSn != null">#{orderSn, jdbcType=VARCHAR},</if>
+            <if test="extOrderSn != null">#{extOrderSn, jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="refundStatus != null">#{refundStatus, jdbcType=TINYINT},</if>
+            <if test="totalPrice != null">#{totalPrice, jdbcType=DECIMAL},</if>
+            <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
+            <if test="settlementPrice != null">#{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
+            <if test="vipGoodsId != null">#{vipGoodsId, jdbcType=BIGINT},</if>
+            <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
+            <if test="buyNum != null">#{buyNum, jdbcType=INTEGER},</if>
+            <if test="cardList != null">#{cardList, jdbcType=VARCHAR},</if>
+            <if test="vipGoodsName != null">#{vipGoodsName, jdbcType=VARCHAR},</if>
+            <if test="vipGoodsType != null">#{vipGoodsType, jdbcType=TINYINT},</if>
+            <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
+            <if test="supplierOrderSn != null">#{supplierOrderSn, jdbcType=VARCHAR},</if>
+            <if test="settleStatus != null">#{settleStatus, jdbcType=TINYINT},</if>
+            <if test="orderResponseBody != null">#{orderResponseBody, jdbcType=VARCHAR},</if>
+            <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="update" parameterType="com.vscing.model.entity.VipOrder">
+        UPDATE <include refid="tableName" />
+        <set>
+            <if test="orderSn != null">order_sn = #{orderSn, jdbcType=VARCHAR},</if>
+            <if test="extOrderSn != null">ext_order_sn = #{extOrderSn, jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="refundStatus != null">refund_status = #{refundStatus, jdbcType=TINYINT},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice, jdbcType=DECIMAL},</if>
+            <if test="officialPrice != null">official_price = #{officialPrice, jdbcType=DECIMAL},</if>
+            <if test="settlementPrice != null">settlement_price = #{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
+            <if test="vipGoodsId != null">vip_goods_id = #{vipGoodsId, jdbcType=BIGINT},</if>
+            <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
+            <if test="buyNum != null">buy_num = #{buyNum, jdbcType=INTEGER},</if>
+            <if test="cardList != null">card_list = #{cardList, jdbcType=VARCHAR},</if>
+            <if test="vipGoodsName != null">`vip_goods_name` = #{vipGoodsName, jdbcType=VARCHAR},</if>
+            <if test="vipGoodsType != null">vip_goods_type = #{vipGoodsType, jdbcType=TINYINT},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
+            <if test="supplierOrderSn != null">supplier_order_sn = #{supplierOrderSn, jdbcType=VARCHAR},</if>
+            <if test="settleStatus != null">settle_status = #{settleStatus, jdbcType=TINYINT},</if>
+            <if test="orderResponseBody != null">order_response_body = #{orderResponseBody, jdbcType=VARCHAR},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
+        </set>
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据 ID 查询 -->
+    <select id="selectById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE id = #{id, jdbcType=BIGINT}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据 ID 软删除用户 -->
+    <update id="softDeleteById" parameterType="map">
+        UPDATE <include refid="tableName" />
+        SET deleted_at = NOW(),
+        deleted_by = #{deleterId, jdbcType=BIGINT}
+        WHERE id = #{id, jdbcType=BIGINT}
+    </update>
+
+</mapper>

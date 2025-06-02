@@ -35,6 +35,61 @@
     <sql id="tableName">
         vscing_vip_goods
     </sql>
+    <sql id="vipGroupTableName">
+        vscing_vip_group
+    </sql>
+
+    <!-- 管理端查询列表 -->
+    <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipGoodsDto" resultType="com.vscing.model.vo.AdminVipGoodsVo">
+        SELECT vGoods.*, vGroup.group_name, vGroup.brand_id, vGroup.brand_name FROM <include refid="tableName" /> vGoods
+        LEFT JOIN <include refid="vipGroupTableName" /> vGroup ON vGoods.group_id = vGroup.id
+        <where>
+            <if test="id != null">
+                AND vGoods.id = #{id, jdbcType=BIGINT}
+            </if>
+            <if test="tpGoodsId != null">
+                AND vGoods.tp_goods_id = #{tpGoodsId, jdbcType=BIGINT}
+            </if>
+            <if test="groupId != null">
+                AND vGoods.group_id = #{groupId, jdbcType=BIGINT}
+            </if>
+            <if test="tpGroupId != null">
+                AND vGoods.tp_group_id = #{tpGroupId, jdbcType=BIGINT}
+            </if>
+            <if test="brandId != null">
+                AND vGroup.brand_id = #{brandId, jdbcType=BIGINT}
+            </if>
+            <if test="goodsStatus != null">
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=BIGINT}
+            </if>
+            <if test="goodsType != null">
+                AND vGoods.goods_type = #{goodsType, jdbcType=BIGINT}
+            </if>
+            <if test="priceChange != null and priceChange != 0">
+                <choose>
+                    <when test="priceChange == 1">
+                        AND vGoods.goods_price > vGoods.old_goods_price
+                    </when>
+                    <when test="priceChange == 2">
+                        AND vGoods.old_goods_price > vGoods.goods_price
+                    </when>
+                    <when test="priceChange == 3">
+                        AND vGoods.goods_price = vGoods.old_goods_price
+                    </when>
+                </choose>
+            </if>
+            <if test="goodsName != null">
+                AND vGoods.goods_name LIKE CONCAT('%', #{goodsName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="groupName != null">
+                AND vGroup.group_name LIKE CONCAT('%', #{groupName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="brandName != null">
+                AND vGroup.brand_name LIKE CONCAT('%', #{brandName, jdbcType=VARCHAR}, '%')
+            </if>
+            AND vGoods.deleted_at IS NULL
+        </where>
+    </select>
 
     <!-- 查询用户列表 -->
     <select id="getList" resultMap="BaseResultMap">

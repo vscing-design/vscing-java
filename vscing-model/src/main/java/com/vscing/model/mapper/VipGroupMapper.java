@@ -1,6 +1,8 @@
 package com.vscing.model.mapper;
 
+import com.vscing.model.dto.AdminVipGroupDto;
 import com.vscing.model.entity.VipGroup;
+import com.vscing.model.vo.AdminVipGroupVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,6 +16,11 @@ import java.util.List;
  */
 @Mapper
 public interface VipGroupMapper {
+
+  /**
+   * 管理端查询列表
+  */
+  List<AdminVipGroupVo> getAdminList(AdminVipGroupDto record);
 
   /**
    * 批量插入数据源
