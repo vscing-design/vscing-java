@@ -41,7 +41,8 @@
     </sql>
 
     <!-- 管理端查询列表 -->
-    <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipGoodsDto" resultType="com.vscing.model.vo.AdminVipGoodsVo">
+    <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipGoodsDto"
+            resultType="com.vscing.model.vo.AdminVipGoodsVo">
         SELECT vGoods.*, vGroup.group_name, vGroup.brand_id, vGroup.brand_name FROM <include refid="tableName" /> vGoods
         LEFT JOIN <include refid="vipGroupTableName" /> vGroup ON vGoods.group_id = vGroup.id
         <where>
@@ -90,6 +91,36 @@
             </if>
             AND vGoods.deleted_at IS NULL
         </where>
+        ORDER BY vGroup.brand_id DESC
+    </select>
+
+    <!-- 商户端查询列表 -->
+    <select id="getMerchantList" parameterType="com.vscing.model.dto.MerchantGoodsListDto"
+            resultType="com.vscing.model.vo.MerchantGoodsListVo">
+        SELECT vGoods.*, vGroup.group_name, vGroup.brand_id, vGroup.brand_name FROM <include refid="tableName" /> vGoods
+        LEFT JOIN <include refid="vipGroupTableName" /> vGroup ON vGoods.group_id = vGroup.id
+        <where>
+            <if test="id != null">
+                AND vGoods.id = #{id, jdbcType=BIGINT}
+            </if>
+            <if test="goodsStatus != null">
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=BIGINT}
+            </if>
+            <if test="goodsType != null">
+                AND vGoods.goods_type = #{goodsType, jdbcType=BIGINT}
+            </if>
+            <if test="goodsName != null">
+                AND vGoods.goods_name LIKE CONCAT('%', #{goodsName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="groupName != null">
+                AND vGroup.group_name LIKE CONCAT('%', #{groupName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="brandName != null">
+                AND vGroup.brand_name LIKE CONCAT('%', #{brandName, jdbcType=VARCHAR}, '%')
+            </if>
+            AND vGoods.deleted_at IS NULL
+        </where>
+        ORDER BY vGroup.brand_id DESC
     </select>
 
     <!-- 查询用户列表 -->
