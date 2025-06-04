@@ -8,6 +8,7 @@
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
         <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="vip_goods_id" property="vipGoodsId" jdbcType="BIGINT" />
         <result column="markup_amount" property="markupAmount" jdbcType="DECIMAL" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
@@ -56,6 +57,7 @@
             <if test="id != null">id,</if>
             <if test="supplierId != null">supplier_id,</if>
             <if test="merchantId != null">merchant_id,</if>
+            <if test="vipGoodsId != null">vip_goods_id,</if>
             <if test="markupAmount != null">markup_amount,</if>
             <if test="createdBy != null">created_by</if>
         </trim>
@@ -64,8 +66,38 @@
             <if test="id != null">#{id, jdbcType=BIGINT},</if>
             <if test="supplierId != null">#{supplierId, jdbcType=BIGINT},</if>
             <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
+            <if test="vipGoodsId != null">#{vipGoodsId, jdbcType=BIGINT},</if>
             <if test="markupAmount != null">#{markupAmount, jdbcType=DECIMAL},</if>
             <if test="createdBy != null">#{createdBy, jdbcType=BIGINT}</if>
+        </trim>
+    </insert>
+
+    <!-- 批量插入信息 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">id,</if>
+            <if test="list[0].supplierId != null">supplier_id,</if>
+            <if test="list[0].merchantId != null">merchant_id,</if>
+            <if test="list[0].vipGoodsId != null">vip_goods_id,</if>
+            <if test="list[0].markupAmount != null">markup_amount,</if>
+            <if test="list[0].createdBy != null">created_by</if>
+        </trim>
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
+                <if test="item.supplierId != null">#{item.supplierId, jdbcType=BIGINT},</if>
+                <if test="item.merchantId != null">#{item.merchantId, jdbcType=BIGINT},</if>
+                <if test="item.vipGoodsId != null">#{item.vipGoodsId, jdbcType=BIGINT},</if>
+                <if test="item.markupAmount != null">#{item.markupAmount, jdbcType=DECIMAL},</if>
+                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT}</if>
+            </trim>
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="list[0].markupAmount != null">markup_amount = VALUES(markup_amount),</if>
+            <if test="list[0].createdBy != null">created_by = VALUES(created_by)</if>
         </trim>
     </insert>
 
@@ -76,6 +108,7 @@
             <if test="id != null">id = #{id, jdbcType=BIGINT},</if>
             <if test="supplierId != null">supplier_id = #{supplierId, jdbcType=BIGINT},</if>
             <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
+            <if test="vipGoodsId != null">vip_goods_id = #{vipGoodsId, jdbcType=BIGINT},</if>
             <if test="markupAmount != null">markup_amount = #{markupAmount, jdbcType=DECIMAL},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy, jdbcType=BIGINT}</if>
         </set>
@@ -88,9 +121,24 @@
         id,
         supplier_id,
         merchant_id,
+        vip_goods_id,
         markup_amount
         FROM <include refid="tableName" />
         WHERE merchant_id = #{merchantId}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 商户会员卡商品加价列表 -->
+    <select id="getVipGoodsMarkupList" resultMap="BaseResultMap" parameterType="map">
+        SELECT id, supplier_id, merchant_id, vip_goods_id, markup_amount
+        FROM <include refid="tableName" />
+        WHERE merchant_id = #{merchantId}
+        <!-- 使用 foreach 标签处理 vip_goods_id 集合 -->
+        AND vip_goods_id in
+        <foreach item="item" index="index" collection="vipGoodsIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
         AND deleted_at IS NULL
     </select>
 

@@ -1,9 +1,12 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.MerchantPriceListDto;
+import com.vscing.model.dto.MerchantPriceVipGoodsDto;
 import com.vscing.model.entity.MerchantPrice;
+import com.vscing.model.request.AdminVipGoodsPricingRequest;
 import com.vscing.model.vo.MerchantPriceListVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,6 +18,11 @@ import java.util.List;
  */
 @Mapper
 public interface MerchantPriceMapper {
+
+  /**
+   * 批量插入数据源
+   */
+  int batchInsert(@Param("list") List<AdminVipGoodsPricingRequest> list);
 
   /**
    * 管理端查询列表
@@ -40,5 +48,10 @@ public interface MerchantPriceMapper {
    * 商户加价详细
   */
   MerchantPrice getPlatformInfo(long merchantId);
+
+  /**
+   * 商户会员卡商品加价列表
+   */
+  List<MerchantPrice> getVipGoodsMarkupList(MerchantPriceVipGoodsDto record);
 
 }

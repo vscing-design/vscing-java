@@ -17,7 +17,6 @@
         <result column="goods_price" property="goodsPrice" jdbcType="DECIMAL" />
         <result column="old_market_price" property="oldMarketPrice" jdbcType="DECIMAL" />
         <result column="market_price" property="marketPrice" jdbcType="DECIMAL" />
-        <result column="markup_price" property="markupPrice" jdbcType="DECIMAL" />
         <result column="goods_status" property="goodsStatus" jdbcType="TINYINT" />
         <result column="goods_logo" property="goodsLogo" jdbcType="VARCHAR" />
         <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
@@ -39,6 +38,49 @@
     <sql id="vipGroupTableName">
         vscing_vip_group
     </sql>
+    <sql id="merchantPriceTableName">
+        vscing_merchant_price
+    </sql>
+
+    <!-- 管理端查询列表 -->
+    <select id="getAdminPricingList" parameterType="com.vscing.model.dto.AdminVipGoodsPricingDto"
+            resultType="com.vscing.model.vo.AdminVipGoodsPricingVo">
+        SELECT
+        vGoods.id as goodsId,
+        vGoods.group_id,
+        goods_name，
+        stock，
+        markupPrice,
+        old_goods_price,
+        goods_price,
+        old_market_price,
+        goodsStatus,
+        goodsType,
+        market_price,
+        FROM <include refid="tableName" /> vGoods
+        LEFT JOIN <include refid="merchantPriceTableName" /> mp ON vGoods.id = mp.vip_goods_id
+        <where>
+            <if test="merchantId != null">
+                AND mp.merchant_id = #{merchantId, jdbcType=BIGINT}
+            </if>
+            <if test="goodsId != null">
+                AND vGoods.id = #{goodsId, jdbcType=BIGINT}
+            </if>
+            <if test="groupId != null">
+                AND vGoods.group_id = #{groupId, jdbcType=BIGINT}
+            </if>
+            <if test="goodsName != null">
+                AND vGoods.goods_name LIKE CONCAT('%', #{goodsName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="goodsStatus != null">
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=INTEGER}
+            </if>
+            <if test="goodsType != null">
+                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
+            </if>
+            AND vGoods.deleted_at IS NULL
+        </where>
+    </select>
 
     <!-- 管理端查询列表 -->
     <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipGoodsDto"
@@ -62,10 +104,10 @@
                 AND vGroup.brand_id = #{brandId, jdbcType=BIGINT}
             </if>
             <if test="goodsStatus != null">
-                AND vGoods.goods_status = #{goodsStatus, jdbcType=BIGINT}
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=INTEGER}
             </if>
             <if test="goodsType != null">
-                AND vGoods.goods_type = #{goodsType, jdbcType=BIGINT}
+                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
             </if>
             <if test="priceChange != null and priceChange != 0">
                 <choose>
@@ -104,10 +146,10 @@
                 AND vGoods.id = #{id, jdbcType=BIGINT}
             </if>
             <if test="goodsStatus != null">
-                AND vGoods.goods_status = #{goodsStatus, jdbcType=BIGINT}
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=INTEGER}
             </if>
             <if test="goodsType != null">
-                AND vGoods.goods_type = #{goodsType, jdbcType=BIGINT}
+                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
             </if>
             <if test="goodsName != null">
                 AND vGoods.goods_name LIKE CONCAT('%', #{goodsName, jdbcType=VARCHAR}, '%')
@@ -245,9 +287,9 @@
             <if test="goodsPrice != null">#{goodsPrice, jdbcType=DECIMAL},</if>
             <if test="oldMarketPrice != null">#{oldMarketPrice, jdbcType=DECIMAL},</if>
             <if test="marketPrice != null">#{marketPrice, jdbcType=DECIMAL},</if>
-            <if test="goodsStatus != null">#{goodsStatus, jdbcType=TINYINT},</if>
+            <if test="goodsStatus != null">#{goodsStatus, jdbcType=INTEGER},</if>
             <if test="goodsLogo != null">#{goodsLogo, jdbcType=VARCHAR},</if>
-            <if test="goodsType != null">#{goodsType, jdbcType=TINYINT},</if>
+            <if test="goodsType != null">#{goodsType, jdbcType=INTEGER},</if>
             <if test="minBuy != null">#{minBuy, jdbcType=INTEGER},</if>
             <if test="maxBuy != null">#{maxBuy, jdbcType=INTEGER},</if>
             <if test="details != null">#{details, jdbcType=VARCHAR},</if>
@@ -269,7 +311,6 @@
             <if test="goodsPrice != null">goods_price = #{goodsPrice, jdbcType=DECIMAL},</if>
             <if test="oldMarketPrice != null">old_market_price = #{oldMarketPrice, jdbcType=DECIMAL},</if>
             <if test="marketPrice != null">market_price = #{marketPrice, jdbcType=DECIMAL},</if>
-            <if test="markupPrice != null">markup_price = #{markupPrice, jdbcType=DECIMAL},</if>
             <if test="goodsStatus != null">goods_status = #{goodsStatus, jdbcType=TINYINT},</if>
             <if test="goodsLogo != null">goods_logo = #{goodsLogo, jdbcType=VARCHAR},</if>
             <if test="goodsType != null">goods_type = #{goodsType, jdbcType=TINYINT},</if>

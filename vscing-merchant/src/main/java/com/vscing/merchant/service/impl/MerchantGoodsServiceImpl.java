@@ -3,13 +3,18 @@ package com.vscing.merchant.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.vscing.merchant.service.MerchantGoodsService;
 import com.vscing.model.dto.MerchantGoodsListDto;
+import com.vscing.model.dto.MerchantPriceVipGoodsDto;
+import com.vscing.model.entity.MerchantPrice;
+import com.vscing.model.mapper.MerchantPriceMapper;
 import com.vscing.model.mapper.VipGoodsMapper;
 import com.vscing.model.vo.MerchantGoodsListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * MerchantGoodsServiceImpl
@@ -23,14 +28,33 @@ public class MerchantGoodsServiceImpl implements MerchantGoodsService {
   @Autowired
   private VipGoodsMapper vipGoodsMapper;
 
+  @Autowired
+  private MerchantPriceMapper merchantPriceMapper;
+
   @Override
   public List<MerchantGoodsListVo> getVipGoodsList(MerchantGoodsListDto record, Integer pageSize, Integer pageNum) {
+    // 分页查询列表
     PageHelper.startPage(pageNum, pageSize);
     List<MerchantGoodsListVo> list = vipGoodsMapper.getMerchantList(record);
+    // 获取商品id集合
+    List<Long> vipGoodsIds = list.stream()
+      .map(MerchantGoodsListVo::getId)
+      .toList();
+    // 根据商品id集合、商户id
+    MerchantPriceVipGoodsDto merchantPriceVipGoodsDto = new MerchantPriceVipGoodsDto();
+    merchantPriceVipGoodsDto.setMerchantId(record.getMerchantId());
+    merchantPriceVipGoodsDto.setVipGoodsIds(vipGoodsIds);
+    // 获取价格列表
+    List<MerchantPrice> priceList = merchantPriceMapper.getVipGoodsMarkupList(merchantPriceVipGoodsDto);
+    Map<Long, BigDecimal> priceMap = new HashMap<>();
+    for (MerchantPrice price : priceList) {
+      priceMap.put(price.getVipGoodsId(), price.getMarkupAmount());
+    }
+    // 遍历数据列表
     for (MerchantGoodsListVo merchantGoodsListVo : list) {
       // 空值检查
-      if (merchantGoodsListVo.getGoodsPrice() != null && merchantGoodsListVo.getMarkupPrice() != null) {
-        BigDecimal newGoodsPrice = merchantGoodsListVo.getGoodsPrice().add(merchantGoodsListVo.getMarkupPrice());
+      if (merchantGoodsListVo.getGoodsPrice() != null && priceMap.get(merchantGoodsListVo.getId()) != null) {
+        BigDecimal newGoodsPrice = merchantGoodsListVo.getGoodsPrice().add(priceMap.get(merchantGoodsListVo.getId()));
         merchantGoodsListVo.setGoodsPrice(newGoodsPrice);
 
         // 检查市场价是否为 null 或零
@@ -46,7 +70,6 @@ public class MerchantGoodsServiceImpl implements MerchantGoodsService {
         // 商品价格或加价为 null，设置折扣为 0
         merchantGoodsListVo.setDiscount(BigDecimal.ZERO);
       }
-      merchantGoodsListVo.setMarkupPrice(null);
     }
     return list;
   }

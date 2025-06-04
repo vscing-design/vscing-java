@@ -15,6 +15,9 @@ public class AdminVipGoodsPricingDto {
   @Schema(description = "自定义商品 ID")
   private Long goodsId;
 
+  @Schema(description = "商户ID")
+  private Long merchantId;
+
   @Schema(description = "商品名称")
   private String goodsName;
 

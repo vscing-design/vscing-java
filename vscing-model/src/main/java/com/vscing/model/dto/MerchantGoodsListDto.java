@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class MerchantGoodsListDto {
 
+  @Schema(description = "商户ID")
+  private Long merchantId;
+
   @Schema(description = "分组名称")
   private String groupName;
 

@@ -41,10 +41,12 @@ public class MerchantGoodsController {
                                                              @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                                              @AuthenticationPrincipal MerchantDetails userInfo) {
     // 获取商户Id
-    Long merchantId = userInfo.getUserId();
-    if(merchantId == null) {
-      return CommonResult.unauthorized("商户不存在");
-    }
+//    Long merchantId = userInfo.getUserId();
+//    if(merchantId == null) {
+//      return CommonResult.unauthorized("商户不存在");
+//    }
+//    queryParam.setMerchantId(merchantId);
+    queryParam.setMerchantId(0L);
     List<MerchantGoodsListVo> list = merchantGoodsService.getVipGoodsList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }

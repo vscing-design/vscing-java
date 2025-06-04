@@ -14,8 +14,6 @@ import java.math.BigDecimal;
 @Data
 public class AdminVipGoodsPricingVo {
 
-  // TODO 还要分商户。vscing_merchant_price 增加 vip_goods_id
-
   @Schema(description = "自定义商品 ID")
   private Long goodsId;
 

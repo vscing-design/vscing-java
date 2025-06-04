@@ -26,6 +26,9 @@ public class MerchantPrice extends BaseEntity {
   @Schema(description = "商户ID")
   private Long merchantId;
 
+  @Schema(description = "会员卡商户ID")
+  private Long vipGoodsId;
+
   @Schema(description = "加价幅度")
   private BigDecimal markupAmount;
 

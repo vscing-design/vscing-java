@@ -1,8 +1,10 @@
 package com.vscing.model.mapper;
 
 import com.vscing.model.dto.AdminVipGoodsDto;
+import com.vscing.model.dto.AdminVipGoodsPricingDto;
 import com.vscing.model.dto.MerchantGoodsListDto;
 import com.vscing.model.entity.VipGoods;
+import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
 import com.vscing.model.vo.MerchantGoodsListVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -18,6 +20,11 @@ import java.util.List;
  */
 @Mapper
 public interface VipGoodsMapper {
+
+  /**
+   * 管理端查询商品定价列表
+   */
+  List<AdminVipGoodsPricingVo> getAdminPricingList(AdminVipGoodsPricingDto record);
 
   /**
    * 管理端查询列表

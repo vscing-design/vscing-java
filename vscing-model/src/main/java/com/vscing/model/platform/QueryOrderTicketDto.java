@@ -2,7 +2,9 @@ package com.vscing.model.platform;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class QueryOrderTicketDto extends QueryDto {
 
