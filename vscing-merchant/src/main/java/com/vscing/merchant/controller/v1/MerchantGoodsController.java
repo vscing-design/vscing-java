@@ -37,16 +37,15 @@ public class MerchantGoodsController {
   @GetMapping("/vip")
   @Operation(summary = "会员卡商品列表")
   public CommonResult<CommonPage<MerchantGoodsListVo>> vipLists(@ParameterObject MerchantGoodsListDto queryParam,
-                                                             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                             @AuthenticationPrincipal MerchantDetails userInfo) {
+                                                                @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                                @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                                                @AuthenticationPrincipal MerchantDetails userInfo) {
     // 获取商户Id
-//    Long merchantId = userInfo.getUserId();
-//    if(merchantId == null) {
-//      return CommonResult.unauthorized("商户不存在");
-//    }
-//    queryParam.setMerchantId(merchantId);
-    queryParam.setMerchantId(0L);
+    Long merchantId = userInfo.getUserId();
+    if(merchantId == null) {
+      return CommonResult.unauthorized("商户不存在");
+    }
+    queryParam.setMerchantId(merchantId);
     List<MerchantGoodsListVo> list = merchantGoodsService.getVipGoodsList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }

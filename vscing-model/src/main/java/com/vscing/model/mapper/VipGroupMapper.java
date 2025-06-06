@@ -2,6 +2,8 @@ package com.vscing.model.mapper;
 
 import com.vscing.model.dto.AdminVipGroupDto;
 import com.vscing.model.entity.VipGroup;
+import com.vscing.model.platform.QueryVipGroup;
+import com.vscing.model.platform.QueryVipGroupDto;
 import com.vscing.model.vo.AdminVipGroupVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,8 +20,13 @@ import java.util.List;
 public interface VipGroupMapper {
 
   /**
+   * 开放平台查询列表
+   */
+  List<QueryVipGroup> getPlatformList(QueryVipGroupDto record);
+
+  /**
    * 管理端查询列表
-  */
+   */
   List<AdminVipGroupVo> getAdminList(AdminVipGroupDto record);
 
   /**
@@ -39,7 +46,7 @@ public interface VipGroupMapper {
 
   /**
    * 查询
-  */
+   */
   VipGroup selectByTpGroupId(Long tpGroupId);
 
 }

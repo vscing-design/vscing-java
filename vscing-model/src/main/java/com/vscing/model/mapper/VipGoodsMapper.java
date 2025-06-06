@@ -4,6 +4,7 @@ import com.vscing.model.dto.AdminVipGoodsDto;
 import com.vscing.model.dto.AdminVipGoodsPricingDto;
 import com.vscing.model.dto.MerchantGoodsListDto;
 import com.vscing.model.entity.VipGoods;
+import com.vscing.model.platform.*;
 import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
 import com.vscing.model.vo.MerchantGoodsListVo;
@@ -20,6 +21,26 @@ import java.util.List;
  */
 @Mapper
 public interface VipGoodsMapper {
+
+  /**
+   * 查询
+   */
+  VipGoods selectById(Long goodsId);
+
+  /**
+   * 获取所有商品列表
+   */
+  List<VipGoods> getTaskList();
+
+  /**
+   * 开放平台查询详情
+   */
+  QueryVipGoodsDetails getPlatformDetails(QueryVipGoodsDetailsDto record);
+
+  /**
+   * 开放平台查询列表
+   */
+  List<QueryVipGoods> getPlatformList(QueryVipGoodsDto record);
 
   /**
    * 管理端查询商品定价列表
@@ -43,12 +64,12 @@ public interface VipGoodsMapper {
 
   /**
    * 插入数据源
-  */
+   */
   int insert(VipGoods record);
 
   /**
    * 修改数据源
-  */
+   */
   int update(VipGoods record);
 
   /**

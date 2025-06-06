@@ -18,17 +18,10 @@ import com.vscing.model.dto.BaiduCreateNotifyDto;
 import com.vscing.model.dto.BaiduRefundNotifyDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
-import com.vscing.model.entity.Coupon;
-import com.vscing.model.entity.Order;
-import com.vscing.model.entity.Show;
-import com.vscing.model.entity.UserWithdraw;
+import com.vscing.model.entity.*;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
-import com.vscing.model.mapper.CouponMapper;
-import com.vscing.model.mapper.OrderDetailMapper;
-import com.vscing.model.mapper.OrderMapper;
-import com.vscing.model.mapper.ShowMapper;
-import com.vscing.model.mapper.UserWithdrawMapper;
+import com.vscing.model.mapper.*;
 import com.vscing.model.mq.RebateMq;
 import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.mq.config.DelayRabbitMQConfig;
@@ -75,6 +68,9 @@ public class NotifyServiceImpl implements NotifyService {
   private OrderDetailMapper orderDetailMapper;
 
   @Autowired
+  private VipOrderMapper vipOrderMapper;
+
+  @Autowired
   private ShowMapper showMapper;
 
   @Autowired
@@ -85,6 +81,9 @@ public class NotifyServiceImpl implements NotifyService {
 
   @Autowired
   private AppletProperties appletProperties;
+
+  @Autowired
+  private VipGoodsMapper vipGoodsMapper;
 
   @Override
   public boolean queryAlipayOrder(HttpServletRequest request) {
@@ -400,6 +399,41 @@ public class NotifyServiceImpl implements NotifyService {
         String msg = JsonUtils.toJsonString(syncCodeMq);
         rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60*1000);
       }
+    } catch (Exception e) {
+      log.error("调用三方下单异常", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void ticketVipOrder(String orderSn) {
+    try {
+      // 订单详情
+      VipOrder vipOrder = vipOrderMapper.selectByOrderSn(orderSn);
+      if(vipOrder == null || vipOrder.getStatus() != 2) {
+        throw new ServiceException("订单数据不存在");
+      }
+      // 获取会员卡商品详情
+      VipGoods vipGoods = vipGoodsMapper.selectById(vipOrder.getVipGoodsId());
+      if(vipGoods == null) {
+        throw new ServiceException("会员卡商品不存在");
+      }
+      // 服务
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("kky");
+      // 准备请求参数
+      Map<String, String> params = new HashMap<>();
+      params.put("goodsid", String.valueOf(vipGoods.getTpGoodsId()));
+      params.put("buynum", String.valueOf(vipOrder.getBuyNum()));
+      params.put("callbackurl", "https://sys-api.hiyaflix.cn/v1/notify/vipOrder");
+      params.put("attach", vipOrder.getPhone());
+      params.put("usorderno", vipOrder.getOrderSn());
+      params.put("maxmoney", String.valueOf(vipOrder.getMaxMoney()));
+      // 发送请求并获取响应
+      String responseBody = supplierService.sendRequest("http://biubiu.wn8888.cn/dockapiv3/order/create", params);
+      // 保存三方接口的返回结果
+      vipOrder.setOrderResponseBody(responseBody);
+      // 调用保存
+      vipOrderMapper.update(vipOrder);
     } catch (Exception e) {
       log.error("调用三方下单异常", e);
     }

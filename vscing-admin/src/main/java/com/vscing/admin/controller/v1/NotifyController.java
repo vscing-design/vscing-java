@@ -27,4 +27,11 @@ public class NotifyController {
     return "OK";
   }
 
+  @PostMapping("/vipOrder")
+  @Operation(summary = "订单回调", description = "回调保证不了正常业务处理，只做主动查询订单业务处理")
+  public String vipOrder(HttpOrder data) {
+    log.info("vipOrder订单回调data: {}", data);
+    return "OK";
+  }
+
 }

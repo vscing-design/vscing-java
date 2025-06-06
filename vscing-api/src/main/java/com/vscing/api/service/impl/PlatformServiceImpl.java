@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.PageHelper;
 import com.vscing.api.service.NotifyService;
 import com.vscing.api.service.PlatformService;
 import com.vscing.common.api.ResultCode;
@@ -33,6 +34,7 @@ import com.vscing.model.mapper.OrderDetailMapper;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
+import com.vscing.model.mq.OrderNotifyMq;
 import com.vscing.model.platform.QueryCinema;
 import com.vscing.model.platform.QueryCinemaDto;
 import com.vscing.model.platform.QueryCinemaShow;
@@ -54,6 +56,8 @@ import com.vscing.model.platform.QueryShowArea;
 import com.vscing.model.platform.QueryShowDto;
 import com.vscing.model.platform.QuerySubmitOrderDto;
 import com.vscing.model.platform.SeatList;
+import com.vscing.mq.config.DelayRabbitMQConfig;
+import com.vscing.mq.service.RabbitMQService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -120,7 +124,8 @@ public class PlatformServiceImpl implements PlatformService {
   @Autowired
   private OrderDetailMapper orderDetailMapper;
 
-  private Merchant merchant;
+  @Autowired
+  private RabbitMQService rabbitMQService;
 
   @Override
   public Merchant getMerchant(QueryDto record) {
@@ -178,12 +183,16 @@ public class PlatformServiceImpl implements PlatformService {
 
   @Override
   public List<QueryCinema> cinema(QueryCinemaDto record) {
+    // 分页查询列表
+    PageHelper.startPage(record.getPageNum(), record.getPageSize());
     List<QueryCinema> list = cinemaMapper.getPlatformList(record);
     return CollectionUtil.isEmpty(list) ? Collections.emptyList() : list;
   }
 
   @Override
   public List<QueryMovie> movie(QueryMovieDto record) {
+    // 分页查询列表
+    PageHelper.startPage(record.getPageNum(), record.getPageSize());
     List<QueryMovie> movieList = movieMapper.getPlatformList(record);
     movieList = CollectionUtil.isEmpty(movieList) ? Collections.emptyList() : movieList;
     List<QueryMovieProducer> movieProducerList = movieProducerMapper.getPlatformList(record);
@@ -207,11 +216,10 @@ public class PlatformServiceImpl implements PlatformService {
     MerchantPrice merchantPrice = merchantPriceMapper.getPlatformInfo(merchant.getId());
     // 加价
     BigDecimal markupAmount = merchantPrice.getMarkupAmount();
+    // 分页查询列表
+    PageHelper.startPage(record.getPageNum(), record.getPageSize());
     // 获取影院场次列表
     List<QueryShow> showList = showMapper.getPlatformList(record);
-    if(showList == null) {
-      showList = Collections.emptyList();
-    }
     // 获取影院场次id集合
     List<Long> showIds = showList.stream().map(QueryShow::getShowId).toList();
     if(!showIds.isEmpty()) {
@@ -446,7 +454,7 @@ public class PlatformServiceImpl implements PlatformService {
       merchant.setBalance(merchantBalance);
       merchant.setVersion(merchant.getVersion());
       rowsAffected = merchantMapper.updateVersion(merchant);
-      if (rowsAffected != orderDetailList.size()) {
+      if (rowsAffected <= 0) {
         throw new ServiceException("商户扣款失败");
       }
       // 商户账单新增数据
@@ -460,7 +468,7 @@ public class PlatformServiceImpl implements PlatformService {
       merchantBill.setChangeAfterBalance(merchantBalance);
       merchantBill.setStatus(2);
       rowsAffected = merchantBillMapper.insert(merchantBill);
-      if (rowsAffected != orderDetailList.size()) {
+      if (rowsAffected <= 0) {
         throw new ServiceException("创建商户账单失败");
       }
       // 返回平台订单号、商户订单号、下单时间、取票手机号
@@ -468,8 +476,17 @@ public class PlatformServiceImpl implements PlatformService {
       queryOrder.setTradeNo(record.getTradeNo());
       queryOrder.setOrderTime(LocalDateTime.now());
       queryOrder.setPhoneNumber(record.getTakePhoneNumber());
-      // 异步通知mq
+      // 发起三方下单
       notifyService.ticketOrder(orderSn);
+      // 发送mq异步处理 5分钟后异步通知
+      OrderNotifyMq orderNotifyMq = new OrderNotifyMq();
+      orderNotifyMq.setUrl(record.getNotifyUrl());
+      orderNotifyMq.setOrderId(orderId);
+      orderNotifyMq.setOrderNo(orderSn);
+      orderNotifyMq.setOrderType(1);
+      orderNotifyMq.setNum(1);
+      String msg = JsonUtils.toJsonString(orderNotifyMq);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_QUEUE, msg, 5*60*1000);
       return queryOrder;
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());

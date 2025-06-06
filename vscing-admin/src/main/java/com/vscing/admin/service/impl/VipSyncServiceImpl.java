@@ -119,6 +119,7 @@ public class VipSyncServiceImpl implements VipSyncService {
     }
   }
 
+  @Async("threadPoolTaskExecutor")
   @Override
   public void queryGoods(int page) {
     try {
@@ -206,6 +207,58 @@ public class VipSyncServiceImpl implements VipSyncService {
       }
     } catch (Exception e) {
       log.error("vip同步商品失败", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void allGoods() {
+    try {
+      List<VipGoods> vipGoodsList = vipGoodsMapper.getTaskList();
+      for (VipGoods vipGoods : vipGoodsList) {
+        // 调详情接口
+        this.queryGoodsDetails(vipGoods.getTpGoodsId());
+        Thread.sleep(2000);
+      }
+    } catch (Exception e) {
+      log.error("vip同步全部商品失败", e);
+    }
+  }
+
+  @Async("threadPoolTaskExecutor")
+  @Override
+  public void queryGoodsDetails(Long tpGoodsId) {
+    try {
+      // 准备请求参数
+      Map<String, String> params = new HashMap<>();
+      params.put("goodsid", String.valueOf(tpGoodsId));
+      SupplierService supplierService = supplierServiceFactory.getSupplierService("kky");
+      // 发送请求并获取响应
+      String responseBody = supplierService.sendRequest("/dockapiv3/goods/details", params);
+      // 将 JSON 字符串解析为 JsonNode 对象
+      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+      // 解析 JSON 数据到 Map
+      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+      int code = (int) responseMap.get("code");
+      Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
+      // 判断数据
+      if (code != 1 || data == null) {
+        log.info("vip同步商品详情结果异常: {}", responseBody);
+        return;
+      }
+      VipGoods vipGoods = vipGoodsMapper.selectByTpGoodsId(tpGoodsId);
+      vipGoods.setStock(objectMapper.convertValue(data.get("stock"), Integer.class));
+      vipGoods.setGoodsPrice(objectMapper.convertValue(data.get("goodsprice"), BigDecimal.class));
+      vipGoods.setMarketPrice(objectMapper.convertValue(data.get("marketprice"), BigDecimal.class));
+      vipGoods.setGoodsStatus(objectMapper.convertValue(data.get("goodsstatus"), Integer.class));
+      vipGoods.setGoodsType(objectMapper.convertValue(data.get("goodstype"), Integer.class));
+      vipGoods.setMaxBuy(objectMapper.convertValue(data.get("maxbuy"), Integer.class));
+      vipGoods.setMinBuy(objectMapper.convertValue(data.get("minbuy"), Integer.class));
+      vipGoods.setDetails(objectMapper.convertValue(data.get("details"), String.class));
+      vipGoodsMapper.update(vipGoods);
+      log.info("vip同步商品详情结束");
+    } catch (Exception e) {
+      log.error("vip同步商品详情失败", e);
     }
   }
 }

@@ -57,6 +57,9 @@
             <if test="status != null and status != 0">
                 AND status = #{status}
             </if>
+            <if test="productType != null and productType != 0">
+                AND product_type = #{productType}
+            </if>
             <if test="merchantName != null">
                 AND merchant_name LIKE CONCAT('%', #{merchantName}, '%')
             </if>

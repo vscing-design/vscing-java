@@ -1,6 +1,7 @@
 package com.vscing.admin.component;
 
 import com.vscing.admin.service.TaskService;
+import com.vscing.admin.service.VipSyncService;
 import com.vscing.model.mapper.ShowAreaMapper;
 import com.vscing.model.mapper.ShowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ScheduledTasks {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private VipSyncService vipSyncService;
 
     @Autowired
     private ShowMapper showMapper;
@@ -88,5 +92,35 @@ public class ScheduledTasks {
 //        System.out.println("执行定时任务 每3分钟同步一下出票信息：" + LocalDateTime.now());
 //        taskService.syncPendingTicketOrder();
 //    }
+
+    @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点执行会员商品分类同步
+    public void vipGroupTask() {
+        System.out.println("执行定时任务 每天凌晨1点执行场次清空：" + LocalDateTime.now());
+        vipSyncService.queryGroup();
+    }
+
+    @Scheduled(cron = "0 0 8-23/2 * * ?") // 每天8点开始，每2小时执行一次
+    public void vipGoodsFirstTask() {
+        System.out.println("执行定时任务 每天8点开始，每2小时执行商品同步：" + LocalDateTime.now());
+        vipSyncService.queryGoods(1);
+    }
+
+    @Scheduled(cron = "0 30 8-23/2 * * ?")
+    public void vipGoodsFirstTask1() {
+        System.out.println("执行定时任务 每天8点开始，每2个半小时执行商品同步：" + LocalDateTime.now());
+        vipSyncService.allGoods();
+    }
+
+    @Scheduled(cron = "0 0 0-4/2 * * ?") // 每天0点开始，每2小时执行一次
+    public void vipGoodsSecondTask() {
+        System.out.println("执行定时任务 每天0点开始，每2小时执行商品同步：" + LocalDateTime.now());
+        vipSyncService.queryGoods(1);
+    }
+
+    @Scheduled(cron = "0 30 0-4/2 * * ?") // 每天0点开始，每2小时执行一次
+    public void vipGoodsSecondTask1() {
+        System.out.println("执行定时任务 每天0点开始，每2个半小时执行商品同步：" + LocalDateTime.now());
+        vipSyncService.queryGoods(1);
+    }
 
 }

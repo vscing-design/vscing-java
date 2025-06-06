@@ -8,10 +8,24 @@ package com.vscing.admin.service;
  */
 public interface VipSyncService {
 
-  // 获取分组数据
+  /**
+   * 获取分组数据
+  */
   void queryGroup();
 
-  // 获取商品列表
+  /**
+   * 获取商品列表
+   */
   void queryGoods(int page);
+
+  /**
+   * 获取全部商品列表
+   */
+  void allGoods();
+
+  /**
+   * 获取商品详情
+   */
+  void queryGoodsDetails(Long id);
 
 }

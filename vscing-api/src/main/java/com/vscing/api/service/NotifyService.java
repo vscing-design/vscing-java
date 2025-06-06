@@ -38,8 +38,13 @@ public interface NotifyService {
   boolean queryBaiduRefund(BaiduRefundNotifyDto baiduRefundNotifyDto);
 
   /**
-   * 出票
+   * 三方电影票下单
    */
   void ticketOrder(String orderSn);
+
+  /**
+   * 三方会员商品下单
+   */
+  void ticketVipOrder(String orderSn);
 
 }

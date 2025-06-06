@@ -30,6 +30,19 @@
         vscing_supplier
     </sql>
 
+    <!-- 开放平台查询列表 -->
+    <select id="getPlatformList" parameterType="com.vscing.model.platform.QueryVipGroupDto" resultType="com.vscing.model.platform.QueryVipGroup">
+        SELECT
+        id as group_id,
+        group_name,
+        group_alias,
+        group_logo,
+        brand_id,
+        brand_name,
+        brand_logo
+        FROM <include refid="tableName" /> WHERE deleted_at IS NULL
+    </select>
+
     <!-- 管理端查询列表 -->
     <select id="getAdminList" parameterType="com.vscing.model.dto.AdminVipGroupDto" resultType="com.vscing.model.vo.AdminVipGroupVo">
         SELECT vg.*, s.name as supplier_name FROM <include refid="tableName" /> vg

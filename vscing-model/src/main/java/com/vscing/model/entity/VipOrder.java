@@ -62,6 +62,18 @@ public class VipOrder extends BaseEntity {
   @Schema(description = "商品类型 1 直冲  2 卡密")
   private Integer vipGoodsType;
 
+  @Schema(description = "最大进货总金额（非商品单价），该验证防止商家亏损。原理：商家进货价格<=此值放行，>此值则拦截")
+  private BigDecimal maxMoney;
+
+  @Schema(description = "退款金额")
+  private BigDecimal refundMoney;
+
+  @Schema(description = "订单回执")
+  private String receipt;
+
+  @Schema(description = "退款回执")
+  private String refundReceipt;
+
   @Schema(description = "供应商ID")
   private Long supplierId;
 

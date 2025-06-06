@@ -52,6 +52,18 @@ public class DelayRabbitMQConfig {
   public static final String REFUND_QUERY_ROUTING_KEY = "refund_query_routing_key";
 
   /**
+   * 同步会员商品订单信息
+  */
+  public static final String SYNC_VIP_ORDER_QUEUE = "sync_vip_order_queue";
+  public static final String SYNC_VIP_ORDER_ROUTING_KEY = "sync_vip_order_routing_key";
+
+  /**
+   * 订单异步通知
+   */
+  public static final String ORDER_NOTIFY_QUEUE = "order.notify.queue";
+  public static final String ORDER_NOTIFY_ROUTING_KEY = "order.notify.routing.key";
+
+  /**
    * 创建延迟交换机。
    */
   @Bean
@@ -132,6 +144,38 @@ public class DelayRabbitMQConfig {
   @Bean
   public Binding bindingRefundQueryQueueToDelayedExchange(Queue refundQueryQueue) {
     return BindingBuilder.bind(refundQueryQueue).to(delayedExchange()).with(REFUND_QUERY_ROUTING_KEY).noargs();
+  }
+
+  /**
+   * 创建同步会员商品订单信息队列
+   */
+  @Bean
+  public Queue syncVipOrderQueue() {
+    return QueueBuilder.durable(SYNC_VIP_ORDER_QUEUE).build();
+  }
+
+  /**
+   * 绑定同步会员商品订单信息队列到延迟交换机
+   */
+  @Bean
+  public Binding bindingSyncVipOrderQueueToDelayedExchange(Queue syncVipOrderQueue) {
+    return BindingBuilder.bind(syncVipOrderQueue).to(delayedExchange()).with(SYNC_VIP_ORDER_ROUTING_KEY).noargs();
+  }
+
+  /**
+   * 订单异步通知队列
+   */
+  @Bean
+  public Queue orderNotifyQueue() {
+    return QueueBuilder.durable(ORDER_NOTIFY_QUEUE).build();
+  }
+
+  /**
+   * 绑定订单异步通知队列到延迟交换机
+   */
+  @Bean
+  public Binding bindingOrderNotifyQueueToDelayedExchange(Queue orderNotifyQueue) {
+    return BindingBuilder.bind(orderNotifyQueue).to(delayedExchange()).with(ORDER_NOTIFY_ROUTING_KEY).noargs();
   }
 
 }

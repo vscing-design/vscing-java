@@ -42,21 +42,65 @@
         vscing_merchant_price
     </sql>
 
+    <!-- 根据 ID 查询 -->
+    <select id="getPlatformDetails" parameterType="com.vscing.model.platform.QueryVipGoodsDetailsDto" resultType="com.vscing.model.platform.QueryVipGoodsDetails">
+        SELECT
+        id as goodsId,
+        group_id,
+        stock,
+        goods_logo,
+        goods_name,
+        goods_price,
+        market_price,
+        goods_status,
+        goods_type,
+        min_buy,
+        max_buy,
+        details
+        FROM <include refid="tableName" />
+        WHERE id = #{goodsId,jdbcType=BIGINT} and deleted_at IS NULL
+        LIMIT 1
+    </select>
+
+    <!-- 开放平台查询列表 -->
+    <select id="getPlatformList" parameterType="com.vscing.model.platform.QueryVipGoodsDto" resultType="com.vscing.model.platform.QueryVipGoods">
+        SELECT
+        id as goodsId,
+        group_id,
+        goods_name,
+        goods_logo,
+        stock,
+        goods_price,
+        market_price,
+        goods_status,
+        goods_type
+        FROM <include refid="tableName" />
+        <where>
+            <if test="groupId != null">
+                vGoods.group_id = #{groupId, jdbcType=BIGINT}
+            </if>
+            <if test="goodsType != null">
+                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
+            </if>
+            AND vGoods.deleted_at IS NULL
+        </where>
+    </select>
+
     <!-- 管理端查询列表 -->
     <select id="getAdminPricingList" parameterType="com.vscing.model.dto.AdminVipGoodsPricingDto"
             resultType="com.vscing.model.vo.AdminVipGoodsPricingVo">
         SELECT
         vGoods.id as goodsId,
         vGoods.group_id,
-        goods_name，
-        stock，
-        markupPrice,
-        old_goods_price,
-        goods_price,
-        old_market_price,
-        goodsStatus,
-        goodsType,
-        market_price,
+        vGoods.goods_name,
+        vGoods.stock,
+        vGoods.old_goods_price,
+        vGoods.goods_price,
+        vGoods.old_market_price,
+        vGoods.market_price,
+        vGoods.goods_status,
+        vGoods.goods_type,
+        mp.markup_price
         FROM <include refid="tableName" /> vGoods
         LEFT JOIN <include refid="merchantPriceTableName" /> mp ON vGoods.id = mp.vip_goods_id
         <where>
@@ -178,12 +222,17 @@
 
     <!-- 根据 ID 查询 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
+    </select>
+
+    <!-- 查询全部列表 -->
+    <select id="getTaskList" resultMap="BaseResultMap">
+        SELECT id, tp_goods_id FROM <include refid="tableName" /> deleted_at IS NULL
     </select>
 
     <!-- 根据 tp_goods_id 查询 -->
     <select id="selectByTpGoodsId" parameterType="long" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} and deleted_at IS NULL
+        SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
     </select>
 
     <!-- 批量插入信息 -->

@@ -128,6 +128,26 @@
         AND deleted_at IS NULL
     </select>
 
+    <!-- 商户加价详细 -->
+    <select id="getPlatformVipGoods" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        id,
+        supplier_id,
+        merchant_id,
+        vip_goods_id,
+        markup_amount
+        FROM <include refid="tableName" />
+        <where>
+            <if test="merchantId != null">
+                AND merchant_id = #{merchantId}
+            </if>
+            <if test="vipGoodsId != null">
+                AND vip_goods_id = #{vipGoodsId}
+            </if>
+            AND deleted_at IS NULL
+        </where>
+    </select>
+
     <!-- 商户会员卡商品加价列表 -->
     <select id="getVipGoodsMarkupList" resultMap="BaseResultMap" parameterType="map">
         SELECT id, supplier_id, merchant_id, vip_goods_id, markup_amount

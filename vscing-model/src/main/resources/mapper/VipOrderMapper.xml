@@ -10,9 +10,13 @@
         <result column="ext_order_sn" property="extOrderSn" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="refund_status" property="refundStatus" jdbcType="TINYINT" />
+        <result column="receipt" property="receipt" jdbcType="VARCHAR" />
+        <result column="refund_receipt" property="refundReceipt" jdbcType="VARCHAR" />
         <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
         <result column="official_price" property="officialPrice" jdbcType="DECIMAL" />
         <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+        <result column="max_money" property="maxMoney" jdbcType="DECIMAL" />
+        <result column="refund_money" property="refundMoney" jdbcType="DECIMAL" />
         <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
         <result column="vip_goods_id" property="vipGoodsId" jdbcType="BIGINT" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -122,9 +126,13 @@
             <if test="extOrderSn != null">ext_order_sn,</if>
             <if test="status != null">status,</if>
             <if test="refundStatus != null">refund_status,</if>
+            <if test="receipt != null">receipt,</if>
+            <if test="refundReceipt != null">refund_receipt,</if>
             <if test="totalPrice != null">total_price,</if>
             <if test="officialPrice != null">official_price,</if>
             <if test="settlementPrice != null">settlement_price,</if>
+            <if test="maxMoney != null">max_money,</if>
+            <if test="refundMoney != null">refund_money,</if>
             <if test="merchantId != null">merchant_id,</if>
             <if test="vipGoodsId != null">vip_goods_id,</if>
             <if test="phone != null">phone,</if>
@@ -145,9 +153,13 @@
             <if test="extOrderSn != null">#{extOrderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="refundStatus != null">#{refundStatus, jdbcType=TINYINT},</if>
+            <if test="receipt != null">#{receipt, jdbcType=VARCHAR},</if>
+            <if test="refundReceipt != null">#{refundReceipt, jdbcType=VARCHAR},</if>
             <if test="totalPrice != null">#{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">#{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">#{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="maxMoney != null">#{maxMoney, jdbcType=DECIMAL},</if>
+            <if test="refundMoney != null">#{refundMoney, jdbcType=DECIMAL},</if>
             <if test="merchantId != null">#{merchantId, jdbcType=BIGINT},</if>
             <if test="vipGoodsId != null">#{vipGoodsId, jdbcType=BIGINT},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
@@ -171,9 +183,13 @@
             <if test="extOrderSn != null">ext_order_sn = #{extOrderSn, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="refundStatus != null">refund_status = #{refundStatus, jdbcType=TINYINT},</if>
+            <if test="receipt != null">receipt = #{receipt, jdbcType=VARCHAR},</if>
+            <if test="refundReceipt != null">refund_receipt = #{refundReceipt, jdbcType=VARCHAR},</if>
             <if test="totalPrice != null">total_price = #{totalPrice, jdbcType=DECIMAL},</if>
             <if test="officialPrice != null">official_price = #{officialPrice, jdbcType=DECIMAL},</if>
             <if test="settlementPrice != null">settlement_price = #{settlementPrice, jdbcType=DECIMAL},</if>
+            <if test="maxMoney != null">max_money = #{maxMoney, jdbcType=DECIMAL},</if>
+            <if test="refundMoney != null">refund_money = #{refundMoney, jdbcType=DECIMAL},</if>
             <if test="merchantId != null">merchant_id = #{merchantId, jdbcType=BIGINT},</if>
             <if test="vipGoodsId != null">vip_goods_id = #{vipGoodsId, jdbcType=BIGINT},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
@@ -195,6 +211,7 @@
         SELECT * FROM <include refid="tableName" />
         WHERE id = #{id, jdbcType=BIGINT}
         AND deleted_at IS NULL
+        LIMIT 1
     </select>
 
     <!-- 根据 ID 软删除用户 -->
@@ -204,5 +221,39 @@
         deleted_by = #{deleterId, jdbcType=BIGINT}
         WHERE id = #{id, jdbcType=BIGINT}
     </update>
+
+    <!-- 开放平台查订单详情 -->
+    <select id="getPlatformInfo" resultType="com.vscing.model.platform.QueryVipOrderTicket">
+        SELECT
+        order_sn AS orderNo,
+        ext_order_sn AS tradeNo,
+        created_at AS orderTime,
+        phone,
+        total_price AS money,
+        max_money,
+        refund_money,
+        `receipt`,
+        refund_receipt,
+        `status`,
+        refund_status,
+        card_list
+        FROM <include refid="tableName" />
+        <where>
+            <if test="orderNo != null">
+                AND `order`.order_sn LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="tradeNo != null">
+                AND `order`.ext_order_sn LIKE CONCAT('%', #{tradeNo}, '%')
+            </if>
+            AND `order`.deleted_at IS NULL
+        </where>
+        limit 1
+    </select>
+
+    <!-- 根据 order_sn 查询订单信息 -->
+    <select id="selectByOrderSn" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM <include refid="tableName" />
+        WHERE order_sn = #{orderSn, jdbcType=BIGINT} and status > 1 and deleted_at IS NULL LIMIT 1
+    </select>
 
 </mapper>

@@ -46,8 +46,13 @@ public interface MerchantPriceMapper {
 
   /**
    * 商户加价详细
-  */
+   */
   MerchantPrice getPlatformInfo(long merchantId);
+
+  /**
+   * 商户会员卡商品加价详细
+   */
+  MerchantPrice getPlatformVipGoods(@Param("merchantId") long merchantId, @Param("vipGoodsId") long vipGoodsId);
 
   /**
    * 商户会员卡商品加价列表

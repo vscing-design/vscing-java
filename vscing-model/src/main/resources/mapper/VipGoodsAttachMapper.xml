@@ -22,14 +22,18 @@
         vscing_vip_goods_attach
     </sql>
 
-    <!-- 查询用户列表 -->
-    <select id="getList" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" />
+    <!-- 开放平台查询列表 -->
+    <select id="getPlatformByGoodsId" parameterType="com.vscing.model.platform.QueryVipGoodsDetailsDto" resultType="com.vscing.model.platform.QueryVipGoodsAttach">
+        SELECT
+        vip_goods_id as goodsId,
+        title,
+        tip
+        FROM <include refid="tableName" />
         <where>
-            deleted_at IS NULL
-            <if test="name != null">
-                AND name LIKE CONCAT('%', #{name}, '%')
+            <if test="goodsId != null">
+                vip_goods_id = #{goodsId,jdbcType=BIGINT}
             </if>
+            AND deleted_at IS NULL
         </where>
     </select>
 
