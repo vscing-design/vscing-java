@@ -100,7 +100,7 @@
         vGoods.market_price,
         vGoods.goods_status,
         vGoods.goods_type,
-        mp.markup_price
+        mp.markup_amount
         FROM <include refid="tableName" /> vGoods
         LEFT JOIN <include refid="merchantPriceTableName" /> mp ON vGoods.id = mp.vip_goods_id
         <where>
@@ -177,7 +177,7 @@
             </if>
             AND vGoods.deleted_at IS NULL
         </where>
-        ORDER BY vGroup.brand_id DESC
+        ORDER BY vGroup.group_id DESC
     </select>
 
     <!-- 商户端查询列表 -->

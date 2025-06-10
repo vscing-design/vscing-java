@@ -13,7 +13,7 @@ import lombok.Data;
 public class AdminVipGroupDto {
 
   @Schema(description = "供应商名称")
-  private Long supplierName;
+  private String supplierName;
 
   @Schema(description = "分组名称")
   private String groupName;
