@@ -59,8 +59,11 @@
             <if test="refundStatus != null">
                 AND vo.refund_status = #{refundStatus, jdbcType=BIGINT}
             </if>
-            <if test="createdAt != null">
-                AND DATE(vo.created_at) <![CDATA[ = ]]> CURDATE()
+            <if test="startDate != null">
+                AND vo.created_at <![CDATA[ >= ]]> #{startDate, jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                AND vo.created_at <![CDATA[ <= ]]> #{endDate, jdbcType=TIMESTAMP}
             </if>
             <if test="orderSn != null">
                 AND vo.order_sn LIKE CONCAT('%', #{orderSn, jdbcType=VARCHAR}, '%')

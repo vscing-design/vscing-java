@@ -39,8 +39,12 @@ public class AdminVipOrderDto {
   @Schema(description = "商户名称")
   private String merchantName;
 
-  @Schema(description = "订单生成日期")
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDateTime createdAt;
+  @Schema(description = "开始创建日期")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime startDate;
+
+  @Schema(description = "结束创建日期")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime endDate;
 
 }

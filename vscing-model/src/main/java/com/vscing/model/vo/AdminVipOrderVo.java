@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * AdminVipOrderVo
@@ -70,5 +71,11 @@ public class AdminVipOrderVo {
 
   @Schema(description = "结算状态 1 已结算 2 未结算")
   private Integer settleStatus;
+
+  @Schema(description = "创建时间")
+  private LocalDateTime createdAt;
+
+  @Schema(description = "更新时间")
+  private LocalDateTime updatedAt;
 
 }
