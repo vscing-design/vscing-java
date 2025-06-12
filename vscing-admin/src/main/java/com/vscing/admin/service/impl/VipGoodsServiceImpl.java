@@ -1,5 +1,6 @@
 package com.vscing.admin.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.github.pagehelper.PageHelper;
 import com.vscing.admin.service.VipGoodsService;
 import com.vscing.common.exception.ServiceException;
@@ -87,6 +88,7 @@ public class VipGoodsServiceImpl implements VipGoodsService {
   public void vipGoodsPricing(List<AdminVipGoodsPricingRequest> record, Long by) {
     try {
       for (AdminVipGoodsPricingRequest vo : record) {
+        vo.setId(IdUtil.getSnowflakeNextId());
         vo.setCreatedBy(by);
       }
       int rowsAffected = merchantPriceMapper.batchInsert(record);

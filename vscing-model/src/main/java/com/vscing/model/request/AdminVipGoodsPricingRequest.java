@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 @Data
 public class AdminVipGoodsPricingRequest {
 
+  @Schema(description = "ID")
+  private Long id;
+
   @Schema(description = "商户ID")
   private Long merchantId;
 
@@ -21,7 +24,7 @@ public class AdminVipGoodsPricingRequest {
   private Long supplierId;
 
   @Schema(description = "商品ID")
-  private Long goodsId;
+  private Long vipGoodsId;
 
   @Schema(description = "加价金额")
   private BigDecimal markupAmount;

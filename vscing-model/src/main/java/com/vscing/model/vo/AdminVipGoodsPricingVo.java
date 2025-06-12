@@ -17,6 +17,9 @@ public class AdminVipGoodsPricingVo {
   @Schema(description = "自定义商品 ID")
   private Long goodsId;
 
+  @Schema(description = "供应商ID")
+  private Long supplierId;
+
   @Schema(description = "自定义商品分组 ID")
   private Long groupId;
 
