@@ -28,7 +28,7 @@ public class QueryVipOrderTicket {
   private Integer refundStatus;
 
   @Schema(description = "订单总金额")
-  private String money;
+  private BigDecimal money;
 
   @Schema(description = "最大进货总金额（非商品单价），该验证防止商家亏损。原理：商家进货价格<=此值放行，>此值则拦截")
   private BigDecimal maxMoney;

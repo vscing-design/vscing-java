@@ -3,6 +3,7 @@ package com.vscing.model.platform;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,7 +22,7 @@ public class QueryOrderTicket {
   private String phoneNumber;
 
   @Schema(description = "订单总金额")
-  private String amount;
+  private BigDecimal amount;
 
   @Schema(description = "购票座位")
   private String seatInfo;
