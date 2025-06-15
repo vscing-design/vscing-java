@@ -3,6 +3,8 @@ package com.vscing.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * MerchantListDto
  *
@@ -19,6 +21,6 @@ public class MerchantListDto {
   private Integer status;
 
   @Schema(description = "合作产品：1 电影票 2 会员卡商品")
-  private Integer productType;
+  private List<Integer> productType;
 
 }

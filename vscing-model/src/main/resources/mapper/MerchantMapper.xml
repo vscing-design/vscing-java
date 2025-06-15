@@ -9,7 +9,7 @@
         <result column="merchant_name" property="merchantName" jdbcType="VARCHAR" />
         <result column="password" property="password" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
-        <result column="product_type" property="productType" jdbcType="TINYINT" />
+        <result column="product_type" property="productType" jdbcType="VARCHAR" />
         <result column="balance" property="balance" jdbcType="DECIMAL" />
         <result column="total_recharge" property="totalRecharge" jdbcType="DECIMAL" />
         <result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -57,8 +57,12 @@
             <if test="status != null and status != 0">
                 AND status = #{status}
             </if>
-            <if test="productType != null and productType != 0">
-                AND product_type = #{productType}
+            <if test="productType != null and !productType.isEmpty()">
+                AND (
+                <foreach collection="productType" item="type" separator=" OR ">
+                    FIND_IN_SET(#{type}, product_type)
+                </foreach>
+                )
             </if>
             <if test="merchantName != null">
                 AND merchant_name LIKE CONCAT('%', #{merchantName}, '%')

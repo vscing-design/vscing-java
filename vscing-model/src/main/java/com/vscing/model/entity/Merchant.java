@@ -37,7 +37,7 @@ public class Merchant extends BaseEntity {
   private Integer status;
 
   @Schema(description = "合作产品：1 电影票 2 会员卡商品")
-  private Integer productType;
+  private String productType;
 
   @Schema(description = "账户余额金额")
   private BigDecimal balance;
