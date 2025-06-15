@@ -208,91 +208,70 @@
     <select id="getList" resultMap="BaseResultMap">
         SELECT * FROM <include refid="tableName" />
         <where>
-            deleted_at IS NULL
             <if test="name != null">
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
+            AND deleted_at IS NULL
         </where>
     </select>
 
     <!-- 根据 ID 查询 -->
     <select id="selectById" parameterType="long" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
+        SELECT * FROM <include refid="tableName" /> WHERE id = #{id,jdbcType=BIGINT} AND deleted_at IS NULL LIMIT 1
     </select>
 
     <!-- 查询全部列表 -->
     <select id="getTaskList" resultMap="BaseResultMap">
-        SELECT id, tp_goods_id FROM <include refid="tableName" /> deleted_at IS NULL
+        SELECT id, tp_goods_id FROM <include refid="tableName" /> AND deleted_at IS NULL
     </select>
 
     <!-- 根据 tp_goods_id 查询 -->
     <select id="selectByTpGoodsId" parameterType="long" resultMap="BaseResultMap">
-        SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} and deleted_at IS NULL LIMIT 1
+        SELECT * FROM <include refid="tableName" /> WHERE tp_goods_id = #{tpGoodsId,jdbcType=BIGINT} AND deleted_at IS NULL LIMIT 1
     </select>
 
     <!-- 批量插入信息 -->
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO <include refid="tableName" />
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="list[0].id != null">id,</if>
-            <if test="list[0].supplierId != null">supplier_id,</if>
-            <if test="list[0].tpGoodsId != null">tp_goods_id,</if>
-            <if test="list[0].goodsName != null">`goods_name`,</if>
-            <if test="list[0].groupId != null">group_id,</if>
-            <if test="list[0].tpGroupId != null">tp_group_id,</if>
-            <if test="list[0].stock != null">stock,</if>
-            <if test="list[0].oldGoodsPrice != null">old_goods_price,</if>
-            <if test="list[0].goodsPrice != null">goods_price,</if>
-            <if test="list[0].oldMarketPrice != null">old_market_price,</if>
-            <if test="list[0].marketPrice != null">market_price,</if>
-            <if test="list[0].goodsStatus != null">goods_status,</if>
-            <if test="list[0].goodsLogo != null">goods_logo,</if>
-            <if test="list[0].goodsType != null">goods_type,</if>
-            <if test="list[0].minBuy != null">min_buy,</if>
-            <if test="list[0].maxBuy != null">max_buy,</if>
-            <if test="list[0].details != null">details,</if>
-            <if test="list[0].createdBy != null">created_by</if>
-        </trim>
+        INSERT INTO <include refid="tableName"/>
+        (id, supplier_id, tp_goods_id, goods_name, group_id, tp_group_id,
+        stock, old_goods_price, goods_price, old_market_price, market_price,
+        goods_status, goods_logo, goods_type, min_buy, max_buy, details, created_by)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="item.id != null">#{item.id, jdbcType=BIGINT},</if>
-                <if test="item.supplierId != null">#{item.supplierId, jdbcType=BIGINT},</if>
-                <if test="item.tpGoodsId != null">#{item.tpGoodsId, jdbcType=BIGINT},</if>
-                <if test="item.goodsName != null">#{item.goodsName, jdbcType=VARCHAR},</if>
-                <if test="item.groupId != null">#{item.groupId, jdbcType=BIGINT},</if>
-                <if test="item.tpGroupId != null">#{item.tpGroupId, jdbcType=BIGINT},</if>
-                <if test="item.stock != null">#{item.stock, jdbcType=INTEGER},</if>
-                <if test="item.oldGoodsPrice != null">#{item.oldGoodsPrice, jdbcType=DECIMAL},</if>
-                <if test="item.goodsPrice != null">#{item.goodsPrice, jdbcType=DECIMAL},</if>
-                <if test="item.oldMarketPrice != null">#{item.oldMarketPrice, jdbcType=DECIMAL},</if>
-                <if test="item.marketPrice != null">#{item.marketPrice, jdbcType=DECIMAL},</if>
-                <if test="item.goodsStatus != null">#{item.goodsStatus, jdbcType=TINYINT},</if>
-                <if test="item.goodsLogo != null">#{item.goodsLogo, jdbcType=VARCHAR},</if>
-                <if test="item.goodsType != null">#{item.goodsType, jdbcType=TINYINT},</if>
-                <if test="item.minBuy != null">#{item.minBuy, jdbcType=INTEGER},</if>
-                <if test="item.maxBuy != null">#{item.maxBuy, jdbcType=INTEGER},</if>
-                <if test="item.details != null">#{item.details, jdbcType=VARCHAR},</if>
-                <if test="item.createdBy != null">#{item.createdBy, jdbcType=BIGINT}</if>
-            </trim>
+            (
+            #{item.id, jdbcType=BIGINT},
+            #{item.supplierId, jdbcType=BIGINT},
+            #{item.tpGoodsId, jdbcType=BIGINT},
+            #{item.goodsName, jdbcType=VARCHAR},
+            #{item.groupId, jdbcType=BIGINT},
+            #{item.tpGroupId, jdbcType=BIGINT},
+            #{item.stock, jdbcType=INTEGER},
+            #{item.oldGoodsPrice, jdbcType=DECIMAL},
+            #{item.goodsPrice, jdbcType=DECIMAL},
+            #{item.oldMarketPrice, jdbcType=DECIMAL},
+            #{item.marketPrice, jdbcType=DECIMAL},
+            #{item.goodsStatus, jdbcType=TINYINT},
+            #{item.goodsLogo, jdbcType=VARCHAR},
+            #{item.goodsType, jdbcType=TINYINT},
+            #{item.minBuy, jdbcType=INTEGER},
+            #{item.maxBuy, jdbcType=INTEGER},
+            #{item.details, jdbcType=VARCHAR},
+            #{item.createdBy, jdbcType=BIGINT}
+            )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        <trim prefix="" suffix="" suffixOverrides=",">
-            <if test="list[0].id != null">id = VALUES(id),</if>
-            <if test="list[0].supplierId != null">supplier_id = VALUES(supplier_id),</if>
-            <if test="list[0].goodsName != null">`goods_name` = VALUES(`goods_name`),</if>
-            <if test="list[0].groupId != null">group_id = VALUES(group_id),</if>
-            <if test="list[0].tpGroupId != null">tp_group_id = VALUES(tp_group_id),</if>
-            <if test="list[0].stock != null">stock = VALUES(stock),</if>
-            <if test="list[0].oldGoodsPrice != null">old_goods_price = VALUES(old_goods_price),</if>
-            <if test="list[0].goodsPrice != null">goods_price = VALUES(goods_price),</if>
-            <if test="list[0].oldMarketPrice != null">old_market_price = VALUES(old_market_price),</if>
-            <if test="list[0].marketPrice != null">market_price = VALUES(market_price),</if>
-            <if test="list[0].goodsStatus != null">goods_status = VALUES(goods_status),</if>
-            <if test="list[0].goodsType != null">goods_type = VALUES(goods_type),</if>
-            <if test="list[0].minBuy != null">min_buy = VALUES(min_buy),</if>
-            <if test="list[0].maxBuy != null">max_buy = VALUES(max_buy)</if>
-        </trim>
+        goods_name = VALUES(goods_name),
+        group_id = VALUES(group_id),
+        tp_group_id = VALUES(tp_group_id),
+        stock = VALUES(stock),
+        old_goods_price = VALUES(old_goods_price),
+        goods_price = VALUES(goods_price),
+        old_market_price = VALUES(old_market_price),
+        market_price = VALUES(market_price),
+        goods_status = VALUES(goods_status),
+        goods_type = VALUES(goods_type),
+        min_buy = VALUES(min_buy),
+        max_buy = VALUES(max_buy)
     </insert>
 
     <!-- 插入信息 -->
