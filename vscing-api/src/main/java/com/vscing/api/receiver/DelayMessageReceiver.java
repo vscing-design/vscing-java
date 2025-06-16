@@ -401,6 +401,7 @@ public class DelayMessageReceiver {
       if (orderNotifyMq == null) {
         throw new Exception("解析消息体错误");
       }
+      // TODO 判断url是否正常 最大通知次数
       // 查询订单信息
       String jsonBody = "";
       ObjectMapper objectMapper = JsonUtils.getObjectMapper();
