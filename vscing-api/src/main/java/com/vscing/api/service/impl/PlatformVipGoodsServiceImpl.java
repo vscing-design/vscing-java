@@ -148,14 +148,14 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
       // 订单号
       String orderSn = OrderUtils.generateOrderSn("HY", 1);
       // 计算订单总价格
-      BigDecimal totalPrice = vipGoods.getMarketPrice().add(markupAmount);
-      totalPrice = totalPrice.subtract(BigDecimal.valueOf(record.getBuyNum()));
+      BigDecimal totalPrice = vipGoods.getGoodsPrice().add(markupAmount);
+      totalPrice = totalPrice.multiply(BigDecimal.valueOf(record.getBuyNum()));
       // 订单官方价
       BigDecimal officialPrice = vipGoods.getMarketPrice();
-      officialPrice = officialPrice.subtract(BigDecimal.valueOf(record.getBuyNum()));
+      officialPrice = officialPrice.multiply(BigDecimal.valueOf(record.getBuyNum()));
       // 订单结算价
       BigDecimal settlementPrice = vipGoods.getGoodsPrice();
-      settlementPrice = settlementPrice.subtract(BigDecimal.valueOf(record.getBuyNum()));
+      settlementPrice = settlementPrice.multiply(BigDecimal.valueOf(record.getBuyNum()));
       // 判断商户余额是否足够支付
       if(totalPrice.compareTo(merchant.getBalance()) > 0) {
         throw new ServiceException("余额不足");
@@ -207,6 +207,7 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
       MerchantBill merchantBill = new MerchantBill();
       merchantBill.setId(IdUtil.getSnowflakeNextId());
       merchantBill.setMerchantId(merchant.getId());
+      merchantBill.setProductType(2);
       merchantBill.setPlatformOrderNo(orderSn);
       merchantBill.setExternalOrderNo(record.getTradeNo());
       merchantBill.setChangeType(1);
@@ -225,7 +226,7 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
       // 发起三方下单
       notifyService.ticketVipOrder(orderSn);
       // 发送mq异步处理 2分钟后查询退款订单
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_QUEUE, orderId.toString(), 2*60*1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, orderId.toString(), 2*60*1000);
       // 发送mq异步处理 5分钟后异步通知
       OrderNotifyMq orderNotifyMq = new OrderNotifyMq();
       orderNotifyMq.setUrl(record.getNotifyUrl());
@@ -234,7 +235,7 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
       orderNotifyMq.setOrderType(2);
       orderNotifyMq.setNum(1);
       String msg = JsonUtils.toJsonString(orderNotifyMq);
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_QUEUE, msg, 5*60*1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, msg, 5*60*1000);
       return queryOrder;
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());

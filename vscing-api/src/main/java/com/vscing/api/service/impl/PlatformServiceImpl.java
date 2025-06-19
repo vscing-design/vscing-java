@@ -486,7 +486,7 @@ public class PlatformServiceImpl implements PlatformService {
       orderNotifyMq.setOrderType(1);
       orderNotifyMq.setNum(1);
       String msg = JsonUtils.toJsonString(orderNotifyMq);
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_QUEUE, msg, 5*60*1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, msg, 5*60*1000);
       return queryOrder;
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());

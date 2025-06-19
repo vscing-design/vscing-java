@@ -76,12 +76,12 @@
         FROM <include refid="tableName" />
         <where>
             <if test="groupId != null">
-                vGoods.group_id = #{groupId, jdbcType=BIGINT}
+                group_id = #{groupId, jdbcType=BIGINT}
             </if>
             <if test="goodsType != null">
-                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
+                AND goods_type = #{goodsType, jdbcType=INTEGER}
             </if>
-            AND vGoods.deleted_at IS NULL
+            AND deleted_at IS NULL
         </where>
     </select>
 
@@ -116,6 +116,19 @@
             </if>
             <if test="goodsType != null">
                 AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
+            </if>
+            <if test="priceChange != null and priceChange != 0">
+                <choose>
+                    <when test="priceChange == 1">
+                        AND vGoods.goods_price > vGoods.old_goods_price
+                    </when>
+                    <when test="priceChange == 2">
+                        AND vGoods.old_goods_price > vGoods.goods_price
+                    </when>
+                    <when test="priceChange == 3">
+                        AND vGoods.goods_price = vGoods.old_goods_price
+                    </when>
+                </choose>
             </if>
             AND vGoods.deleted_at IS NULL
         </where>

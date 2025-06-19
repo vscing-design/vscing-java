@@ -7,13 +7,11 @@ import com.vscing.common.service.InviteCodeService;
 import com.vscing.common.service.RedisService;
 import com.vscing.common.service.applet.AppletService;
 import com.vscing.common.service.applet.AppletServiceFactory;
-import com.vscing.common.utils.JsonUtils;
 import com.vscing.model.entity.Order;
 import com.vscing.model.entity.UserAuth;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.mapper.OrderMapper;
 import com.vscing.model.mapper.UserAuthMapper;
-import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.model.request.ShowSeatRequest;
 import com.vscing.model.vo.SeatMapVo;
 import com.vscing.mq.config.DelayRabbitMQConfig;
@@ -240,14 +238,16 @@ public class TestController {
     @GetMapping("/baidu")
     @Operation(summary = "测试百度")
     public CommonResult<Object> baidu() {
-        // 发送mq异步处理 同步出票信息
-        SyncCodeMq syncCodeMq = new SyncCodeMq();
-        syncCodeMq.setOrderId(1911006715162316800L);
-        syncCodeMq.setNum(1);
-        String msg = JsonUtils.toJsonString(syncCodeMq);
-        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60*1000);
-//        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893920153807257600", 10 * 1000);
-        AppletService appletService = appletServiceFactory.getAppletService("baidu");
+
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, "1935719390957940736", 10 * 1000);
+//        // 发送mq异步处理 同步出票信息
+//        SyncCodeMq syncCodeMq = new SyncCodeMq();
+//        syncCodeMq.setOrderId(1911006715162316800L);
+//        syncCodeMq.setNum(1);
+//        String msg = JsonUtils.toJsonString(syncCodeMq);
+//        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_CODE_ROUTING_KEY, msg, 3*60*1000);
+////        rabbitMQService.sendDelayedMessage(RabbitMQConfig.REFUND_ROUTING_KEY, "1893920153807257600", 10 * 1000);
+//        AppletService appletService = appletServiceFactory.getAppletService("baidu");
         return CommonResult.success(true);
     }
 

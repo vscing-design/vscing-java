@@ -372,7 +372,7 @@ public class DelayMessageReceiver {
       if (rowsAffected <= 0) {
         log.info("vip同步商品订单详情数据更新失败");
         // 发送mq异步处理 2分钟后查询退款订单
-        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_QUEUE, vipOrder.getId().toString(), 2*60*1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, vipOrder.getId().toString(), 2*60*1000);
         return;
       }
       log.error("vip同步商品订单详情延迟队列成功");
@@ -441,7 +441,7 @@ public class DelayMessageReceiver {
         int num = orderNotifyMq.getNum() + 1;
         orderNotifyMq.setNum(num);
         String newMsg = JsonUtils.toJsonString(orderNotifyMq);
-        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_QUEUE, newMsg, (long) num*5*60*1000);
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, newMsg, (long) num*5*60*1000);
       }
     } finally {
       channel.basicAck(deliveryTag, false);

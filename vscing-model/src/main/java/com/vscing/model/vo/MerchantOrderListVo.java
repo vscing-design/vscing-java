@@ -36,7 +36,7 @@ public class MerchantOrderListVo {
   @Schema(description = "外部订单号")
   private String extOrderSn;
 
-  @Schema(description = "商品类型 1 电影票")
+  @Schema(description = "商品类型 1 电影票 2 会员")
   private Integer productType;
 
   @Schema(description = "商品信息")

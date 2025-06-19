@@ -122,7 +122,7 @@
             <if test="merchantName != null">#{merchantName, jdbcType=VARCHAR},</if>
             <if test="password != null">#{password, jdbcType=VARCHAR},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
-            <if test="productType != null">#{productType, jdbcType=TINYINT},</if>
+            <if test="productType != null">#{productType, jdbcType=VARCHAR},</if>
             <if test="balance != null">#{balance, jdbcType=DECIMAL},</if>
             <if test="totalRecharge != null">#{totalRecharge, jdbcType=DECIMAL},</if>
             <if test="phone != null">#{phone, jdbcType=VARCHAR},</if>
@@ -145,7 +145,7 @@
             <if test="merchantName != null">merchant_name = #{merchantName, jdbcType=VARCHAR},</if>
             <if test="password != null">password = #{password, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
-            <if test="productType != null">product_type = #{productType, jdbcType=TINYINT},</if>
+            <if test="productType != null">product_type = #{productType, jdbcType=VARCHAR},</if>
             <if test="balance != null">balance = #{balance, jdbcType=DECIMAL},</if>
             <if test="totalRecharge != null">total_recharge = #{totalRecharge, jdbcType=DECIMAL},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>
@@ -172,7 +172,7 @@
             <if test="merchantName != null">merchant_name = #{merchantName, jdbcType=VARCHAR},</if>
             <if test="password != null">password = #{password, jdbcType=VARCHAR},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
-            <if test="productType != null">product_type = #{productType, jdbcType=TINYINT},</if>
+            <if test="productType != null">product_type = #{productType, jdbcType=VARCHAR},</if>
             <if test="balance != null">balance = #{balance, jdbcType=DECIMAL},</if>
             <if test="totalRecharge != null">total_recharge = #{totalRecharge, jdbcType=DECIMAL},</if>
             <if test="phone != null">phone = #{phone, jdbcType=VARCHAR},</if>

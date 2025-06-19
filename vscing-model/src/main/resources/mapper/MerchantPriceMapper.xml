@@ -37,6 +37,7 @@
             <if test="merchantName != null">
                 AND m.merchant_name LIKE CONCAT('%', #{merchantName}, '%')
             </if>
+            AND mp.vip_goods_id IS NULL
             AND mp.deleted_at IS NULL
             AND m.deleted_at IS NULL
         </where>

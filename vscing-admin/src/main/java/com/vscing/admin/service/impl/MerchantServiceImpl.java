@@ -81,7 +81,9 @@ public class MerchantServiceImpl implements MerchantService {
 
   @Override
   public int updated(Merchant merchant) {
-    merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
+    if (merchant.getPassword() != null) {
+      merchant.setPassword(passwordEncoder.encode(merchant.getPassword()));
+    }
     return merchantMapper.update(merchant);
   }
 
