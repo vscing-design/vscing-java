@@ -46,6 +46,9 @@
             <!--            <if test="status != null and status != 0">-->
             <!--                AND status = #{status, jdbcType=TINYINT}-->
             <!--            </if>-->
+            <if test="productType != null">
+                AND product_type = #{productType}
+            </if>
             <if test="startDate != null">
                 AND updated_at <![CDATA[ >= ]]> #{startDate, jdbcType=TIMESTAMP}
             </if>

@@ -100,9 +100,14 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
     }
     // 遍历数据列表
     for (QueryVipGoods queryVipGoods : list) {
+      // 加价
+      BigDecimal markupPrice = new BigDecimal("1.00");
+      if(priceMap.get(queryVipGoods.getGoodsId()) != null) {
+        markupPrice = priceMap.get(queryVipGoods.getGoodsId());
+      }
       // 空值检查
-      if (queryVipGoods.getGoodsPrice() != null && priceMap.get(queryVipGoods.getGoodsId()) != null) {
-        BigDecimal newGoodsPrice = queryVipGoods.getGoodsPrice().add(priceMap.get(queryVipGoods.getGoodsId()));
+      if (queryVipGoods.getGoodsPrice() != null) {
+        BigDecimal newGoodsPrice = queryVipGoods.getGoodsPrice().add(markupPrice);
         queryVipGoods.setGoodsPrice(newGoodsPrice);
       }
     }
@@ -115,9 +120,14 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
     if(data != null) {
       // 获取价格列表
       MerchantPrice merchantPrice = merchantPriceMapper.getPlatformVipGoods(record.getUserId(), data.getGoodsId());
+      // 加价
+      BigDecimal markupPrice = new BigDecimal("1.00");
+      if(merchantPrice != null) {
+        markupPrice = merchantPrice.getMarkupAmount();
+      }
       // 空值检查
-      if (data.getGoodsPrice() != null && merchantPrice != null) {
-        BigDecimal newGoodsPrice = data.getGoodsPrice().add(merchantPrice.getMarkupAmount());
+      if (data.getGoodsPrice() != null) {
+        BigDecimal newGoodsPrice = data.getGoodsPrice().add(markupPrice);
         data.setGoodsPrice(newGoodsPrice);
       }
       // 扩展属性
@@ -137,7 +147,7 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
         throw new ServiceException("商品信息错误");
       }
       // 加价
-      BigDecimal markupAmount = BigDecimal.ZERO;
+      BigDecimal markupAmount = new BigDecimal("1.00");
       // 获取价格列表
       MerchantPrice merchantPrice = merchantPriceMapper.getPlatformVipGoods(record.getUserId(), record.getGoodsId());
       if(merchantPrice != null) {
@@ -225,18 +235,20 @@ public class PlatformVipGoodsServiceImpl implements PlatformVipGoodsService {
       queryOrder.setPhoneNumber(record.getPhone());
       // 发起三方下单
       notifyService.ticketVipOrder(orderSn);
-      // 发送mq异步处理 2分钟后查询退款订单
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, orderId.toString(), 2*60*1000);
-      // 发送mq异步处理 5分钟后异步通知
+      // 发送mq异步处理 1s后查询退款订单
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, orderId.toString(), 1000);
+      // 发送mq异步处理 10s后异步通知
       OrderNotifyMq orderNotifyMq = new OrderNotifyMq();
       orderNotifyMq.setUrl(record.getNotifyUrl());
       orderNotifyMq.setOrderId(orderId);
       orderNotifyMq.setOrderNo(orderSn);
       orderNotifyMq.setOrderType(2);
-      orderNotifyMq.setNum(1);
+      orderNotifyMq.setNum(0);
       String msg = JsonUtils.toJsonString(orderNotifyMq);
-      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, msg, 5*60*1000);
+      rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, msg, 10*1000);
       return queryOrder;
+    } catch (ServiceException e) {
+      throw new ServiceException(e.getMessage());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());
     }

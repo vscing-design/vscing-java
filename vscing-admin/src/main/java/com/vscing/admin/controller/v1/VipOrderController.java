@@ -1,5 +1,6 @@
 package com.vscing.admin.controller.v1;
 
+import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.admin.service.VipOrderService;
 import com.vscing.common.api.CommonPage;
 import com.vscing.common.api.CommonResult;
@@ -11,10 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,8 +35,8 @@ public class VipOrderController {
   @GetMapping
   @Operation(summary = "会员卡商品订单列表")
   public CommonResult<CommonPage<AdminVipOrderVo>> lists(@ParameterObject AdminVipOrderDto queryParam,
-                                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                  @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+                                                         @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                         @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
     List<AdminVipOrderVo> list = vipOrderService.getList(queryParam, pageSize, pageNum);
     return CommonResult.success(CommonPage.restPage(list));
   }
@@ -46,6 +45,24 @@ public class VipOrderController {
   @Operation(summary = "会员卡商品金额统计")
   public CommonResult<OrderPriceVo> amount(@ParameterObject AdminVipOrderDto queryParam) {
     return CommonResult.success(vipOrderService.getCountAmount(queryParam));
+  }
+
+  @PostMapping("/close/{id}")
+  @Operation(summary = "订单关闭-仅支持商户订单")
+  public CommonResult<Object> close(@PathVariable("id") Long id,
+                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
+    // 操作人ID
+    Long by = 0L;
+    if(userInfo != null && userInfo.getUserId() != null) {
+      by = userInfo.getUserId();
+    }
+    try {
+      vipOrderService.closeOrder(id, by);
+      return CommonResult.success("关闭成功");
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("关闭失败");
+    }
   }
 
 }

@@ -21,24 +21,12 @@ import com.vscing.model.dto.OrderListDto;
 import com.vscing.model.dto.PricingRuleListDto;
 import com.vscing.model.dto.SeatListDto;
 import com.vscing.model.dto.ShowInforDto;
-import com.vscing.model.entity.Coupon;
-import com.vscing.model.entity.Order;
-import com.vscing.model.entity.OrderDetail;
-import com.vscing.model.entity.PricingRule;
-import com.vscing.model.entity.Show;
-import com.vscing.model.entity.ShowArea;
-import com.vscing.model.entity.User;
+import com.vscing.model.entity.*;
 import com.vscing.model.enums.AppletTypeEnum;
 import com.vscing.model.enums.JfshouOrderSubmitResponseCodeEnum;
 import com.vscing.model.http.HttpOrder;
 import com.vscing.model.http.HttpTicketCode;
-import com.vscing.model.mapper.CouponMapper;
-import com.vscing.model.mapper.OrderDetailMapper;
-import com.vscing.model.mapper.OrderMapper;
-import com.vscing.model.mapper.PricingRuleMapper;
-import com.vscing.model.mapper.ShowAreaMapper;
-import com.vscing.model.mapper.ShowMapper;
-import com.vscing.model.mapper.UserMapper;
+import com.vscing.model.mapper.*;
 import com.vscing.model.mq.SyncCodeMq;
 import com.vscing.model.request.OrderChangeRequest;
 import com.vscing.model.request.OrderSaveRequest;
@@ -101,6 +89,12 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private PricingRuleMapper pricingRuleMapper;
+
+  @Autowired
+  private MerchantMapper merchantMapper;
+
+  @Autowired
+  private MerchantBillMapper merchantBillMapper;
 
   @Autowired
   private RabbitMQService rabbitMQService;
@@ -490,7 +484,6 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public boolean ticketOrder(Long id, Long by) {
-
     try {
       // 订单详情
       Order order = orderMapper.selectById(id);
@@ -590,6 +583,56 @@ public class OrderServiceImpl implements OrderService {
       throw new ServiceException(e.getMessage());
     }
     return true;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+  public void closeOrder(Long id, Long by) {
+    try {
+      int rowsAffected = 0;
+      // 根据订单id获取订单
+      Order order = orderMapper.selectById(id);
+      if(order == null || order.getMerchantId() == null || order.getStatus() > 4) {
+        throw new ServiceException("订单数据异常");
+      }
+      // 根据商户id查询商户信息
+      Merchant merchant = merchantMapper.selectById(order.getMerchantId());
+      // 修改订单状态到取消
+      Order updateOrder = new Order();
+      updateOrder.setId(order.getId());
+      updateOrder.setStatus(5);
+      rowsAffected = orderMapper.update(updateOrder);
+      if (rowsAffected <= 0) {
+        throw new ServiceException("改变订单状态失败");
+      }
+      // 计算商户余额
+      BigDecimal merchantBalance = merchant.getBalance();
+      merchantBalance = merchantBalance.add(order.getTotalPrice());
+      // 创建商户账单
+      MerchantBill merchantBill = new MerchantBill();
+      merchantBill.setId(IdUtil.getSnowflakeNextId());
+      merchantBill.setMerchantId(order.getMerchantId());
+      merchantBill.setPlatformOrderNo(order.getOrderSn());
+      merchantBill.setExternalOrderNo(order.getExtOrderSn());
+      merchantBill.setChangeAmount(order.getTotalPrice());
+      merchantBill.setChangeAfterBalance(merchantBalance);
+      merchantBill.setStatus(2);
+      merchantBill.setChangeType(2);
+      merchantBill.setProductType(1);
+      rowsAffected = merchantBillMapper.insert(merchantBill);
+      if (rowsAffected < 0) {
+        throw new ServiceException("创建商户账单失败");
+      }
+      // 商户余额修改
+      merchant.setBalance(merchantBalance);
+      merchant.setVersion(merchant.getVersion());
+      rowsAffected = merchantMapper.updateVersion(merchant);
+      if (rowsAffected < 0) {
+        throw new ServiceException("商户扣款失败");
+      }
+    } catch (Exception e) {
+      throw new ServiceException(e.getMessage());
+    }
   }
 
 }

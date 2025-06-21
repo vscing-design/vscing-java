@@ -78,7 +78,7 @@ public class VipGoodsServiceImpl implements VipGoodsService {
       if (priceMap.get(adminVipGoodsPricingVo.getGoodsId()) != null) {
         adminVipGoodsPricingVo.setMarkupPrice(priceMap.get(adminVipGoodsPricingVo.getGoodsId()));
       } else {
-        adminVipGoodsPricingVo.setMarkupPrice(new BigDecimal("0.00"));
+        adminVipGoodsPricingVo.setMarkupPrice(new BigDecimal("1.00"));
       }
     }
     return list;

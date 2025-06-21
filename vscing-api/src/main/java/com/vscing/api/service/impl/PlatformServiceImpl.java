@@ -302,6 +302,8 @@ public class PlatformServiceImpl implements PlatformService {
       querySeat.setRestrictions(restrictions);
       querySeat.setSeatList(seatList);
       return querySeat;
+    } catch (ServiceException e) {
+      throw new ServiceException(e.getMessage());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());
     }
@@ -488,6 +490,8 @@ public class PlatformServiceImpl implements PlatformService {
       String msg = JsonUtils.toJsonString(orderNotifyMq);
       rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.ORDER_NOTIFY_ROUTING_KEY, msg, 5*60*1000);
       return queryOrder;
+    } catch (ServiceException e) {
+      throw new ServiceException(e.getMessage());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());
     }

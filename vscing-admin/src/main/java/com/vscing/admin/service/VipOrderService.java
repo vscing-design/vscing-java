@@ -21,7 +21,12 @@ public interface VipOrderService {
 
   /**
    * 会员卡商品金额统计
-  */
+   */
   OrderPriceVo getCountAmount(AdminVipOrderDto record);
+
+  /**
+   * 订单关闭-仅支持商户订单
+   */
+  void closeOrder(Long id, Long by);
 
 }

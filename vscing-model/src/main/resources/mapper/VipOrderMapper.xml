@@ -246,12 +246,12 @@
         FROM <include refid="tableName" />
         <where>
             <if test="orderNo != null">
-                AND `order`.order_sn LIKE CONCAT('%', #{orderNo}, '%')
+                AND order_sn LIKE CONCAT('%', #{orderNo}, '%')
             </if>
             <if test="tradeNo != null">
-                AND `order`.ext_order_sn LIKE CONCAT('%', #{tradeNo}, '%')
+                AND ext_order_sn LIKE CONCAT('%', #{tradeNo}, '%')
             </if>
-            AND `order`.deleted_at IS NULL
+            AND deleted_at IS NULL
         </where>
         limit 1
     </select>

@@ -42,6 +42,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -330,7 +331,7 @@ public class DelayMessageReceiver {
    */
   @RabbitListener(queues = DelayRabbitMQConfig.SYNC_VIP_ORDER_QUEUE, ackMode = "MANUAL")
   public void syncVipOrderMessage(Message message, Channel channel,
-                                        @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
+                                  @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
     try {
       // 处理队列消息
       String msg = new String(message.getBody(), StandardCharsets.UTF_8);
@@ -342,6 +343,9 @@ public class DelayMessageReceiver {
       log.error("会员商品订单查询延迟队列 orderId: {}", orderId);
       // 查询订单信息
       VipOrder vipOrder = vipOrderMapper.selectById(orderId);
+      if (vipOrder == null || vipOrder.getStatus() > 2) {
+        throw new Exception("订单信息错误");
+      }
       // 准备请求参数
       Map<String, String> params = new HashMap<>();
       params.put("usorderno", vipOrder.getOrderSn());
@@ -357,6 +361,8 @@ public class DelayMessageReceiver {
       // 判断数据
       if (code != 1 || data == null) {
         log.info("vip同步商品订单详情结果异常: {}", responseBody);
+        // 发送mq异步处理 2分钟后查询退款订单
+        rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, vipOrder.getId().toString(), 2*60*1000);
         return;
       }
       // 标记
@@ -388,7 +394,7 @@ public class DelayMessageReceiver {
    */
   @RabbitListener(queues = DelayRabbitMQConfig.ORDER_NOTIFY_QUEUE, ackMode = "MANUAL")
   public void orderNotifyMessage(Message message, Channel channel,
-                                        @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
+                                 @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
     OrderNotifyMq orderNotifyMq = null;
     try {
       // 处理队列消息
@@ -401,7 +407,13 @@ public class DelayMessageReceiver {
       if (orderNotifyMq == null) {
         throw new Exception("解析消息体错误");
       }
-      // TODO 判断url是否正常 最大通知次数
+      // 判断url是否正常 最大通知次数
+      if (orderNotifyMq.getUrl() == null || orderNotifyMq.getUrl().trim().isEmpty() || !orderNotifyMq.getUrl().matches("^(?i)(http|https)://.*")) {
+        return;
+      }
+      if (orderNotifyMq.getNum() > 5) {
+        return;
+      }
       // 查询订单信息
       String jsonBody = "";
       ObjectMapper objectMapper = JsonUtils.getObjectMapper();

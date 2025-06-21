@@ -38,4 +38,7 @@ public class MerchantBillListDto {
   @Schema(description = "状态 1 进行中 2 成功 3 失败")
   private Integer status;
 
+  @Schema(description = "商品类型 1 电影票 2 会员")
+  private Integer productType;
+
 }

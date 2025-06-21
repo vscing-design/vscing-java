@@ -102,7 +102,7 @@ public class OrderController {
   @PostMapping("/cancel/{id}")
   @Operation(summary = "取消订单")
   public CommonResult<Object> cancel(@PathVariable("id") Long id,
-                                   @AuthenticationPrincipal AdminUserDetails userInfo) {
+                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
     // 操作人ID
     Long by = 0L;
     if(userInfo != null && userInfo.getUserId() != null) {
@@ -169,7 +169,7 @@ public class OrderController {
   @Operation(summary = "调座")
   public CommonResult<Object> exchange(@Validated @RequestBody OrderChangeRequest data,
                                        BindingResult bindingResult,
-                                     @AuthenticationPrincipal AdminUserDetails userInfo) {
+                                       @AuthenticationPrincipal AdminUserDetails userInfo) {
     if (bindingResult.hasErrors()) {
       // 获取第一个错误信息，如果需要所有错误信息
       String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
@@ -190,6 +190,24 @@ public class OrderController {
     } catch (Exception e) {
       log.error("请求错误: ", e);
       return CommonResult.failed("请求错误");
+    }
+  }
+
+  @PostMapping("/close/{id}")
+  @Operation(summary = "订单关闭-仅支持商户订单")
+  public CommonResult<Object> close(@PathVariable("id") Long id,
+                                    @AuthenticationPrincipal AdminUserDetails userInfo) {
+    // 操作人ID
+    Long by = 0L;
+    if(userInfo != null && userInfo.getUserId() != null) {
+      by = userInfo.getUserId();
+    }
+    try {
+      orderService.closeOrder(id, by);
+      return CommonResult.success("关闭成功");
+    } catch (Exception e) {
+      log.error("请求错误: ", e);
+      return CommonResult.failed("关闭失败");
     }
   }
 

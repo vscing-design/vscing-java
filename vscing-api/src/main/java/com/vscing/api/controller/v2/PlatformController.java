@@ -2,6 +2,7 @@ package com.vscing.api.controller.v2;
 
 import com.vscing.api.service.PlatformService;
 import com.vscing.common.api.CommonResult;
+import com.vscing.common.exception.ServiceException;
 import com.vscing.common.utils.RequestUtil;
 import com.vscing.model.entity.Merchant;
 import com.vscing.model.platform.*;
@@ -145,9 +146,10 @@ public class PlatformController {
     try {
       QuerySeat querySeat = platformService.seat(record);
       return CommonResult.success(querySeat);
+    } catch (ServiceException e) {
+      return CommonResult.failed(e.getMessage());
     } catch (RuntimeException e) {
-      String errorMessage = e.getMessage();
-      return CommonResult.failed(errorMessage);
+      return CommonResult.failed("服务异常，请联系平台");
     }
   }
 
@@ -174,9 +176,10 @@ public class PlatformController {
     try {
       QueryOrder queryOrder = platformService.submitOrder(record, merchant);
       return CommonResult.success(queryOrder);
+    } catch (ServiceException e) {
+      return CommonResult.failed(e.getMessage());
     } catch (RuntimeException e) {
-      String errorMessage = e.getMessage();
-      return CommonResult.failed(errorMessage);
+      return CommonResult.failed("服务异常，请联系平台");
     }
   }
 
@@ -200,9 +203,10 @@ public class PlatformController {
     try {
       QueryOrderTicket queryOrder = platformService.orderTicket(record);
       return CommonResult.success(queryOrder);
+    } catch (ServiceException e) {
+      return CommonResult.failed(e.getMessage());
     } catch (RuntimeException e) {
-      String errorMessage = e.getMessage();
-      return CommonResult.failed(errorMessage);
+      return CommonResult.failed("服务异常，请联系平台");
     }
   }
 

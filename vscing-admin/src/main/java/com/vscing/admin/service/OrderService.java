@@ -25,12 +25,12 @@ public interface OrderService {
 
   /**
    * 详情
-  */
+   */
   OrderDetailVo getDetails(Long id);
 
   /**
    * 统计订单价格
-  */
+   */
   OrderPriceVo getOrderPrice(OrderListDto data);
 
   /**
@@ -40,17 +40,17 @@ public interface OrderService {
 
   /**
    * 手动下单
-  */
+   */
   boolean createOrder(OrderSaveRequest orderSave, Long by);
 
   /**
    * 调座
-  */
+   */
   boolean changeOrder(OrderChangeRequest orderChange, Long by);
 
   /**
    * 取消订单
-  */
+   */
   boolean cancelOrder(Long id, Long by);
 
   /**
@@ -60,12 +60,17 @@ public interface OrderService {
 
   /**
    * 取票
-  */
+   */
   boolean ticketOrder(Long id, Long by);
 
   /**
    * 同步三方订单列表 作废了
    */
   boolean supplierOrder(HttpOrder httpOrder);
+
+  /**
+   * 订单关闭-仅支持商户订单
+   */
+  void closeOrder(Long id, Long by);
 
 }
