@@ -432,6 +432,14 @@ public class NotifyServiceImpl implements NotifyService {
       String responseBody = supplierService.sendRequest("http://biubiu.wn8888.cn/dockapiv3/order/create", params);
       // 保存三方接口的返回结果
       vipOrder.setOrderResponseBody(responseBody);
+      // 将 JSON 字符串解析为 JsonNode 对象
+      ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+      // 解析 JSON 数据到 Map
+      Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
+      int code = (int) responseMap.get("code");
+      if(code != 1 && code != 9999 && code != -530) {
+        vipOrder.setStatus(4);
+      }
       // 调用保存
       vipOrderMapper.update(vipOrder);
     } catch (Exception e) {
