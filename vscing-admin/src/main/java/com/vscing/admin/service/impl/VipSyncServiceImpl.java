@@ -79,12 +79,14 @@ public class VipSyncServiceImpl implements VipSyncService {
       for (Map<String, Object> data : dataList) {
         // 判断数据是否存在
         VipGroup oldVipGroup = vipGroupMapper.selectByTpGroupId(objectMapper.convertValue(data.get("groupid"), Long.class));
-        if(oldVipGroup != null) {
-          continue;
-        }
         VipGroup vipGroup = new VipGroup();
-        vipGroup.setId(IdUtil.getSnowflakeNextId());
-        vipGroup.setSupplierId(supplierId);
+        if(oldVipGroup != null) {
+          vipGroup.setId(oldVipGroup.getId());
+          vipGroup.setSupplierId(oldVipGroup.getSupplierId());
+        } else {
+          vipGroup.setId(IdUtil.getSnowflakeNextId());
+          vipGroup.setSupplierId(supplierId);
+        }
         // 转义三方数据
         vipGroup.setTpGroupId(objectMapper.convertValue(data.get("groupid"), Long.class));
         vipGroup.setGroupName(objectMapper.convertValue(data.get("groupname"), String.class));
@@ -198,7 +200,9 @@ public class VipSyncServiceImpl implements VipSyncService {
         vipGoodsList.add(vipGoods);
       }
       vipGoodsMapper.batchInsert(vipGoodsList);
-      vipGoodsAttachMapper.batchInsert(vipGoodsAttachList);
+      if(!vipGoodsAttachList.isEmpty()) {
+        vipGoodsAttachMapper.batchInsert(vipGoodsAttachList);
+      }
       log.info("vip同步商品结束");
       Thread.sleep(4500);
       if(maxPage > page) {

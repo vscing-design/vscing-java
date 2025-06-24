@@ -235,7 +235,7 @@
 
     <!-- 查询全部列表 -->
     <select id="getTaskList" resultMap="BaseResultMap">
-        SELECT id, tp_goods_id FROM <include refid="tableName" /> AND deleted_at IS NULL
+        SELECT id, tp_goods_id FROM <include refid="tableName" /> WHERE deleted_at IS NULL
     </select>
 
     <!-- 根据 tp_goods_id 查询 -->

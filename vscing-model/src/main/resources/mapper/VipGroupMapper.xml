@@ -127,6 +127,12 @@
                 <if test="item.createdBy != null">#{item.createdBy,jdbcType=BIGINT}</if>
             </trim>
         </foreach>
+        ON DUPLICATE KEY UPDATE
+        group_name = VALUES(group_name),
+        group_alias = VALUES(group_alias),
+        group_logo = VALUES(group_logo),
+        brand_name = VALUES(brand_name),
+        brand_logo = VALUES(brand_logo)
     </insert>
 
     <!-- 更新信息 -->
