@@ -92,7 +92,8 @@ public class VipSyncServiceImpl implements VipSyncService {
         vipGroup.setGroupName(objectMapper.convertValue(data.get("groupname"), String.class));
         vipGroup.setGroupAlias(objectMapper.convertValue(data.get("groupaliasname"), String.class));
         String groupLogo = objectMapper.convertValue(data.get("groupimgurl"), String.class);
-        if(groupLogo != null && !groupLogo.isEmpty()){
+        boolean isGroupLogo = oldVipGroup == null || oldVipGroup.getGroupLogo() == null || !oldVipGroup.getGroupLogo().equals(groupLogo);
+        if(groupLogo != null && !groupLogo.isEmpty() && isGroupLogo){
           try {
             groupLogo = uploadService.put(groupLogo, "kky");
           } catch (Exception e) {
@@ -103,7 +104,8 @@ public class VipSyncServiceImpl implements VipSyncService {
         vipGroup.setBrandId(objectMapper.convertValue(data.get("brandid"), Long.class));
         vipGroup.setBrandName(objectMapper.convertValue(data.get("brandname"), String.class));
         String brandLogo = objectMapper.convertValue(data.get("brandimgurl"), String.class);
-        if(brandLogo != null && !brandLogo.isEmpty()){
+        boolean isBrandLogo = oldVipGroup == null || oldVipGroup.getBrandLogo() == null || !oldVipGroup.getBrandLogo().equals(brandLogo);
+        if(brandLogo != null && !brandLogo.isEmpty() && isBrandLogo){
           try {
             brandLogo = uploadService.put(brandLogo, "kky");
           } catch (Exception e) {
