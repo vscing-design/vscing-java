@@ -42,7 +42,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -367,8 +366,15 @@ public class DelayMessageReceiver {
       }
       // 标记
       int rowsAffected = 0;
+      Integer status = objectMapper.convertValue(data.get("status"), Integer.class);
+      if (status == 3) {
+        vipOrder.setStatus(2);
+      } else if (status == 4) {
+        vipOrder.setStatus(4);
+      } else if (status == 5) {
+        vipOrder.setStatus(3);
+      }
       vipOrder.setSupplierOrderSn(objectMapper.convertValue(data.get("orderno"), String.class));
-      vipOrder.setStatus(objectMapper.convertValue(data.get("status"), Integer.class));
       vipOrder.setRefundMoney(objectMapper.convertValue(data.get("refundmoney"), BigDecimal.class));
       vipOrder.setRefundStatus(objectMapper.convertValue(data.get("refundstatus"), Integer.class));
       vipOrder.setCardList(objectMapper.convertValue(data.get("cardlist"), List.class).toString());

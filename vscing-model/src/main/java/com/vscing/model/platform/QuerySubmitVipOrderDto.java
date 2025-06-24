@@ -23,11 +23,12 @@ public class QuerySubmitVipOrderDto extends QueryDto {
   @Schema(description = "商户平台订单号")
   private String tradeNo;
 
-  @Schema(description = "异步回调地址")
-  private String notifyUrl;
-
+  @NotNull(message = "充值手机号未传入")
   @Schema(description = "充值手机号(卡密订单无需传递)")
   private String phone;
+
+  @Schema(description = "异步回调地址")
+  private String notifyUrl;
 
   @Schema(description = "最大进货总金额（非商品单价），该验证防止商家亏损。原理：商家进货价格<=此值放行，>此值则拦截")
   private BigDecimal maxMoney;
