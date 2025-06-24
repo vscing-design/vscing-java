@@ -57,7 +57,7 @@ public class VipOrderServiceImpl implements VipOrderService {
       int rowsAffected = 0;
       // 根据订单id获取订单
       VipOrder vipOrder = vipOrderMapper.selectById(id);
-      if(vipOrder == null || vipOrder.getMerchantId() == null || vipOrder.getStatus() > 2) {
+      if(vipOrder == null || vipOrder.getMerchantId() == null || vipOrder.getStatus() > 3) {
         throw new ServiceException("订单数据异常");
       }
       // 根据商户id查询商户信息
