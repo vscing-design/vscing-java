@@ -36,7 +36,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/v1/vipGoods")
-@Tag(name = "商品管理接口", description = "商品管理接口")
+@Tag(name = "VIP会员卡商品管理接口", description = "VIP会员卡商品管理接口")
 public class VipGoodsController {
 
   @Autowired

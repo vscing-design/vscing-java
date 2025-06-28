@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/v1/vipSync")
-@Tag(name = "vip会员卡信息同步接口", description = "vip会员卡信息同步接口")
+@Tag(name = "VIP会员卡商品信息同步接口", description = "VIP会员卡商品信息同步接口")
 public class VipSyncController {
 
   @Autowired
