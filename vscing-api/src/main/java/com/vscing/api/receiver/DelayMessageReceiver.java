@@ -381,7 +381,7 @@ public class DelayMessageReceiver {
       vipOrder.setReceipt(objectMapper.convertValue(data.get("receipt"), String.class));
       vipOrder.setRefundReceipt(objectMapper.convertValue(data.get("refundreceipt"), String.class));
       rowsAffected = vipOrderMapper.update(vipOrder);
-      if (rowsAffected <= 0) {
+      if (rowsAffected <= 0 || status == 3) {
         log.info("vip同步商品订单详情数据更新失败");
         // 发送mq异步处理 2分钟后查询退款订单
         rabbitMQService.sendDelayedMessage(DelayRabbitMQConfig.SYNC_VIP_ORDER_ROUTING_KEY, vipOrder.getId().toString(), 2*60*1000);

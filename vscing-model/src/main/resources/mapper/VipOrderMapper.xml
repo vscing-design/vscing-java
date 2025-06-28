@@ -106,10 +106,11 @@
         vo.supplier_order_sn,
         vo.created_at,
         vo.updated_at,
-        m.merchant_name
+        m.merchant_name as merchantName
         FROM <include refid="tableName" /> vo
-        LEFT JOIN <include refid="merchantTableName" /> m ON vo.supplier_id = m.id
+        LEFT JOIN <include refid="merchantTableName" /> m ON vo.merchant_id = m.id
         <include refid="commonWhereClause" />
+        ORDER BY vo.updated_at desc
     </select>
 
     <!-- 根据 ID 查询 -->

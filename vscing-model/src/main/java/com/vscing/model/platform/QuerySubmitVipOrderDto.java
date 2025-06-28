@@ -1,6 +1,7 @@
 package com.vscing.model.platform;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,11 +20,11 @@ public class QuerySubmitVipOrderDto extends QueryDto {
   @Schema(description = "购买数量")
   private Integer buyNum;
 
-  @NotNull(message = "商户平台订单号未传入")
+  @NotBlank(message = "商户平台订单号未传入")
   @Schema(description = "商户平台订单号")
   private String tradeNo;
 
-  @NotNull(message = "充值手机号未传入")
+  @NotBlank(message = "充值手机号未传入")
   @Schema(description = "充值手机号(卡密订单无需传递)")
   private String phone;
 
