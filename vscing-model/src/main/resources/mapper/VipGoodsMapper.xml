@@ -120,10 +120,10 @@
             <if test="priceChange != null and priceChange != 0">
                 <choose>
                     <when test="priceChange == 1">
-                        AND vGoods.goods_price > vGoods.old_goods_price
+                        AND vGoods.goods_price &gt; vGoods.old_goods_price
                     </when>
                     <when test="priceChange == 2">
-                        AND vGoods.old_goods_price > vGoods.goods_price
+                        AND vGoods.goods_price &lt; vGoods.old_goods_price
                     </when>
                     <when test="priceChange == 3">
                         AND vGoods.goods_price = vGoods.old_goods_price
