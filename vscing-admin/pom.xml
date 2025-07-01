@@ -55,6 +55,11 @@
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
         </dependency>
+        <!-- EasyExcel -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.vscing</groupId>
             <artifactId>vscing-model</artifactId>

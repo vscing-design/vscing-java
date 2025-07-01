@@ -1,5 +1,6 @@
 package com.vscing.admin.controller.v1;
 
+import com.alibaba.excel.EasyExcel;
 import com.vscing.admin.po.AdminUserDetails;
 import com.vscing.admin.service.VipGoodsService;
 import com.vscing.common.api.CommonPage;
@@ -11,8 +12,10 @@ import com.vscing.model.request.AdminVipGoodsPricingRequest;
 import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
 import com.vscing.model.vo.AdminVipGroupVo;
+import com.vscing.model.vo.ExcelVipGoodsVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -88,6 +94,29 @@ public class VipGoodsController {
       log.error("请求异常: {}", e.getMessage());
       return CommonResult.failed("设置失败");
     }
+  }
+
+  @GetMapping("/export")
+  @Operation(summary = "导出会员商品")
+  public void exportGoodsToExcel(@ParameterObject AdminVipGoodsDto queryParam, HttpServletResponse response) throws Exception {
+    try {
+      List<ExcelVipGoodsVo> list = vipGoodsService.exportGoodsList(queryParam);
+
+      // 设置 Excel 文件名和表格名
+      String dateStr = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+      String fileName = "商品列表" + dateStr + ".xlsx";
+
+      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+
+      EasyExcel.write(response.getOutputStream(), ExcelVipGoodsVo.class)
+          .autoCloseStream(true)
+          .sheet("商品信息")
+          .doWrite(list);
+    } catch (Exception e) {
+      throw new Exception("导出失败：" + e.getMessage());
+    }
+
   }
 
 }

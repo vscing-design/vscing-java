@@ -185,7 +185,71 @@
             </if>
             AND vGoods.deleted_at IS NULL
         </where>
-        ORDER BY vGoods.group_id DESC
+        ORDER BY vGoods.group_id DESC, vGoods.tp_goods_id DESC
+    </select>
+
+    <!-- 管理端导出列表 -->
+    <select id="exportGoodsList" parameterType="com.vscing.model.dto.AdminVipGoodsDto"
+            resultType="com.vscing.model.vo.ExcelVipGoodsVo">
+        SELECT
+        vGoods.id,
+        vGoods.goods_name,
+        vGoods.stock,
+        vGoods.goods_price,
+        vGoods.old_goods_price,
+        vGoods.market_price,
+        vGoods.goods_status,
+        vGoods.goods_type,
+        vGoods.details
+        FROM <include refid="tableName" /> vGoods
+        LEFT JOIN <include refid="vipGroupTableName" /> vGroup ON vGoods.group_id = vGroup.id
+        <where>
+            <if test="id != null">
+                AND vGoods.id = #{id, jdbcType=BIGINT}
+            </if>
+            <if test="tpGoodsId != null">
+                AND vGoods.tp_goods_id = #{tpGoodsId, jdbcType=BIGINT}
+            </if>
+            <if test="groupId != null">
+                AND vGoods.group_id = #{groupId, jdbcType=BIGINT}
+            </if>
+            <if test="tpGroupId != null">
+                AND vGoods.tp_group_id = #{tpGroupId, jdbcType=BIGINT}
+            </if>
+            <if test="brandId != null">
+                AND vGroup.brand_id = #{brandId, jdbcType=BIGINT}
+            </if>
+            <if test="goodsStatus != null">
+                AND vGoods.goods_status = #{goodsStatus, jdbcType=INTEGER}
+            </if>
+            <if test="goodsType != null">
+                AND vGoods.goods_type = #{goodsType, jdbcType=INTEGER}
+            </if>
+            <if test="priceChange != null and priceChange != 0">
+                <choose>
+                    <when test="priceChange == 1">
+                        AND vGoods.goods_price > vGoods.old_goods_price
+                    </when>
+                    <when test="priceChange == 2">
+                        AND vGoods.old_goods_price > vGoods.goods_price
+                    </when>
+                    <when test="priceChange == 3">
+                        AND vGoods.goods_price = vGoods.old_goods_price
+                    </when>
+                </choose>
+            </if>
+            <if test="goodsName != null">
+                AND vGoods.goods_name LIKE CONCAT('%', #{goodsName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="groupName != null">
+                AND vGroup.group_name LIKE CONCAT('%', #{groupName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="brandName != null">
+                AND vGroup.brand_name LIKE CONCAT('%', #{brandName, jdbcType=VARCHAR}, '%')
+            </if>
+            AND vGoods.deleted_at IS NULL
+        </where>
+        ORDER BY vGoods.group_id DESC, vGoods.tp_goods_id DESC
     </select>
 
     <!-- 商户端查询列表 -->

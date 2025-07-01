@@ -4,9 +4,13 @@ import com.vscing.model.dto.AdminVipGoodsDto;
 import com.vscing.model.dto.AdminVipGoodsPricingDto;
 import com.vscing.model.dto.MerchantGoodsListDto;
 import com.vscing.model.entity.VipGoods;
-import com.vscing.model.platform.*;
+import com.vscing.model.platform.QueryVipGoods;
+import com.vscing.model.platform.QueryVipGoodsDetails;
+import com.vscing.model.platform.QueryVipGoodsDetailsDto;
+import com.vscing.model.platform.QueryVipGoodsDto;
 import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
+import com.vscing.model.vo.ExcelVipGoodsVo;
 import com.vscing.model.vo.MerchantGoodsListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -51,6 +55,11 @@ public interface VipGoodsMapper {
    * 管理端查询列表
    */
   List<AdminVipGoodsVo> getAdminList(AdminVipGoodsDto record);
+
+  /**
+   * 管理端导出列表
+   */
+  List<ExcelVipGoodsVo> exportGoodsList(AdminVipGoodsDto record);
 
   /**
    * 商户端查询列表

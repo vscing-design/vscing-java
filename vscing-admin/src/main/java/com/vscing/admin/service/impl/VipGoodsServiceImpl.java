@@ -16,6 +16,7 @@ import com.vscing.model.request.AdminVipGoodsPricingRequest;
 import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
 import com.vscing.model.vo.AdminVipGroupVo;
+import com.vscing.model.vo.ExcelVipGoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,11 @@ public class VipGoodsServiceImpl implements VipGoodsService {
   public List<AdminVipGroupVo> getGroupList(AdminVipGroupDto record, Integer pageSize, Integer pageNum) {
     PageHelper.startPage(pageNum, pageSize);
     return vipGroupMapper.getAdminList(record);
+  }
+
+  @Override
+  public List<ExcelVipGoodsVo> exportGoodsList(AdminVipGoodsDto record) {
+    return vipGoodsMapper.exportGoodsList(record);
   }
 
   @Override

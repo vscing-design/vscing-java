@@ -7,6 +7,7 @@ import com.vscing.model.request.AdminVipGoodsPricingRequest;
 import com.vscing.model.vo.AdminVipGoodsPricingVo;
 import com.vscing.model.vo.AdminVipGoodsVo;
 import com.vscing.model.vo.AdminVipGroupVo;
+import com.vscing.model.vo.ExcelVipGoodsVo;
 
 import java.util.List;
 
@@ -22,6 +23,11 @@ public interface VipGoodsService {
    * 会员商品分组列表
   */
   List<AdminVipGroupVo> getGroupList(AdminVipGroupDto record, Integer pageSize, Integer pageNum);
+
+  /**
+   * 会员商品导出
+   */
+  List<ExcelVipGoodsVo> exportGoodsList(AdminVipGoodsDto record);
 
   /**
    * 会员商品列表
