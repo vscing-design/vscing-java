@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -107,7 +108,7 @@ public class VipGoodsController {
       String fileName = "商品列表" + dateStr + ".xlsx";
 
       response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+      response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
 
       EasyExcel.write(response.getOutputStream(), ExcelVipGoodsVo.class)
           .autoCloseStream(true)
