@@ -103,6 +103,7 @@
         FROM <include refid="tableName" /> menu
         INNER JOIN <include refid="roleMenuTableName" /> rm ON menu.id = rm.menu_id
         WHERE rm.role_id = #{id, jdbcType=BIGINT}
+        ORDER BY menu.`sort` DESC, menu.`id` ASC
     </select>
 
     <!-- 根据 角色ID 查询关联菜单信息 -->
@@ -114,6 +115,7 @@
         <foreach collection="roleIds" item="roleId" open="(" separator="," close=")">
             #{roleId, jdbcType=BIGINT}
         </foreach>
+        ORDER BY menu.`sort` DESC, menu.`id` ASC
     </select>
 
     <!-- 根据 角色ID 删除关联信息 -->
