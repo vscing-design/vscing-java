@@ -278,7 +278,7 @@
             </if>
             AND vGoods.deleted_at IS NULL
         </where>
-        ORDER BY vGoods.group_id DESC
+        ORDER BY vGoods.group_id DESC, vGoods.tp_goods_id DESC
     </select>
 
     <!-- 查询用户列表 -->
