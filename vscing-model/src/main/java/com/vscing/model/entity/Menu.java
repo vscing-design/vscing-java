@@ -46,4 +46,8 @@ public class Menu extends BaseEntity {
 
   @Schema(description = "状态：1->显示 2->隐藏")
   private Integer status;
+
+  @Schema(description = "排序：越大越在前")
+  private Integer sort;
+
 }

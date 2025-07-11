@@ -13,6 +13,7 @@
         <result column="path" property="path" jdbcType="VARCHAR" />
         <result column="component" property="component" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="sort" property="sort" jdbcType="TINYINT" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <result column="created_by" property="createdBy" jdbcType="BIGINT" />
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -38,6 +39,7 @@
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
         </where>
+        ORDER BY menu.`sort` DESC, menu.`id` ASC
     </select>
 
     <!-- 根据 ID 查询 -->
