@@ -39,7 +39,7 @@
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
         </where>
-        ORDER BY menu.`sort` DESC, menu.`id` ASC
+        ORDER BY `sort` DESC, `id` ASC
     </select>
 
     <!-- 根据 ID 查询 -->
