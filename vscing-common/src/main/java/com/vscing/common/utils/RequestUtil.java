@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 请求工具类
@@ -86,11 +87,14 @@ public class RequestUtil {
      * @return 转换后的字符串
      */
     public static <T> String encryptBodyWithoutSign(T request) {
-        // 将对象转换为Map
-        Map<String, Object> params = BeanUtil.beanToMap(request);
+        // 将对象转换为Map，并过滤掉值为 null 的字段
+        Map<String, Object> params = BeanUtil.beanToMap(request, false, true);
 
-        // 去除sign字段
+        // 移除 sign 字段
         params.remove("sign");
+
+        // 移除值为 null 的键值对（可选，双重保险）
+        params.values().removeIf(Objects::isNull);
 
         // 按字典顺序排序并拼接成字符串
         List<Map.Entry<String, Object>> entries = new ArrayList<>(params.entrySet());
@@ -101,8 +105,9 @@ public class RequestUtil {
             sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
         if (!sb.isEmpty()) {
-            sb.setLength(sb.length() - 1); // 移除最后一个&
+            sb.deleteCharAt(sb.length() - 1); // 移除最后一个 &
         }
+
         return sb.toString();
     }
 
