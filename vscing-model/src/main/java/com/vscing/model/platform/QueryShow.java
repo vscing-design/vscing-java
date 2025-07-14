@@ -13,6 +13,9 @@ public class QueryShow {
   @Schema(description = "影片id")
   private Long movieId;
 
+  @Schema(description = "影片名称")
+  private String movieName;
+
   @Schema(description = "场次ID")
   private Long showId;
 

@@ -455,24 +455,26 @@
     <!-- 开放平台查询列表 -->
     <select id="getPlatformList" resultType="com.vscing.model.platform.QueryShow">
         SELECT
-        id as show_id,
-        movie_id,
-        hall_name,
-        duration,
-        show_time,
-        stop_sell_time,
-        show_version_type,
-        `show_price`,
-        user_price
-        FROM <include refid="tableName" />
+        s.id as show_id,
+        s.movie_id,
+        m.name as movie_name,
+        s.hall_name,
+        s.duration,
+        s.show_time,
+        s.stop_sell_time,
+        s.show_version_type,
+        s.`show_price`,
+        s.user_price
+        FROM <include refid="tableName" /> s
+        LEFT JOIN <include refid="movieTableName" /> m ON s.movie_id = m.id
         <where>
             <if test="cinemaId != null">
-                AND cinema_id = #{cinemaId}
+                AND s.cinema_id = #{cinemaId}
             </if>
             <if test="endTime != null">
-                AND stop_sell_time BETWEEN NOW() AND #{endTime}
+                AND s.stop_sell_time BETWEEN NOW() AND #{endTime}
             </if>
-            AND deleted_at IS NULL
+            AND s.deleted_at IS NULL
         </where>
     </select>
 
