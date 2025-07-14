@@ -23,6 +23,9 @@ public class QueryCinemaShow {
   @Schema(description = "纬度")
   private Double latitude;
 
+  @Schema(description = "场次总数")
+  private long total;
+
   @Schema(description = "场次列表")
   private List<QueryShow> showList;
 

@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.vscing.api.service.NotifyService;
 import com.vscing.api.service.PlatformService;
 import com.vscing.common.api.ResultCode;
@@ -138,7 +139,7 @@ public class PlatformServiceImpl implements PlatformService {
     // 获取当前时间戳
     long currentTimeMillis = System.currentTimeMillis();
     // 假设允许的时间差为1分钟（60000毫秒）
-    long allowedTimeDifference = 60000;
+    long allowedTimeDifference = 3 * 60 * 1000;
     // 比较时间戳
     if (Math.abs(currentTimeMillis - record.getTimestamp()) > allowedTimeDifference) {
       return false;
@@ -220,6 +221,10 @@ public class PlatformServiceImpl implements PlatformService {
     PageHelper.startPage(record.getPageNum(), record.getPageSize());
     // 获取影院场次列表
     List<QueryShow> showList = showMapper.getPlatformList(record);
+    // 获取总数
+    PageInfo<QueryShow> pageInfo = new PageInfo<>(showList);
+    long total = pageInfo.getTotal();
+    cinemaShow.setTotal(total);
     // 获取影院场次id集合
     List<Long> showIds = showList.stream().map(QueryShow::getShowId).toList();
     if(!showIds.isEmpty()) {
